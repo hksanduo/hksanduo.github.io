@@ -1,37 +1,6 @@
-## Welcome to GitHub Pages
+## Welcome to hksanduo'blog
 
-You can use the [editor on GitHub](https://github.com/hksanduo/hksanduo.github.io/edit/master/README.md) to maintain and preview the content for your website in Markdown files.
+随着年龄增加，个人的记忆力直线下降，对于许多学习内容和研究只能使用博客来记录下来，以供以后的查询和学习。如果博客有什么不合适的地方，请及时指正。
 
-Whenever you commit to this repository, GitHub Pages will run [Jekyll](https://jekyllrb.com/) to rebuild the pages in your site, from the content in your Markdown files.
-
-### Markdown
-
-Markdown is a lightweight and easy-to-use syntax for styling your writing. It includes conventions for
-
-```markdown
-Syntax highlighted code block
-
-# Header 1
-## Header 2
-### Header 3
-
-- Bulleted
-- List
-
-1. Numbered
-2. List
-
-**Bold** and _Italic_ and `Code` text
-
-[Link](url) and ![Image](src)
-```
-
-For more details see [GitHub Flavored Markdown](https://guides.github.com/features/mastering-markdown/).
-
-### Jekyll Themes
-
-Your Pages site will use the layout and styles from the Jekyll theme you have selected in your [repository settings](https://github.com/hksanduo/hksanduo.github.io/settings). The name of this theme is saved in the Jekyll `_config.yml` configuration file.
-
-### Support or Contact
-
-Having trouble with Pages? Check out our [documentation](https://help.github.com/categories/github-pages-basics/) or [contact support](https://github.com/contact) and we’ll help you sort it out.
+### About me
+hksanduo,信息安全研究员，主要研究方向为：wireless、web
