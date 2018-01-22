@@ -1,9 +1,9 @@
 ---
 title: "KaliLinux 安装Nvidia闭源驱动"
 date:   2018-01-9 22:05:41 +0800
-layout: page
+layout: post
 tag: 
-- Linux
+- Kali
 categories:
 - Kali
 - Linux
