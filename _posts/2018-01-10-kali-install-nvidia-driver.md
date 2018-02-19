@@ -49,6 +49,10 @@ apt-get install nvidia-kernel-dkms nvidia-cuda-toolkit nvidia-driver
 ```
 apt install bumblebee-nvidia primus
 ```
+开机自启动bumblebee服务
+```
+#systemctl enable bumblebeed
+```
 添加当前用户到bumblebee组
 ```
 adduser root bumblebee
@@ -58,7 +62,7 @@ adduser root bumblebee
 vim /etc/bumblebee/bumblebee.conf 
 ```
 >KeepUnusedXServer=true
-Driver=nvidia
+>Driver=nvidia
 
 接下来修改 vim /etc/bumblebee/xorg.conf.nvidia
 下面这条指令可以获取显卡的总线的ID
