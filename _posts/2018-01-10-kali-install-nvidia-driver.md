@@ -60,10 +60,11 @@ adduser root bumblebee
 改变以下 bumblebee.conf 设置:
 ```
 vim /etc/bumblebee/bumblebee.conf 
-
-> KeepUnusedXServer=true
-> Driver=nvidia
-
+```
+```
+KeepUnusedXServer=true
+Driver=nvidia
+```
 接下来修改 vim /etc/bumblebee/xorg.conf.nvidia
 下面这条指令可以获取显卡的总线的ID
 ```
