@@ -16,17 +16,17 @@ grub命令
 ## 一、菜单命令
 
 菜单命令只能用于grub配置文件的全局配置部分，不能用在grub命令行交互界面，菜单命令在配置文件中应放在其它命令之前。
-           
+```           
 1.default //设置默认启动的菜单项
 2.fallback //设置启动某菜单项失败后反回的菜单项
 3.hiddenmenu //隐藏菜单界面
 4.timeout //设置菜单自动启动的延时时间
 5.title //开始一个菜单项
-
+```
 ## 二、常规命令
 
 常规命令可以应该于配置文件和grub命令行交互界面，可使用的常规命令有
-
+```
 1.bootp //通过bootp初始化网络设备
 2.color //设置菜单界面的颜色
 3.device //指定设备文件作为驱动器
@@ -44,11 +44,11 @@ grub命令
 15.termainal //选择终端类型
 16.tftpserver //指定TFTP服务器
 17.unhide //还原某隐藏分区
-
+```
 ## 三、命令行和菜单项命令
 
 命令行和菜单项命令可应该于GRUB配置文件的菜单项设置中，也可以用在GRUB命令交互界面。
-
+```
 1.bolcklist //显示某文件所在分区位置（block list notation）
 2.boot //启动操作系统
 3.cat //显示文件内容
@@ -86,4 +86,5 @@ grub命令
 35.testload //从文件系统中测试读取某文件
 36.testvbe //测试VESA BIOS EXTENSION
 37.uppermem //强制设置主机上位内存的大小
-38.vbeprobe //查询VESA BIOS EXTENSION信息 </p>
+38.vbeprobe //查询VESA BIOS EXTENSION信息 
+```
