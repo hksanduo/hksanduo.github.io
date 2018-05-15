@@ -535,8 +535,7 @@ LABEL=/boot             /boot                   ext3    defaults        1 2
 
 如果发现不对，可以重新来过；没有什么大不了的；
 
-
-### 5） kernel 指令，用来指定Linux的内核，及/所在的分区；
+### 5） kernel 指令，用来指定Linux的内核，及所在的分区；
 
 kernel 这个指令可能初学者有点怕，不知道内核在哪个分区，及内核文件名的全称是什么。不要忘记tab键的命令补齐的应用；
 
@@ -699,7 +698,6 @@ grub>boot
 ```
 
 # 六、通过GRUB引导Windows操作系统；
-
 
 ## 1、通过编辑 menu.lst 来引导Windows 系统；
 
