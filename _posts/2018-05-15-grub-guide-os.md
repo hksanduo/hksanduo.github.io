@@ -256,7 +256,7 @@ default=0 是默认启动哪个系统，从0开始；每个操作系统的启动
 timeout=5
 
 注：表示在开机后，GRUB画面出现几秒后开始以默认启动；如果在启动时，移动上下键，则解除这一规则；
-#splashimage=(hd0,6)/boot/grub/splash.xpm.gz 注：GRUB的背景画面，这个是可选项；我不喜欢GRUB的背景画面，所以加#号注掉，也可以删除；
+    #splashimage=(hd0,6)/boot/grub/splash.xpm.gz 注：GRUB的背景画面，这个是可选项；我不喜欢GRUB的背景画面，所以加#号注掉，也可以删除；
 hiddenmenu
 
 注解：隐藏GRUB的启动菜单，这项也是可选的，也可以用#号注掉；
