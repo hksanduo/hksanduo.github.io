@@ -134,19 +134,18 @@ Password:
 [root@localhost ~]#/sbin/grub  注：用绝对路径来运行grub命令；
 ```
 
-三、在Linux中，GRUB的配置中的安装和写入硬盘的MBR；
+# 三、在Linux中，GRUB的配置中的安装和写入硬盘的MBR；
 
 
-1、在Linux中，GRUB配置过程中的安装grub-install；
+## 1、在Linux中，GRUB配置过程中的安装grub-install；
 
 grub-install 命令有何用呢？其实就是把我们前面已经安装的软件包中的一些文件复制到 /boot/grub中；对于新安装GRUB软件包后，也是一个必经的过程；我们前面所说的GRUB软件包的安装；而现在我们说的是GRUB配置的过程中的安装；虽然在洋文中都是install ，但表达的意思是不一样的；
 
 我们首先要运行 fdisk -l 来确认到底是硬盘的标识；
 
 这个过程主要是确认硬盘的标识是哪个调备，到底是/dev/hda还是/dev/hdb 还是其它的；
-
-	[root@localhost ~]# fdisk -l
 ```
+[root@localhost ~]# fdisk -l
 Disk /dev/hda: 80.0 GB, 80026361856 bytes
 255 heads, 63 sectors/track, 9729 cylinders
 Units = cylinders of 16065 * 512 = 8225280 bytes
