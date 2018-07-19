@@ -10,7 +10,9 @@ categories:
 信息安全新人阅读书籍
 ------
 我们在学习信安的途中会阅读很多书籍，其中书籍的质量层次不齐，前几天看泉哥（riusksk）的博客，看到他写了一个信息安全从业者书单推荐，下面是github链接[https://github.com/riusksk/secbook]()
+
 ![](/images/Security-worker-books-lists-by-riusksk.jpg)
+
 以下书籍列表是基于泉哥推荐书籍列表汇总的，不定期进行更新
 # 计算机及系统原理
 · 《编码：隐匿在计算机软硬件背后的语言》 【美】Charles Petzold
