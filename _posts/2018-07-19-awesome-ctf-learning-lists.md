@@ -55,5 +55,22 @@ CTF 竞赛涉及众多领域，内容繁杂。目前，安全技术发展地越�
 
 - [vulnhub](https://www.vulnhub.com/)
 
+# 离线学习平台
+
+- [vulnhub docker](https://vulhub.org/)
+- [vulapps](http://vulapps.evalbug.com/)
+- [official Kali Linux](https://hub.docker.com/r/kalilinux/kali-linux-docker/)
+- [official OWASP ZAP](https://github.com/zaproxy/zaproxy)
+- [official WPScan](https://hub.docker.com/r/wpscanteam/wpscan/)
+- [Damn Vulnerable Web Application (DVWA)](https://hub.docker.com/r/citizenstig/dvwa/)
+- [Vulnerable WordPress Installation](https://hub.docker.com/r/wpscanteam/vulnerablewordpress/)
+- [Security Ninjas](https://hub.docker.com/r/opendns/security-ninjas/)
+- [Docker Bench for Security](https://hub.docker.com/r/diogomonica/docker-bench-security/)
+- [OWASP Security Shepherd](https://hub.docker.com/r/ismisepaul/securityshepherd/)
+- [OWASP WebGoat Project docker image](https://hub.docker.com/r/danmx/docker-owasp-webgoat/)
+- [OWASP Mutillidae II Web Pen-Test Practice Application](https://hub.docker.com/r/citizenstig/nowasp/)
+
+离线平台docker资源链接参考[awesome-web-hacking](https://github.com/infoslack/awesome-web-hacking)
+
 ------
 附：有什么问题请及时联系本人，本人CTF新人，多谢关照。
