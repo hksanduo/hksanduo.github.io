@@ -13,6 +13,7 @@ Ubertooth安装教程
 ------
 # 前言
 本教程安装环境为ubuntu 19.04
+
 # 准备
 在构建libbtbb和Ubertooth工具之前，需要预先安装一下编译环境，其中许多都可以从您的操作系统的安装源中中获得，例如：
 ## Debian/Ubuntu
