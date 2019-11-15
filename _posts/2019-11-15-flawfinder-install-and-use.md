@@ -10,7 +10,6 @@ categories:
 
 Flawfinder开源C/C++静态扫描分析工具安装与使用
 ------
-
 ## flawfinder的介绍
 Flawfinder是一款开源的关于C/C++静态扫描分析工具，其根据内部字典数据库进行静态搜索，匹配简单的缺陷与漏洞，flawfinder工具不需要编译C/C++代码，可以直接进行扫描分析。简单快速，最大的有点就是免费，不需要编译。flawfinder工具可以在官网进行下载。
 [https://dwheeler.com/flawfinder/#downloading](https://dwheeler.com/flawfinder/#downloading)
@@ -40,7 +39,7 @@ flawfinder --csv > result.csv 指定扫描目录
 ![flawfinder-csv.png](https://hksanduo.github.io/images/flawfinder-csv.png)
 
 ## flawfinder分析
-Flawfinder 不是类似于fortify那样复杂的工具。它是一个有意义的简单工具，但它很有用。  Flawfinder通过使用内置的C / C ++函数数据库来工作，该数据库具有众所周知的问题，例如缓冲区溢出风险（例如strcpy（），strcat（），gets（），sprintf（）和scanf（）系列） ），格式字符串问题（printf（）， snprintf（）和syslog（）），竞争条件（例如access（），chown（），chgrp（），chmod（）， tmpfile（），tmpnam（），tempnam（）和mktemp（）），潜在的外壳元字符危险（大多数exec（）系列，system（），popen（））和较差的随机数获取（例如random（ ））。
+Flawfinder 不是类似于fortify那样复杂的工具。它是一个有意义的简单工具，但它很有用。  Flawfinder通过使用内置的C / C ++函数数据库来工作，该数据库具有众所周知的问题，例如缓冲区溢出风险（例如strcpy()，strcat()，gets()，sprintf()和scanf()系列），格式字符串问题（printf()， snprintf()和syslog()），竞争条件（例如access()，chown()，chgrp()，chmod()， tmpfile()，tmpnam()，tempnam()和mktemp()），潜在的外壳元字符危险（大多数exec()系列，system()，popen()）和较差的随机数获取（例如random()）。
 Flawfinder的好处是不必创建此数据库，该工具附带了该数据库。Flawfinder获取源代码文本，并将源代码文本与这些名称匹配，同时忽略注释和字符串中的文本。
 Flawfinder还了解gettext（国际化程序的公共库），并且会将通过gettext传递的常量字符串当作常量字符串对待。这减少了国际化程序中的错误命中次数。
 Flawfinder生成按风险分类的“命中”（潜在安全漏洞）列表；默认情况下，最危险的匹配项将首先显示。此风险级别不仅取决于功能，还取决于功能的参数值。例如，在许多情况下，常量字符串通常比完全可变字符串的风险要小。在某些情况下，代码审计人员可能能够确定该构造物完全没有风险，从而减少了误报。与仅在源代码上运行“ grep”相比，Flawfinder提供了更好的信息和更好的优先级。毕竟，它知道忽略注释和字符串内部，并且还将检查参数以估计风险水平。但是，从根本上来说，flawfinder是一个简单的程序。它甚至不知道函数参数的数据类型，并且当然也不进行控制流或数据流分析。由于Flawfinder很简单，因此不会被宏定义和更复杂的工具遇到的其他奇怪问题所混淆。Flawfinder可以分析您无法构建的软件；在某些情况下，它可以分析甚至无法在本地编译的文件。并非每个命中实际上都是一个安全漏洞，也不一定找到每个安全漏洞。如上所述，flawfinder根本不真正理解代码的语义，它主要完成简单的文本模式匹配（忽略注释和字符串）。同样，它根本不执行数据流或控制流分析。
