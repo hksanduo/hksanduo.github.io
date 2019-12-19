@@ -13,6 +13,8 @@ categories:
 ## 背景
 老哥突然私聊我，他负责的服务器CPU飙高，发现可疑进程，疑似挖矿。
 ![20191219-trojan-01.png](https://hksanduo.github.io/images/20191219-trojan-01.png)
+
+## 分析
 为了防止事态进一步扩大，我让老哥先把这个进程kill掉，然后进行排查，可是没过多久，挖矿进程死灰复燃了，这次挖矿的名称变成了BP70vI
 ![20191219-trojan-02.png](https://hksanduo.github.io/images/20191219-trojan-02.png)
 我想事情可能没那么简单，可能设置了定时任务或者有其他远控尚未发现。通过排查定时任务使用`crontab -l`，发现有一条定时任务，仔细一看原来是阿里云的shell脚本，但是整个系统就配置了这一条定时任务，难免让人怀疑。
@@ -119,6 +121,7 @@ int检测结果：
 通过分析`ps -ef`的结果，获取异常异常进程信息
 ![20191219-trojan-11.png](https://hksanduo.github.io/images/20191219-trojan-11.png)
 综合所有信息，我们发现jKhnvF是挖矿进程，OYK6yV是木马远控的进程。
+
 ## 移除挖矿木马
 分析完挖矿木马基本信息，接下来我们需要移除这些恶意的进程，并针对相关漏洞进行打补丁。
 我们首先移除了crotab中设定的定时任务
@@ -129,8 +132,11 @@ int检测结果：
 ![20191219-trojan-14.png](https://hksanduo.github.io/images/20191219-trojan-14.png)
 我们通过移除两个定时任务，然后重复上面的操作，找到挖矿端和木马远控客户端，杀掉就行
 ![20191219-trojan-15.png](https://hksanduo.github.io/images/20191219-trojan-15.png)
+清除`/root/.aliyun.sh`和`/opt/aliyun.sh`
 看着运行正常的系统，内心还是很满足的。
 ![20191219-trojan-16.png](https://hksanduo.github.io/images/20191219-trojan-16.png)
+
+## 后续
 后续溯源工作由于系统是研发同事的测试系统，上面运行三个web站点，并且安装redis，memcache等，并且未设置日志，所以并未发现攻击者是从什么地方进来的。针对这些问题我们给出以下建议:
 1、配置redis的日志，对redis进行安全加固和合规性配置
 2、使用河马webshell查杀工具对web目录进行扫描，查看是否有遗留的webshell
