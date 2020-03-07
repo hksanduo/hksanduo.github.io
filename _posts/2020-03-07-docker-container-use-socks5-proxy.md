@@ -1,5 +1,5 @@
 ---
-title: "docker 容器使用socks5代理"
+title: "docker容器使用socks5做全局代理"
 date:   2020-03-07  15:13:00 +0800
 layout: post
 tag:
@@ -9,7 +9,7 @@ categories:
 - Linux
 ---
 
-docker 容器使用socks5代理
+docker容器使用socks5做全局代理
 
 -------
 ## 背景
