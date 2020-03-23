@@ -17,7 +17,7 @@ Linux下激活navicat15
 
 Navicat这个工具很强大,方便IT人员日常对数据库进行管理，但是由于自己太穷，所以买不起正版授权，从网上看到有大佬放出patch，根据大佬提供的wiki和patch源码，在自己的本机成功激活Navicat15,这里只是在记录自己激活的步骤，有条件还是去买个永久版吧。
 
-##　激活
+## 激活
 ### 下载navicat。
 从[官方网站](https://www.navicat.com/en/download/navicat-premium)下载navicat,你会得到一个AppImage文件。例如 navicat15-premium-en.AppImage。
 我假定这个AppImage文件在 ~/Desktop 文件夹下。
@@ -328,7 +328,7 @@ $ rm ~/Desktop/navicat15-premium-en.AppImage
 $ rm -rf ~/Desktop/navicat15-premium-en-patched
 $ mv ~/Desktop/navicat15-premium-en-patched.AppImage ~/Desktop/navicat15-premium-en.AppImage
 ```
-### 后续使用
+## 后续使用
 你可以将激活的navicat15放置于/opt目录下或者/usr/local/share目录下，设置一个软连接，方便在终端及命令行调用，我的navicat15-premium-en.AppImage放置的目录为：/usr/local/share/,使用以下命令建立软连接
 ```
 sudo chmod +x /usr/local/share/navicat15-premium-en.AppImage
