@@ -338,5 +338,5 @@ sudo ln -sf /usr/local/share/navicat15-premium-en.AppImage /usr/local/bin/navica
 
 ## 参考内容
 - [https://gitee.com/yangzhuoming/navicat-keygen](https://gitee.com/yangzhuoming/navicat-keygen)
-- (https://github.com/DoubleLabyrinth/navicat-keygen.git)[https://github.com/DoubleLabyrinth/navicat-keygen.git]
+- [https://github.com/DoubleLabyrinth/navicat-keygen.git](https://github.com/DoubleLabyrinth/navicat-keygen.git)
 - [https://github.com/AppImage/AppImageKit/](https://github.com/AppImage/AppImageKit/)
