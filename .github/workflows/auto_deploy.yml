@@ -3,7 +3,7 @@ name: Deploy                      # Actions 显示的名字，随意设置
 on: 
     push:
         branches:                        # 监听到 push 事件后触发
-            - master
+            - src
         paths-ignore:                 # 下列文件的变更不触发部署
             - README.md
             - LICENSE
@@ -16,7 +16,7 @@ jobs:
     - name: Checkout              # 拉取当前执行 Actions 仓库的指定分支
       uses: actions/checkout@v2
       with:
-        ref: master
+        ref: src
 
 
     - name: Setup Node            # 安装 Node 环境
