@@ -102,4 +102,4 @@ theme: fluid
 deploy:
   type: git
   repo: git@github.com:hksanduo/hksanduo.github.io.git
-  branch: gh-pages
+  branch: master
