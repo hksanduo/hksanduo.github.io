@@ -101,5 +101,5 @@ theme: fluid
 ## Docs: https://hexo.io/docs/deployment.html
 deploy:
   type: git
-  repo: https://github.com/hksanduo/hksanduo.github.io/
+  repo: https://github.com/hksanduo/hksanduo.github.io.git
   branch: gh-pages
