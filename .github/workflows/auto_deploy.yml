@@ -1,7 +1,12 @@
 name: Deploy                      # Actions 显示的名字，随意设置
 
-on: [push]                        # 监听到 push 事件后触发
-
+on: 
+    push:
+        branches:                        # 监听到 push 事件后触发
+            - master
+    paths-ignore:                 # 下列文件的变更不触发部署
+            - README.md
+            - LICENSE
 jobs:
   build:
 
