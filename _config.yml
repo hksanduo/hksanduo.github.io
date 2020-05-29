@@ -103,4 +103,3 @@ deploy:
   type: git
   repo: https://github.com/hksanduo/hksanduo.github.io/
   branch: gh-pages
-  repo:   
