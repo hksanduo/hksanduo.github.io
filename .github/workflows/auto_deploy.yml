@@ -28,7 +28,6 @@ jobs:
       run: |
         rm -f .yarnclean
         yarn --frozen-lockfile --ignore-engines --ignore-optional --non-interactive --silent --ignore-scripts --production=false
-        rm -rf ./public
         yarn run hexo clean
         yarn run hexo generate
 
