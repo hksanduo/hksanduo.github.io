@@ -14,21 +14,21 @@ docker容器使用socks5做全局代理
 -------
 ## 背景
 博主自行构建ubuntu容器来编译openwrt，部分组件构建需要获取墙外资源，博主使用的代理工具，支持的协议
-为socks5，但是容器中部分工具如：**wget** 只支持http代理，所以在容器中需要配置socks5转http全局代理。  
+为socks5，但是容器中部分工具如：**wget** 只支持http代理，所以在容器中需要配置socks5转http全局代理。
 
 ## 宿主机代理配置
 需要修改宿主机代理客户端配置，方便局域网其他主机连接代理，容器使用的网络类型为桥接。之前也使用过host网
-络，但是在容器中测试并未成功。为了能迅速编译openwrt，只能使用默认桥接网络进行代理。     
+络，但是在容器中测试并未成功。为了能迅速编译openwrt，只能使用默认桥接网络进行代理。
 
 首先配置客户端，允许局域网中其他主机进行连接，我这里直接配置成“0.0.0.0”，虽说这个不安全，但是在局域网中
 风险暂时可以接受。这里需要注意，需要使用firewalld或者iptables启用本地代理端口。firewalld配置指令如下：
 ```
 firewall-cmd --permanent --add-port=6666/tcp
-```    
+```
 
 个人本地代理服务器配置如下：
-![20200307-proxy-client.png](https://hksanduo.github.io/images/20200307-proxy-client.png)    
-宿主机本地的代理端口为：6666，未设置验证用户名和密码    
+![20200307-proxy-client.png](/images/20200307-proxy-client.png)
+宿主机本地的代理端口为：6666，未设置验证用户名和密码
 可以使用局域网中其他主机测试一下，宿主机本地代理服务器是否配置成功，测试过程这里就不在赘述了。
 
 ## 容器构建配置
@@ -65,7 +65,7 @@ proxyPort = 8183
 proxyAddress = "0.0.0.0"
 allowedClients = 127.0.0.1
 ```
-宿主机的ip为192.168.3.200，宿主机代理服务器启用的端口为：6666，polipo全局代理的端口为8183   
+宿主机的ip为192.168.3.200，宿主机代理服务器启用的端口为：6666，polipo全局代理的端口为8183
 使用以下指令进行构建
 ```
 docker build -t openwrt-build-env .
@@ -75,16 +75,16 @@ docker build -t openwrt-build-env .
 执行以下指令映射本地目录到容器中去
 ```
 docker run -itd --name openwrt-build-env -v ～/openwrt/openwrt:/home/user/openwrt openwrt-build-env
-```     
+```
 使用以下指令进入容器
 ```
 docker exec -it openwrt-build-env /bin/bash
 ```
-使用以下指令测试代理是否成功      
+使用以下指令测试代理是否成功
 ```
 curl cip.cc
 ```
-![20200307-proxy-test.png](https://hksanduo.github.io/images/20200307-proxy-test.png)
+![20200307-proxy-test.png](/images/20200307-proxy-test.png)
 显示得ip位于国外，代理成功，可以开心编译openwrt了。
 
 ## 参考内容

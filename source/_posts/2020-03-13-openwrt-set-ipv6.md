@@ -74,7 +74,7 @@ sudo systemctl restart dhcpcd
 sudo systemctl restart NetworkManager
 ```
 每个发行版本重启网络的方式不一样，请根据实际情况刷新网络
-![20200313-ip-addr.png](https://hksanduo.github.io/images/20200313-ip-addr.png)
+![20200313-ip-addr.png](/images/20200313-ip-addr.png)
 
 ## 体验
 体验较好，可以访问ipv6站点。
