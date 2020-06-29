@@ -1,5 +1,5 @@
 ---
-title: "windows install and config nodejs"
+title: "windows安装配置nodejs"
 date:   2020-06-28  14:10:00 +0800
 layout: post
 tag:
