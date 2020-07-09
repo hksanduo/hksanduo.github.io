@@ -348,7 +348,7 @@ about:  # 关于页需要手动创建，具体请见：https://hexo.fluid-dev.co
   icons: # 更多图标可从 https://hexo.fluid-dev.com/docs/icon/ 查找，class 代表图标的 css class
     - { class: 'iconfont icon-github-fill', link: 'https://github.com/hksanduo/' }
       #    - { class: 'iconfont icon-douban-fill', link: '' }
-    - { class: 'iconfont icon-wechat-fill', qrcode: '/img/wechat.jpg' }  # 添加 qrcode 后，点击不再跳转，而是悬浮二维码，需要指定 image
+    - { class: 'iconfont icon-wechat-fill', qrcode: '/images/wechat.jpg' }  # 添加 qrcode 后，点击不再跳转，而是悬浮二维码，需要指定 image
 
 
 #---------------------------
