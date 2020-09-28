@@ -3,7 +3,7 @@ title: "使用mondo备份恢复Linux操作系统"
 date:   2020-09-20  09:30:00 +0800
 layout: post
 tag:
-- backup
+- Backup
 categories:
 - OS
 - Linux

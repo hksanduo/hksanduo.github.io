@@ -3,7 +3,7 @@ title: "导入centos7虚拟机出现dracut-initqueue timeout"
 date:   2020-09-10  10:37:00 +0800
 layout: post
 tag:
-- 虚拟机
+- VM
 categories:
 - Linux
 ---
