@@ -86,5 +86,4 @@ yum install -y mondo --nogpgcheck
 ![20200920-28](/images/20200920-28.png)
 
 ## 参考
-- []()【】
-
+- [https://www.howtoing.com/how-to-clone-linux-systems](https://www.howtoing.com/how-to-clone-linux-systems)【如何克隆/备份Linux系统使用 - Mondo Rescue灾难恢复工具】
