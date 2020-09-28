@@ -3,10 +3,10 @@ title: "grub多系统引导"
 date:   2018-05-15 12:00 +0800
 layout: post
 tag: 
-- grub
+- Grub
 categories:
-- linux
-- os
+- Linux
+- OS
 ---
 
 grub多系统引导

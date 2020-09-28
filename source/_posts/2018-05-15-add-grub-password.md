@@ -6,7 +6,7 @@ tag:
 - grub
 categories:
 - Linux
-- os
+- OS
 ---
 
 如何为GRUB系统引导管理器加上密码

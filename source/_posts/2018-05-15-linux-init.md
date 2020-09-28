@@ -3,7 +3,7 @@ title: "init进程"
 date:   2018-05-15 12:00 +0800
 layout: post
 tag: 
-- kernel
+- Kernel
 categories:
 - Linux
 ---

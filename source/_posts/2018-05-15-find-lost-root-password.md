@@ -6,7 +6,7 @@ tag:
 - grub
 categories:
 - Linux
-- os
+- OS
 ---
 
 Linux root密码丢失的解决办法

@@ -5,8 +5,8 @@ layout: post
 tag: 
 - grub
 categories:
-- linux
-- os
+- Linux
+- OS
 ---
 
 grub命令

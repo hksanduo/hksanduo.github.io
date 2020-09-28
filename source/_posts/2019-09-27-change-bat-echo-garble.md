@@ -4,7 +4,7 @@ date:   2019-09-27  11:00:00 +0800
 layout: post
 tag:
 - Note
-- bat
+- Bat
 categories:
 - Windows
 ---

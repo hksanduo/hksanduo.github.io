@@ -3,7 +3,7 @@ title: "grub vs grub2 bootloader"
 date:   2019-11-12  23:00:00 +0800
 layout: post
 tag:
-- grub
+- Grub
 categories:
 - Linux
 - Security

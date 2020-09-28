@@ -3,10 +3,10 @@ title: "解决Python3 控制台输出InsecureRequestWarning的问题"
 date:   2018-05-28 12:00 +0800
 layout: post
 tag: 
-- urllib3
+- Python
 categories:
-- python
-- web
+- Python
+- Web
 ---
 
 # google hacking web常用语法收集

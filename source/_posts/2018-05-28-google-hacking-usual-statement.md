@@ -3,11 +3,11 @@ title: "google hacking web常用语法收集"
 date:   2018-05-28 12:00 +0800
 layout: post
 tag: 
-- google
+- Google
 categories:
-- security
-- php
-- web
+- Security
+- Php
+- Web
 ---
 
 # google hacking web常用语法收集

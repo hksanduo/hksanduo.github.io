@@ -3,9 +3,9 @@ title: "不同企业规模信息安全关注方向"
 date:   2018-04-28 12:00 +0800
 layout: post
 tag: 
-- security
+- Security
 categories:
-- security
+- Security
 ---
 
 # 不同企业规模信息安全关注方向

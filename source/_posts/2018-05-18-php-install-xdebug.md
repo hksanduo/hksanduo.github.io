@@ -3,10 +3,10 @@ title: "ubuntu 安装php7.0 xdebug"
 date:   2018-05-18 12:00 +0800
 layout: post
 tag: 
-- php
+- Php
 categories:
-- code
-- php
+- Code
+- Php
 ---
 
 # ubuntu 安装php xdebug
