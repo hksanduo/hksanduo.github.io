@@ -14,7 +14,7 @@ dwr框架代码审计
 -------
 
 ## 简述
-在做测试的过程中发现一个老系统提交的请求包比较奇怪，通过检索，发现是早期java web研发人员常用的DWR框架，dwr框架比较古老，帮助你实现Ajax网站。它可以让你在浏览器中的Javascript代码调用Web服务器上的Java，就像在Java代码就在浏览器中一样。</br>
+在做测试的过程中发现一个老系统提交的请求包比较奇怪，通过检索，发现是早期java web研发人员常用的DWR框架，dwr框架比较古老，可以帮助用户实现Ajax网站，可以让你在浏览器中的Javascript代码调用Web服务器上的Java，就像在Java代码就在浏览器中一样。</br>
 ![20210301-01](/images/20210301-01.png)
 
 DWR 主要包括两部分：
@@ -59,7 +59,7 @@ dwr配置如下：
   </allow>
 </dwr>
 ```
-dwr.xml 是 dwr 的核心配置文件，主要的标签有：<converter>、<convert>、<create>这三个标签。<create> 标签是 dwr 中重要的标签，用来描述 java（服务器端） 与 javascript （客户端）的交互方式。其基本格式如下：
+dwr.xml 是 dwr 的核心配置文件，主要的标签有：\<converter\>、\<convert\>、\<create\>这三个标签。\<create\> 标签是 dwr 中重要的标签，用来描述 java（服务器端） 与 javascript （客户端）的交互方式。其基本格式如下：
 ```
 <allow>
   <create creator="..." javascript="..." scope="...">
@@ -98,7 +98,7 @@ DWR框架对于审计人员比较友好，通过分析web.xml和dwr配置文件�
 ![20210301-02](/images/20210301-02.png)
 获取dwr配置文件目录
 ![20210301-03](/images/20210301-03.png)
-这里查找scritName为：CaUsermanAjax，方法名为：getTysfyhbList的具体实现的代码。
+这里查找scriptName为：CaUsermanAjax，方法名为：getTysfyhbList的具体实现的代码。
 本次审计的dwr框架配置文件使用spring模式，使用spring框架访问bean,并且使用dwr-signatures的配置模式，signatures段使DWR能确定集合中存放的数据类型。
 signatures段允许我们暗示DWR应该用什么类型去处理。格式对以了解JDK5的泛型的人来说很容易理解。
 
