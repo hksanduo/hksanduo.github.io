@@ -51,7 +51,7 @@ docker run --name sonarqube -d -p 9000:9000 -e SONARQUBE_JDBC_USERNAME=sonar -e 
 查看sonar和postgres实例进程是否正常
 
 ## 访问
-在宿主机上直接访问http://localhost:9000,账户和密码均为admin.如果需要开放宿主机端口供其他主机访问,请使用iptables或者firewall-cmd自行增加防火墙规则,这里就不在赘述了.
+在宿主机上直接访问  http://localhost:9000, 账户和密码均为admin.如果需要开放宿主机端口供其他主机访问,请使用iptables或者firewall-cmd自行增加防火墙规则,这里就不在赘述了.
 ![sonarqube-login.png](/images/20200207-sonar-login.png)
 
 ## 遇到的坑
