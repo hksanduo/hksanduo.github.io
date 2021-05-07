@@ -33,6 +33,13 @@ docker run --name sonar-postgres -e POSTGRES_USER=sonar -e POSTGRES_PASSWORD=son
 ```
 
 ### 创建一个Sonar Qube Docker容器
+配置系统：
+```
+sysctl -w vm.max_map_count=262144
+sysctl -w fs.file-max=65536
+ulimit -n 65536
+ulimit -u 4096
+```
 这里我们使用使用宿主机的IP加上容器暴露出的端口号来通信,我的宿主机ip为192.168.3.200
 以下命令的作用主要是通过JDBC连接PostgreSQL数据库创建并运行SonarQube实例。将主机端口9000绑定到mynet容器网络内部的容器端口9000。
 ```
@@ -79,6 +86,17 @@ bootstrap checks failed主要原因是elasticsearch启动失败,elasticsearch需
 ```
 sysctl -w vm.max_map_count=262144
 ```
+
+### 3.防火墙
+docker会在firewalld的规则列表中增加一个docker的域（zone），并且docker0网卡默认是关联到这个docker域下面的，部分系统如果安装docker,默认启用的域会被修改成docker,如果需要开放端口，方便其他人远程访问，需要使用指定域为docker。可参考以下指令：
+
+```
+firewall-cmd --add-port=9000/tcp --permanent --zone=docker
+firewall-cmd --reload
+```
+需要注意：在启动sonarqube服务器过程中，如果未设置数据库，sonarqube的web服务会正常启动，如果配置了数据库，但是由于种种原因，数据库无法被访问到，sonarqube的web服务是失效的，在调试防火墙的过程中先确定当前sonarqube是否成功运行，可以使用指令 ```docker logs ${sonarqube容器名称}``` 来查看sonarqube容器启动日志。连接错误日志如下：
+![20200207-fail-to-connect-to-database.png](/images/20200207-fail-to-connect-to-database.png)
+
 
 ## 参考
 * [https://hub.docker.com/_/sonarqube](https://hub.docker.com/_/sonarqube)
