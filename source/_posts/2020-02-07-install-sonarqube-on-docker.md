@@ -81,7 +81,10 @@ docker run --name sonarqube -p 9000:9000 -e SONARQUBE_JDBC_USERNAME=sonar -e SON
 ### 2.elasticsearch 无法启动
 bootstrap checks failed主要原因是elasticsearch启动失败,elasticsearch需要的vm.max_map_count至少为262144
 ![20200207-bootstrap-checks-failed.png](/images/20200207-bootstrap-checks-failed.png)
-```max virtual memory areas vm.max_map_count [65530] is too low, increase to at least [262144]```
+
+```
+max virtual memory areas vm.max_map_count [65530] is too low, increase to at least [262144]
+```
 解决方法,通过在root权限用户下执行以下指令:
 ```
 sysctl -w vm.max_map_count=262144
@@ -94,7 +97,8 @@ docker会在firewalld的规则列表中增加一个docker的域（zone），并�
 firewall-cmd --add-port=9000/tcp --permanent --zone=docker
 firewall-cmd --reload
 ```
-需要注意：在启动sonarqube服务器过程中，如果未设置数据库，sonarqube的web服务会正常启动，如果配置了数据库，但是由于种种原因，数据库无法被访问到，sonarqube的web服务是失效的，在调试防火墙的过程中先确定当前sonarqube是否成功运行，可以使用指令 ```docker logs ${sonarqube容器名称}``` 来查看sonarqube容器启动日志。连接错误日志如下：
+需要注意：在启动sonarqube服务器过程中，如果未设置数据库，sonarqube的web服务会正常启动，如果配置了数据库，但是由于种种原因，数据库无法被访问到，sonarqube的web服务是失效的，在调试防火墙的过程中先确定当前sonarqube是否成功运行，可以使用指令 ``` docker logs ${sonarqube容器名称} ``` 来查看sonarqube容器启动日志。连接错误日志如下：
+
 ![20200207-fail-to-connect-to-database.png](/images/20200207-fail-to-connect-to-database.png)
 
 
