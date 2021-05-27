@@ -33,7 +33,7 @@ firewall-cmd --permanent --add-port=6666/tcp
 
 ## 容器构建配置
 以下Dockerfile配置文件仅供参考，这是我为了编译openwrt自行构建的。除了openwrt编译需要的基础环境，
-我增加了polipo，我使用polipo这个工具进行全局代理。设置http和https代理地址。
+我增加了polipo，我使用polipo这个工具进行全局代理。设置http和https代理地址。由于polipo只存在ubuntu 20.04 LTS之前的版本库中，这里直接在最新版ubuntu中安装polipo的deb包。
 ```
 FROM ubuntu:latest
 
@@ -44,17 +44,25 @@ RUN ln -sf /usr/share/zoneinfo/Asia/Shanghai /etc/localtime
 
 RUN echo 'Asia/Shanghai' >/etc/timezone
 
+# config apt sources.list
+RUN sed -i 's/archive.ubuntu.com/mirrors.ustc.edu.cn/g' /etc/apt/sources.list
+
 RUN apt-get update -qq && \
     apt-get upgrade -qqy && \
-    apt-get install -qqy build-essential asciidoc binutils bzip2 gawk gettext git libncurses5-dev libz-dev patch python3 unzip zlib1g-dev lib32gcc1 libc6-dev-i386 subversion flex uglifyjs git-core gcc-multilib p7zip p7zip-full msmtp libssl-dev texinfo libglib2.0-dev xmlto qemu-utils upx libelf-dev autoconf automake libtool autopoint device-tree-compiler g++-multilib wget iputils-ping curl polipo  && \
+    apt-get install -qqy build-essential asciidoc binutils bzip2 gawk gettext git libncurses5-dev libz-dev patch python3 unzip zlib1g-dev lib32gcc1 libc6-dev-i386 subversion flex uglifyjs git-core gcc-multilib p7zip p7zip-full msmtp libssl-dev texinfo libglib2.0-dev xmlto qemu-utils upx libelf-dev autoconf automake libtool autopoint device-tree-compiler g++-multilib wget iputils-ping curl  && \
     apt-get clean && \
     rm -rf /tmp/* /var/tmp/*
+
+# install polipo
+RUN wget http://archive.ubuntu.com/ubuntu/pool/universe/p/polipo/polipo_1.1.1-8_amd64.deb && \
+    dpkg -i polipo_1.1.1-8_amd64.deb
 
 ADD config /etc/polipo/config
 
 ENV http_proxy "http://127.0.0.1:8183"
 ENV https_proxy  "http://127.0.0.1:8183"
 ```
+
 polipo配置文件如下：
 ```
 logSyslog = true
@@ -80,6 +88,10 @@ docker run -itd --name openwrt-build-env -v ～/openwrt/openwrt:/home/user/openw
 ```
 docker exec -it openwrt-build-env /bin/bash
 ```
+polipo未设置自启动，需要手动运行
+```
+/etc/init.d/polipo start
+```
 使用以下指令测试代理是否成功
 ```
 curl cip.cc
@@ -87,8 +99,15 @@ curl cip.cc
 ![20200307-proxy-test.png](/images/20200307-proxy-test.png)
 显示得ip位于国外，代理成功，可以开心编译openwrt了。
 
+## 注意
+如果有http协议的代理工具，使用以下指令直接配置即可
+```
+export http_proxy="http://ip:port"
+export https_proxy="http://ip:port"
+```
+这篇文章其实有点儿鸡肋，可以在容器之外安装polipo或者其他工具，将sock5协议转成http协议，然后配置全局代理即可。
+
 ## 参考内容
-- [https://blog.denghaihui.com/2017/10/10/shadowsocks-polipo/](https://blog.denghaihui.com/2017/10/10/shadowsocks-polipo/)
 - [https://wiki.archlinux.org/index.php/Polipo (简体中文))](https://wiki.archlinux.org/index.php/Polipo_(%E7%AE%80%E4%BD%93%E4%B8%AD%E6%96%87))
 - [https://juejin.im/post/5c91ff5ee51d4534446edb9a](https://juejin.im/post/5c91ff5ee51d4534446edb9a)
 - [https://milkice.me/2019/08/07/docker-network-tunnel/](https://milkice.me/2019/08/07/docker-network-tunnel/)
