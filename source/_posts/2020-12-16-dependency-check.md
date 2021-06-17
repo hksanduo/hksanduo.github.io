@@ -187,4 +187,4 @@ dependency track 具有以下特点：
 - [https://mawei.blog/2020/dependency-practice-guide-part-one](https://mawei.blog/2020/dependency-practice-guide-part-one)【用DependencyTrack管理第三方组件安全】
 - [https://www.secrss.com/articles/19515](https://www.secrss.com/articles/19515)【关于软件供应链安全的几点思考】
 - [https://my.oschina.net/oscpyaqxylk/blog/5075907](https://my.oschina.net/oscpyaqxylk/blog/5075907)【关注企业开源供应链：开源有风险，使用需谨慎！】
-- [https://www.tc260.org.cn/front/postDetail.html?id=20200617152854](https://www.tc260.org.cn/front/postDetail.html?id=20200617152854  )[]
+- [https://www.tc260.org.cn/front/postDetail.html?id=20200617152854](https://www.tc260.org.cn/front/postDetail.html?id=20200617152854)[2020版《个人信息安全规范》生效在即，你不得不重视的第三方接入管理规则]
