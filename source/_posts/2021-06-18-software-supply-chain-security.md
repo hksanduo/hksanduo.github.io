@@ -48,7 +48,7 @@ Gartner安全开发工具链
 ![20210618-04.png](/images/20210618-04.png)
 
 某证券DevSecOps落地实践
-![20210618-06.jpg](/images/20210618-06.jgp)
+![20210618-06.jpg](/images/20210618-06.jpg)
 
 默安DevSecOps工具链
 ![20210618-07.png](/images/20210618-07.png)
@@ -128,4 +128,3 @@ web，app,主机，容器等场景下远程漏洞扫描与评估，主要安全�
 - [https://en.wikipedia.org/wiki/Supply_chain_attack](https://en.wikipedia.org/wiki/Supply_chain_attack)【Supply chain attack】
 - [https://www.cisa.gov/sites/default/files/publications/defending_against_software_supply_chain_attacks_508_1.pdf](https://www.cisa.gov/sites/default/files/publications/defending_against_software_supply_chain_attacks_508_1.pdf)【Defending Against Software Supply Chain Attacks】
 - [https://www.csoonline.com/article/3191947/supply-chain-attacks-show-why-you-should-be-wary-of-third-party-providers.html](https://www.csoonline.com/article/3191947/supply-chain-attacks-show-why-you-should-be-wary-of-third-party-providers.html)【】
-- []()【】
