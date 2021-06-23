@@ -92,7 +92,7 @@ Dependency-check --project <project name> --scan <jar path> --out <result path> 
 扫描后的结果需人工排除误报，使用工具扫描出来的检测结果存在误报的情况，可能原因包括漏洞与所述组件无关、引发漏洞的方法未被调用、引发漏洞的配置未启用等。需要根据CVE官网上的漏洞介绍、官方漏洞说明结合源代码和修复方法人工进行逐一排查，确认所用组件是否存在扫描结果中所述漏洞，并确定每个漏洞的修复方法，组件安全风险复核是一件相当费时费力的工作。
 
 ##### dependency track
-Dependency-Track是一个软件组合分析（SCA）平台，用于跟踪组织创建或使用的所有应用程序中使用的所有第三方组件。它集成了多个漏洞数据库，包括国家漏洞数据库（NVD），NPM公众公告， Sonatype的OSS指数，并VulnDB从基于风险的安全性。Dependency-Track监控其产品组合中的所有应用程序，以便主动识别使你的应用程序面临风险的组件中的漏洞。
+Dependency-Track是一个软件组合分析（SCA）平台，用于跟踪组织创建或使用的所有应用程序中使用的所有第三方组件。它集成了多个漏洞数据库，包括国家漏洞数据库（NVD），NPM公告， Sonatype的OSS索引，RiskBased Security的漏洞库。Dependency-Track监控其产品组合中的所有应用程序，以便主动识别使你的应用程序面临风险的组件中的漏洞。
 
 ![20201216-02.jpg](/images/20201216-02.jpg)
 
