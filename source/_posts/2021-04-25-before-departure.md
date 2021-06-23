@@ -5,7 +5,7 @@ layout: post
 tag:
 - Life
 categories:
-- Persional
+- Diary
 ---
 
 你为什么从当前的公司离职

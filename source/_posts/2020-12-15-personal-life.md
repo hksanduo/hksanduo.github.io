@@ -5,7 +5,7 @@ layout: post
 tag:
 - Life
 categories:
-- Persional
+- Diary
 ---
 
 这大概就是生活
