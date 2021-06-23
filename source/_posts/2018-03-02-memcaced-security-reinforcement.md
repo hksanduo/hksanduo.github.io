@@ -3,9 +3,10 @@ title: "memcached 安全加固"
 date:   2018-03-02 12:00:00 +0800
 layout: post
 tag: 
-- Security
+- Memcached
 categories:
 - Web
+- Security
 ---
 
 # Memcached安全加固

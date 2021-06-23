@@ -5,7 +5,7 @@ layout: post
 tag: 
 - Kali
 categories:
-- Kali
+- Security
 - Linux
 ---
 

@@ -6,7 +6,7 @@ tag:
 - Dependency
 categories:
 - Security
-- CodeAudit
+- Code Audit
 ---
 
 第三方组件安全评估指南

@@ -3,9 +3,10 @@ title: "Flawfinder开源C/C++静态扫描分析工具安装与使用"
 date:   2019-11-15  12:00:00 +0800
 layout: post
 tag:
-- Code audit
+- Flawfinder
 categories:
 - Security
+- Code Audit
 ---
 
 Flawfinder开源C/C++静态扫描分析工具安装与使用

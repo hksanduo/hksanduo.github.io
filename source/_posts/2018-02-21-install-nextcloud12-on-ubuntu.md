@@ -3,7 +3,7 @@ title: "ubuntu server 安装nextcloud12"
 date:   2018-02-21 14:05:41 +0800
 layout: post
 tag: 
-- Linux
+- nextcloud
 categories:
 - Linux
 ---

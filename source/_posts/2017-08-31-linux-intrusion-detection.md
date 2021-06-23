@@ -3,10 +3,9 @@ title:	"Linux 入侵检测"
 date:	2017-08-31 15:36:00 +0800
 layout: post
 tag: 
-- Linux
 - Operations
 categories:
-- Operations
+- Security
 - Linux
 ---
 
