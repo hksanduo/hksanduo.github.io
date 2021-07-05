@@ -1,0 +1,684 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+
+
+
+
+<head>
+  <meta charset="UTF-8">
+  <link rel="apple-touch-icon" sizes="76x76" href="/images/favicon.png">
+  <link rel="icon" type="image/png" href="/images/favicon.png">
+  <meta name="viewport"
+        content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, shrink-to-fit=no">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  
+  <meta name="theme-color" content="#2f4154">
+  <meta name="description" content="">
+  <meta name="author" content="hksanduo">
+  <meta name="keywords" content="">
+  <title>谷歌SLSA供应链框架介绍 - sanduo blog</title>
+
+  <link  rel="stylesheet" href="https://cdn.staticfile.org/twitter-bootstrap/4.4.1/css/bootstrap.min.css" />
+<link  rel="stylesheet" href="https://cdn.staticfile.org/github-markdown-css/4.0.0/github-markdown.min.css" />
+
+
+  <link  rel="stylesheet" href="https://cdn.staticfile.org/highlight.js/10.0.0/styles/github-gist.min.css" />
+
+
+<!-- 主题依赖的图标库，不要自行修改 -->
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1749284_yg9cfy8wd6.css">
+
+
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1736178_pjno9b9zyxs.css">
+
+
+
+  <link  rel="stylesheet" href="https://cdn.staticfile.org/gitalk/1.6.2/gitalk.css" />
+
+
+<link  rel="stylesheet" href="/css/main.css" />
+
+<!-- 自定义样式保持在最底部 -->
+
+
+<meta name="generator" content="Hexo 4.2.1"></head>
+
+
+<body>
+  <header style="height: 70vh;">
+    <nav id="navbar" class="navbar fixed-top  navbar-expand-lg navbar-dark scrolling-navbar">
+  <div class="container">
+    <a class="navbar-brand"
+       href="/">&nbsp;<strong>Welcome To Sanduo's Blog</strong>&nbsp;</a>
+
+    <button id="navbar-toggler-btn" class="navbar-toggler" type="button" data-toggle="collapse"
+            data-target="#navbarSupportedContent"
+            aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+      <div class="animated-icon"><span></span><span></span><span></span></div>
+    </button>
+
+    <!-- Collapsible content -->
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+      <ul class="navbar-nav ml-auto text-center">
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/">
+                <i class="iconfont icon-home-fill"></i>
+                首页
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/archives/">
+                <i class="iconfont icon-archive-fill"></i>
+                归档
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/categories/">
+                <i class="iconfont icon-category-fill"></i>
+                分类
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/tags/">
+                <i class="iconfont icon-tags-fill"></i>
+                标签
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/about/">
+                <i class="iconfont icon-user-fill"></i>
+                关于
+              </a>
+            </li>
+          
+        
+        
+          <li class="nav-item" id="search-btn">
+            <a class="nav-link" data-toggle="modal" data-target="#modalSearch">&nbsp;&nbsp;<i
+                class="iconfont icon-search"></i>&nbsp;&nbsp;</a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+</nav>
+
+    <div class="view intro-2" id="background" parallax=true
+         style="background: url('/images/default.png') no-repeat center center;
+           background-size: cover;">
+      <div class="full-bg-img">
+        <div class="mask flex-center" style="background-color: rgba(0, 0, 0, 0.3)">
+          <div class="container text-center white-text fadeInUp">
+            <span class="h2" id="subtitle">
+              
+            </span>
+
+            
+              
+                <div class="mt-3 post-meta">
+                  <i class="iconfont icon-date-fill" aria-hidden="true"></i>
+                  <time datetime="2021-06-23 08:09">
+                    2021年6月23日 早上
+                  </time>
+                </div>
+              
+
+              <div class="mt-1">
+                
+                  
+                  <span class="post-meta mr-2">
+                    <i class="iconfont icon-chart"></i>
+                    2.3k 字
+                  </span>
+                
+
+                
+                  
+                  <span class="post-meta mr-2">
+                      <i class="iconfont icon-clock-fill"></i>
+                    
+                    
+                    24
+                     分钟
+                  </span>
+                
+
+                
+              </div>
+            
+          </div>
+
+          
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <main>
+    
+      
+
+<div class="container-fluid">
+  <div class="row">
+    <div class="d-none d-lg-block col-lg-2"></div>
+    <div class="col-lg-8 nopadding-md">
+      <div class="container nopadding-md" id="board-ctn">
+        <div class="py-5" id="board">
+          <div class="post-content mx-auto" id="post">
+            
+              <p class="note note-info">
+                
+                  本文最后更新于：几秒前
+                
+              </p>
+            
+            <article class="markdown-body">
+              <p>谷歌SLSA供应链框架介绍</p>
+<hr>
+<h2 id="背景"><a href="#背景" class="headerlink" title="背景"></a>背景</h2><p>软件供应链攻击事件（对软件包进行未经授权的修改）在过去的两年中呈上升趋势，并且被证明是影响所有用户的常见且可靠的攻击方式。软件开发和供应链部署都是相当复杂的，从源代码到构建再到发布，在整个工作流程中会存在众多威胁。虽然确实存在针对某些特定漏洞的单点解决方案，但没有全面的端到端框架来定义如何减轻整个软件供应链中的威胁，并提供合理的安全保障方案。面对近几个月令人大开眼界的损失数十亿美元骇客攻击（如：SolarWinds、Codecov)，如果软件开发人员和用户采用类似供应链的安全框架，其中一些攻击可能会被阻止或变得利用起来更加困难。<br>谷歌提出的解决方案是软件开发的供应链级别（Supply chain Levels for Software Artifacts 简称 SLSA，发音为“salsa”），这是一个端到端框架，用于保证整个软件供应链中组件的完整性。它的灵感来自于谷歌内部的“ Borg二进制授权系统”，它已经在谷歌内部使用了8年多，并且强制托管谷歌所有生产工作负载。SLSA的目标是改善行业状况，尤其是开源软件安全状况，进而抵御最要紧的供应链完整性威胁。使用SLSA，用户方便根据他们目前使用软件的安全状况做出明智的选择。</p>
+<h2 id="SLSA用途"><a href="#SLSA用途" class="headerlink" title="SLSA用途"></a>SLSA用途</h2><p>SLSA帮助防范常见的软件供应链攻击。下图展示了一个典型的软件供应链，包括可能发生在供应链各个环节的攻击示例。在过去的几年中，每种类型的攻击均发生过，不幸的是，随着时间的推移，软件供应链事件攻击仍在增加。<br><img src="/images/20210624-01.png" srcset="/img/loading.gif" alt="20210624-01.png"></p>
+<table>
+<thead>
+<tr>
+<th>序号</th>
+<th>威胁类型</th>
+<th>威胁案例</th>
+<th>SLSA防御</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>A</td>
+<td>将恶意代码提交到源存储库</td>
+<td><a href="https://lore.kernel.org/lkml/202105051005.49BFABCE@keescook/" target="_blank" rel="noopener">Linux恶意上传带有漏洞的patch</a>：研究人员试图通过邮件列表上的补丁程序故意将漏洞引入Linux内核。</td>
+<td>双人审查可以审核大多数（但不是全部的）漏洞。</td>
+</tr>
+<tr>
+<td>B</td>
+<td>恶意托管源代码管理平台</td>
+<td><a href="https://news-web.php.net/php.internals/113838" target="_blank" rel="noopener">PHP官方git被攻陷</a>：攻击者破坏了PHP的自托管git服务器，并注入了两个恶意提交。</td>
+<td>防御较好的源代码平台增加了攻击者难度</td>
+</tr>
+<tr>
+<td>C</td>
+<td>使用正式流程构建，但源代码与源代码管理不匹配</td>
+<td><a href="https://www.webmin.com/exploit.html" target="_blank" rel="noopener">Webmin</a>:攻击者修改了构建工作流以使用与源代码管理不匹配的源文件。</td>
+<td>一个符合SLSA的构建服务器会识别实际使用的源代码，允许用户检测此类篡改。</td>
+</tr>
+<tr>
+<td>D</td>
+<td>被攻陷的构建平台</td>
+<td><a href="https://www.crowdstrike.com/blog/sunspot-malware-technical-analysis/" target="_blank" rel="noopener">SolarWinds</a>：攻击者破坏了构建平台，并植入了一个在每次构建过程中注入恶意代码的程序。</td>
+<td>更高SLSA 级别要求构建平台具有<a href="https://github.com/slsa-framework/slsa/blob/main/build-requirements.md" target="_blank" rel="noopener">强有力的安全控制措施</a>，确保构建平台可以持久性并且难以被破坏</td>
+</tr>
+<tr>
+<td>E</td>
+<td>使用恶意的依赖(即A-H，递归)</td>
+<td><a href="https://schneider.dev/blog/event-stream-vulnerability-explained/" target="_blank" rel="noopener">事件流攻击</a>：攻击者添加了一个无害的依赖项，然后更新该依赖并添加恶意代码。更新与提交给GitHub的代码不匹配（即攻击F）</td>
+<td>在所有依赖项中使用SLSA，可能会阻止特定的攻击，因为源代码可能会提示它不是由正确的构建环境构建的，或者源代码不是来自GitHub。</td>
+</tr>
+<tr>
+<td>F</td>
+<td>上传不是由CI/CD系统生成的中间件</td>
+<td><a href="https://about.codecov.io/apr-2021-post-mortem/" target="_blank" rel="noopener">CodeCov</a>：攻击者使用泄露的证书将恶意中间件上传到GCS存储库，用户可以从上面直接下载。</td>
+<td>GCS存储库中，中间件的出处会显示中间件不是以预期的方式从预期的源构建的。</td>
+</tr>
+<tr>
+<td>G</td>
+<td>恶意的软件仓库</td>
+<td><a href="https://theupdateframework.io/papers/attacks-on-package-managers-ccs2008.pdf" target="_blank" rel="noopener">攻击软件镜像站</a>：研究人员测试几个流行的软件镜像站，这些镜像站可能会被用来托管恶意软件</td>
+<td>与上面的（F）类似，恶意组件的出处会显示它们不是按照预期构建的，或者不是从预期的源repo构建的。</td>
+</tr>
+<tr>
+<td>H</td>
+<td>欺骗用户使用恶意的软件包</td>
+<td><a href="https://blog.sonatype.com/damaging-linux-mac-malware-bundled-within-browserify-npm-brandjack-attempt" target="_blank" rel="noopener">包名抢注</a> 攻击者上传了一个与原始文件名相似的恶意软件。</td>
+<td>SLSA不能直接解决这个威胁，但是通过控制源代码链接和增加其他解决方案来解决。</td>
+</tr>
+</tbody></table>
+<h2 id="SLSA-介绍"><a href="#SLSA-介绍" class="headerlink" title="SLSA 介绍"></a>SLSA 介绍</h2><p>在其当前状态下，SLSA是一套逐渐采用的安全准则，由业界一致认可。在最终形式中，SLSA在可执行性方面与最佳实践列表有所不同：它将支持自动创建可审核元数据，这些元数据可以输入到策略引擎中，以便为特定包或构建平台提供“SLSA认证”。SLSA被设计成持续的和可操作的，并且在每一步都提供最优措施。一旦一个组件达到了最高级别，用户就可以确信它没有被篡改，并且可以安全地追溯到源代码，这对于今天的大多数软件来说是很困难的，甚至是不可能的。</p>
+<p>SLSA由四个级别组成，其中SLSA 4表示理想状态。较低级别表示具有相应增量完整性保证的增量里程碑。这些要求目前定义如下。<br><img src="/images/20210624-02.png" srcset="/img/loading.gif" alt="20210624-02.png"></p>
+<ul>
+<li><p><strong>SLSA 1</strong>要求构建过程完全脚本化/自动化，并生成出处。出处是关于如何构建中间件的元数据，包括构建过程、顶级源代码和依赖关系。了解出处可以让用户做出基于风险的安全决策。尽管SLSA 1的源代码不能防止篡改，但它提供了基本级别的源代码识别，有利于漏洞管理。</p>
+</li>
+<li><p><strong>SLSA 2</strong>需要使用版本控制和生成经过身份验证出处的托管构建服务。这些额外的要求使用户对软件的来源有了更大的信心。在这个级别上，源代码在构建受信任服务过程中可以防止被篡改。<strong>SLSA 2</strong>还提供了到<strong>SLSA 3</strong>的简单升级途径。</p>
+</li>
+<li><p><strong>SLSA 3</strong> 进一步要求源代码和构建平台分别满足特定标准，以保证源代码的可审计性和完整性。设想有这么一个认证过程，通过这个过程，审计人员可以证明平台符合要求，用户就可以直接依赖它了。<strong>SLSA 3</strong>通过防御特定类型的威胁（如交叉编译污染），提供了比早期级别更强大的防篡改保护。</p>
+</li>
+<li><p><strong>SLSA 4</strong>目前是最高级别的，需要双人对所有变更进行审查，并且需要一个封闭的、可复制的构建流程。双人评审是一种行业最佳实践，可以发现错误并阻止不法行为。封闭的构建保证了源代码的依赖列表是完整的。可复制的构建，虽然不是严格要求的，但是提供了许多可审计性和可靠性的好处。总的来说，<strong>SLSA 4</strong>让用户对软件没有被篡改有绝对的信心。</p>
+</li>
+</ul>
+<p>用户可以在 <a href="https://github.com/slsa-framework/slsa" target="_blank" rel="noopener">GitHub 存储库</a>中找到有关这些建议级别的更多详细信息，包括相应的源和构建或来源要求。</p>
+<h2 id="论证"><a href="#论证" class="headerlink" title="论证"></a>论证</h2><p>今天，我们发布了 SLSA 1 来源生成器（repo、marketplace）的来论证我们的观点。 这将允许用户在他们的构建组件的同时创建和上传出处，从而实现SLSA 1级别要求。如果要使用它，请将以下代码段添加到您的工作流程中：</p>
+<pre><code class="hljs groovy">- <span class="hljs-string">name:</span> Generate provenance  
+<span class="hljs-string">uses:</span> slsa-framework/github-actions-demo<span class="hljs-meta">@v</span>0<span class="hljs-number">.1</span>  
+<span class="hljs-string">with:</span>    <span class="hljs-string">artifact_path:</span> &lt;path-to-artifact/directory&gt;</code></pre>
+<p>未来，我们计划与流行的源、构建和打包平台合作，以尽可能轻松地达到更高级别的 SLSA。 这些计划包括在构建系统中自动生成出处、在包存储库中本地传播来源以及跨平台添加安全功能。 我们的长期目标是提高整个行业的安全标准，以便默认期望的安全级别就是更高级别的 SLSA 安全标准，进而减少软件生产商的工作量。</p>
+<h2 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h2><p>SLSA是一个用于端到端软件供应链完整性的实用框架，基于一个在世界上最大的软件工程组织中被证明可以大规模工作的模型。对于大多数项目来说，实现最高级别的SLSA可能很困难，但是较低级别的SLSA所认可的持续改进将在很大程度上提高开放源代码生态系统的安全性。</p>
+<h2 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h2><ul>
+<li><a href="https://security.googleblog.com/2021/06/introducing-slsa-end-to-end-framework.html" target="_blank" rel="noopener">https://security.googleblog.com/2021/06/introducing-slsa-end-to-end-framework.html</a>【Introducing SLSA, an End-to-End Framework for Supply Chain Integrity】</li>
+<li><a href="https://github.com/slsa-framework/slsa" target="_blank" rel="noopener">https://github.com/slsa-framework/slsa</a>【slsa】</li>
+<li><a href="https://security.googleblog.com/2021/06/introducing-slsa-end-to-end-framework.html" target="_blank" rel="noopener">https://security.googleblog.com/2021/06/introducing-slsa-end-to-end-framework.html</a>【Introducing SLSA End to End Framework】</li>
+</ul>
+
+            </article>
+            <hr>
+            <div>
+              <div class="post-metas mb-3">
+                
+                  <div class="post-meta mr-3">
+                    <i class="iconfont icon-category"></i>
+                    
+                      <a class="hover-with-bg" href="/categories/Security/">Security</a>
+                    
+                  </div>
+                
+                
+                  <div class="post-meta">
+                    <i class="iconfont icon-tags"></i>
+                    
+                      <a class="hover-with-bg" href="/tags/Supply-Chain/">Supply Chain</a>
+                    
+                  </div>
+                
+              </div>
+              
+                <p class="note note-warning">本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-sa/4.0/deed.zh" target="_blank" rel="nofollow noopener noopener">CC BY-SA 4.0 协议</a> ，转载请注明出处！</p>
+              
+              
+                <div class="post-prevnext row">
+                  <div class="post-prev col-6">
+                    
+                    
+                      <a href="/2021/07/05/2021-07-05-SDL-Best-Practice-Principles/">
+                        <i class="iconfont icon-arrowleft"></i>
+                        <span class="hidden-mobile">SDL最佳实践原则</span>
+                        <span class="visible-mobile">上一篇</span>
+                      </a>
+                    
+                  </div>
+                  <div class="post-next col-6">
+                    
+                    
+                      <a href="/2021/06/22/2021-06-23-devsecops-check-list-and-ledge-introduce/">
+                        <span class="hidden-mobile">DevOps元素周期表及DevSecOps检查清单介绍</span>
+                        <span class="visible-mobile">下一篇</span>
+                        <i class="iconfont icon-arrowright"></i>
+                      </a>
+                    
+                  </div>
+                </div>
+              
+            </div>
+
+            
+              <!-- Comments -->
+              <div class="comments" id="comments">
+                
+                
+  <div id="gitalk-container"></div>
+  <script defer src="https://cdn.staticfile.org/gitalk/1.6.2/gitalk.min.js" ></script>
+  <script type="text/javascript">
+    var oldLoadGt = window.onload;
+    window.onload = function () {
+      oldLoadGt && oldLoadGt();
+
+      var gitalk = new Gitalk({
+        clientID: 'be14fbeeae5d109fc370',
+        clientSecret: '435ce16e4168507c36e8638170f52db128e04c03',
+        repo: 'https://github.com/hksanduo/hksanduo.github.io/issues',
+        owner: 'hksanduo',
+        admin: 'hksanduo',
+        id: 'abe2f11339bee105f3f102052ebaa0c7',
+        language: 'zh-CN',
+        perPage: 15,
+        pagerDirection: 'last',
+        createIssueManually: 'true',
+        distractionFreeMode: 'false'
+      });
+      gitalk.render('gitalk-container')
+    }
+  </script>
+
+
+              </div>
+            
+          </div>
+        </div>
+      </div>
+    </div>
+    
+      <div class="d-none d-lg-block col-lg-2 toc-container" id="toc-ctn">
+        <div id="toc">
+  <p class="toc-header"><i class="iconfont icon-list"></i>&nbsp;目录</p>
+  <div id="tocbot"></div>
+</div>
+
+      </div>
+    
+  </div>
+</div>
+
+<!-- Custom -->
+
+
+    
+  </main>
+
+  
+    <a id="scroll-top-button" href="#" role="button">
+      <i class="iconfont icon-arrowup" aria-hidden="true"></i>
+    </a>
+  
+
+  
+    <div class="modal fade" id="modalSearch" tabindex="-1" role="dialog" aria-labelledby="ModalLabel"
+     aria-hidden="true">
+  <div class="modal-dialog modal-dialog-scrollable modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header text-center">
+        <h4 class="modal-title w-100 font-weight-bold">搜索</h4>
+        <button type="button" id="local-search-close" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body mx-3">
+        <div class="md-form mb-5">
+          <input type="text" id="local-search-input" class="form-control validate">
+          <label data-error="x" data-success="v"
+                 for="local-search-input">关键词</label>
+        </div>
+        <div class="list-group" id="local-search-result"></div>
+      </div>
+    </div>
+  </div>
+</div>
+  
+
+  
+
+  
+
+  <footer class="mt-5">
+  <div class="text-center py-3">
+    <div>
+      <a href="https://hexo.io" target="_blank" rel="nofollow noopener"><span>Hexo</span></a>
+      <i class="iconfont icon-love"></i>
+      <a href="https://github.com/fluid-dev/hexo-theme-fluid" target="_blank" rel="nofollow noopener">
+        <span>Fluid</span></a>
+    </div>
+    
+  <div>
+    
+      <!-- 不蒜子统计PV -->
+      
+      <span id="busuanzi_container_site_pv" style="display: none">
+      总访问量 <span id="busuanzi_value_site_pv"></span> 次
+    </span>
+    
+    
+      <!-- 不蒜子统计UV -->
+      
+      <span id="busuanzi_container_site_uv" style="display: none">
+      总访客数 <span id="busuanzi_value_site_uv"></span> 人
+    </span>
+    
+  </div>
+
+
+    
+
+    
+  </div>
+</footer>
+
+<!-- SCRIPTS -->
+<script  src="https://cdn.staticfile.org/jquery/3.4.1/jquery.min.js" ></script>
+<script  src="https://cdn.staticfile.org/twitter-bootstrap/4.4.1/js/bootstrap.min.js" ></script>
+<script  src="/js/debouncer.js" ></script>
+<script  src="/js/main.js" ></script>
+
+
+  <script  src="/js/lazyload.js" ></script>
+
+
+
+  
+  <script  src="https://cdn.staticfile.org/tocbot/4.11.1/tocbot.min.js" ></script>
+  <script>
+    $(document).ready(function () {
+      var boardCtn = $('#board-ctn');
+      var boardTop = boardCtn.offset().top;
+
+      tocbot.init({
+        tocSelector: '#tocbot',
+        contentSelector: '.post-content',
+        headingSelector: 'h1,h2,h3,h4,h5,h6',
+        linkClass: 'tocbot-link',
+        activeLinkClass: 'tocbot-active-link',
+        listClass: 'tocbot-list',
+        isCollapsedClass: 'tocbot-is-collapsed',
+        collapsibleClass: 'tocbot-is-collapsible',
+        collapseDepth: 0,
+        scrollSmooth: true,
+        headingsOffset: -boardTop
+      });
+      if ($('.toc-list-item').length > 0) {
+        $('#toc').css('visibility', 'visible');
+      }
+    });
+  </script>
+
+
+
+
+
+  <script defer src="https://cdn.staticfile.org/clipboard.js/2.0.6/clipboard.min.js" ></script>
+  <script  src="/js/clipboard-use.js" ></script>
+
+
+
+  <script defer src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js" ></script>
+
+
+
+
+<!-- Plugins -->
+
+
+  
+
+  
+    <!-- Google Analytics -->
+    <script defer>
+      (function (i, s, o, g, r, a, m) {
+        i['GoogleAnalyticsObject'] = r;
+        i[r] = i[r] || function () {
+          (i[r].q = i[r].q || []).push(arguments)
+        }, i[r].l = 1 * new Date();
+        a = s.createElement(o),
+          m = s.getElementsByTagName(o)[0];
+        a.async = 1;
+        a.src = g;
+        m.parentNode.insertBefore(a, m)
+      })(window, document, 'script', 'https://www.google-analytics.com/analytics.js', 'ga');
+
+      ga('create', 'UA-167858469-1', 'auto');
+      ga('send', 'pageview');
+    </script>
+  
+
+  
+
+  
+
+  
+
+  
+
+
+
+  <script  src="https://cdn.staticfile.org/typed.js/2.0.11/typed.min.js" ></script>
+  <script>
+    var typed = new Typed('#subtitle', {
+      strings: [
+        '  ',
+        "谷歌SLSA供应链框架介绍&nbsp;",
+      ],
+      cursorChar: "_",
+      typeSpeed: 70,
+      loop: false,
+    });
+    typed.stop();
+    $(document).ready(function () {
+      $(".typed-cursor").addClass("h2");
+      typed.start();
+    });
+  </script>
+
+
+
+  <script  src="https://cdn.staticfile.org/anchor-js/4.2.2/anchor.min.js" ></script>
+  <script>
+    anchors.options = {
+      placement: "right",
+      visible: "hover",
+      
+    };
+    var el = "h1,h2,h3,h4,h5,h6".split(",");
+    var res = [];
+    for (item of el) {
+      res.push(".markdown-body > " + item)
+    }
+    anchors.add(res.join(", "))
+  </script>
+
+
+
+  <script  src="/js/local-search.js" ></script>
+  <script>
+    var path = "/local-search.xml";
+    var inputArea = document.querySelector("#local-search-input");
+    inputArea.onclick = function () {
+      searchFunc(path, 'local-search-input', 'local-search-result');
+      this.onclick = null
+    }
+  </script>
+
+
+
+  <script  src="https://cdn.staticfile.org/fancybox/3.5.7/jquery.fancybox.min.js" ></script>
+  <link  rel="stylesheet" href="https://cdn.staticfile.org/fancybox/3.5.7/jquery.fancybox.min.css" />
+
+  <script>
+    $('#post img:not(.no-zoom img, img[no-zoom]), img[zoom]').each(
+      function () {
+        var element = document.createElement('a');
+        $(element).attr('data-fancybox', 'images');
+        $(element).attr('href', $(this).attr('src'));
+        $(this).wrap(element);
+      }
+    );
+  </script>
+
+
+
+
+
+
+
+  
+  
+    <script>
+      !function (e, t, a) {
+        function r() {
+          for (var e = 0; e < s.length; e++) s[e].alpha <= 0 ? (t.body.removeChild(s[e].el), s.splice(e, 1)) : (s[e].y--, s[e].scale += .004, s[e].alpha -= .013, s[e].el.style.cssText = "left:" + s[e].x + "px;top:" + s[e].y + "px;opacity:" + s[e].alpha + ";transform:scale(" + s[e].scale + "," + s[e].scale + ") rotate(45deg);background:" + s[e].color + ";z-index:99999");
+          requestAnimationFrame(r)
+        }
+
+        function n() {
+          var t = "function" == typeof e.onclick && e.onclick;
+          e.onclick = function (e) {
+            t && t(), o(e)
+          }
+        }
+
+        function o(e) {
+          var a = t.createElement("div");
+          a.className = "heart", s.push({
+            el: a,
+            x: e.clientX - 5,
+            y: e.clientY - 5,
+            scale: 1,
+            alpha: 1,
+            color: c()
+          }), t.body.appendChild(a)
+        }
+
+        function i(e) {
+          var a = t.createElement("style");
+          a.type = "text/css";
+          try {
+            a.appendChild(t.createTextNode(e))
+          } catch (t) {
+            a.styleSheet.cssText = e
+          }
+          t.getElementsByTagName("head")[0].appendChild(a)
+        }
+
+        function c() {
+          return "rgb(" + ~~(255 * Math.random()) + "," + ~~(255 * Math.random()) + "," + ~~(255 * Math.random()) + ")"
+        }
+
+        var s = [];
+        e.requestAnimationFrame = e.requestAnimationFrame || e.webkitRequestAnimationFrame || e.mozRequestAnimationFrame || e.oRequestAnimationFrame || e.msRequestAnimationFrame || function (e) {
+          setTimeout(e, 1e3 / 60)
+        }, i(".heart{width: 10px;height: 10px;position: fixed;background: #f00;transform: rotate(45deg);-webkit-transform: rotate(45deg);-moz-transform: rotate(45deg);}.heart:after,.heart:before{content: '';width: inherit;height: inherit;background: inherit;border-radius: 50%;-webkit-border-radius: 50%;-moz-border-radius: 50%;position: fixed;}.heart:after{top: -5px;}.heart:before{left: -5px;}"), n(), r()
+      }(window, document);
+    </script>
+  
+
+
+
+
+
+
+
+
+
+
+
+
+</body>
+</html>
