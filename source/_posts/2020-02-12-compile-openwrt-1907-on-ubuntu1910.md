@@ -10,10 +10,14 @@ categories:
 - Linux
 ---
 
-手上有一块任子行的NET110(88F6281)的路由器,还有一块环硕科技(公司已倒闭)的路由器,同样基于88F6281 A1,由于较为小众,固件需要自行编译,本文内容完全是作者自己在编译过程中的血泪史,如果你遇到同样的问题,可以一起交流.
+在ubuntu19.10上编译openwrt19.07
 ------
+## 背景
+手上有一块任子行的NET110(88F6281)的路由器,还有一块环硕科技(公司已倒闭)的路由器,同样基于88F6281 A1,由于较为小众,固件需要自行编译,本文内容完全是作者自己在编译过程中的血泪史,如果你遇到同样的问题,可以一起交流.
+
 ## 准备
 之前使用archlinux编译openwrt的估计,但是出现各种各样玄学问题,再加上梯子不稳定,后续直接转移到梯子上进行编译,虽说速度有点儿慢.
+
 ### 安装编译环境
 ```
 apt update && apt distupgrade -y
@@ -34,7 +38,7 @@ make prereq
 make defconfig
 ```
 ### * 增加自定义patch
-部分平台比较小众,openwrt并为提供相关编译选项,需要自定添加patch,patch的位置在 **openwrt/target/linux/平台/patches-xx/** 目录下,这个需要根据实际情况进行更改,我这里的板子是kirkwood,在patches-4.14目录添加自己板子的patch,其他配置信息需要修改kirkwood目录下的base-files和image,这里我会在接下来的博文详细说明,这里不赘述,你可以直接将我配置好的patches添加到编译目录下,地址:
+部分平台比较小众,openwrt并为提供相关编译选项,需要自定添加patch,patch的位置在 **openwrt/target/linux/平台/patches-xx/** 目录下,这个需要根据实际情况进行更改,我这里的板子是kirkwood,在patches-4.14目录添加自己板子的patch,其他配置信息需要修改kirkwood目录下的base-files和image,这里我会在接下来的博文详细说明,这里不赘述,你可以直接将我配置好的patches添加到编译目录下,地址:[https://github.com/hksanduo/kirkwood-88F6281](https://github.com/hksanduo/kirkwood-88F6281)
 
 然后更新平台信息
 ```
@@ -78,6 +82,9 @@ sudo rm /swapfile
 这个错误很可能是我们在写节点时多加了或者少写了“}”符号造成的，特别是节点里面包含了一些子节点的情况下，很容易少加“}”符号。
 
 解决思路：由于gedit打开dts文件，dts内容的层次结构不好一眼看出，需要把dts内容copy到sourceinsight、UlterEdit或者其他文本工具里编辑，总之一点能让dts内容层次分明。这样一下就可以定位是那个节点存在少加或者多加‘}’符号。
+
+### 4.固件可以在板子上运行,但是找不到网卡,这个有些尴尬,固件还是不完美,目前也没时间去玩了,各位看官可以尝试解决一下
+
 
 ## 参考
 * [https://forum.openwrt.org/t/solved-build-error-make-toplevel-mk-world-error-2/47478](https://forum.openwrt.org/t/solved-build-error-make-toplevel-mk-world-error-2/47478)
