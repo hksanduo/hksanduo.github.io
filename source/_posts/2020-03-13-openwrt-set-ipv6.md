@@ -83,3 +83,4 @@ sudo systemctl restart NetworkManager
 - [http://blog.kompaz.win/2017/02/22/OpenWRT%20IPv6%20%E9%85%8D%E7%BD%AE/](http://blog.kompaz.win/2017/02/22/OpenWRT%20IPv6%20%E9%85%8D%E7%BD%AE/)
 - [https://openwrt.org/docs/guide-user/network/ipv6/start](https://openwrt.org/docs/guide-user/network/ipv6/start)
 - [https://linkthis.me/2018/12/04/ipv6-on-openwrt/](https://linkthis.me/2018/12/04/ipv6-on-openwrt/)
+- [https://github.com/tuna/ipv6.tsinghua.edu.cn/blob/master/openwrt.md](https://github.com/tuna/ipv6.tsinghua.edu.cn/blob/master/openwrt.md)
