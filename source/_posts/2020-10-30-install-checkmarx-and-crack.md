@@ -3,8 +3,9 @@ title: "安装并使用checkmarx进行代码审计"
 date:   2020-10-30  16:08:00 +0800
 layout: post
 tag:
-- Code Audit
+- guide
 categories:
+- Code Audit
 - Security
 ---
 
