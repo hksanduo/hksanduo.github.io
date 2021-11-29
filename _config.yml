@@ -7,16 +7,13 @@ title: sanduo blog
 subtitle: ''
 description: ''
 keywords:
-author: hksanduo
+author: sanduo
 language: zh-CN
 timezone: ''
 
-
-
 # URL
-## If your site is put in a subdirectory, set url as 'http://yoursite.com/child' and root as '/child/'
+## Set your site url here. For example, if you use GitHub Page, set url as 'https://username.github.io/project'
 url: https://hksanduo.github.io
-# root: /
 permalink: :year/:month/:day/:title/
 permalink_defaults:
 pretty_urls:
@@ -83,8 +80,7 @@ meta_generator: true
 ## http://momentjs.com/docs/#/displaying/format/
 date_format: YYYY-MM-DD
 time_format: HH:mm:ss
-## Use post's date for updated date unless set in front-matter
-# use_date_for_updated: false
+## updated_option supports 'mtime', 'date', 'empty'
 updated_option: 'mtime'
 
 # Pagination
@@ -104,7 +100,7 @@ ignore:
 theme: fluid
 
 # Deployment
-## Docs: https://hexo.io/docs/deployment.html
+## Docs: https://hexo.io/docs/one-command-deployment
 deploy:
   type: git
   repo: git@github.com:hksanduo/hksanduo.github.io.git
