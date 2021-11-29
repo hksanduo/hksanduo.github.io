@@ -17,29 +17,29 @@ windows 安装配置nodejs
 纯属扯淡，大家略过就行。
 ## 下载
 首先到官网上下载nodejs，这里以最新的为例。
-![20200628-nodejs-01.png](/images/20200628-nodejs-01.png)
+![20200628-nodejs-01.png](/img/20200628-nodejs-01.png)
 ## 安装
 没有明显需要注意的地方，一直下一步就行，注意安装位置
 ## 配置
 ### 1、修改NodeJs数据存放的路径
-![20200628-nodejs-02.png](/images/20200628-nodejs-02.png)
+![20200628-nodejs-02.png](/img/20200628-nodejs-02.png)
 创建两个文件夹：node_cache、node_data
-![20200628-nodejs-03.png](/images/20200628-nodejs-03.png)
+![20200628-nodejs-03.png](/img/20200628-nodejs-03.png)
 ### 2、配置存储路径
 打开CMD执行以下命令
 ```
 npm config set prefix D:\Program\nodejs\node_data
 npm config set cache D:\Program\nodejs\node_cache
 ```
-![20200628-nodejs-04.png](/images/20200628-nodejs-04.png)
+![20200628-nodejs-04.png](/img/20200628-nodejs-04.png)
 如果什么不显示,则表示修改成功
 
 ### 3、配置环境变量
 修改用户变量把系统的npm指定改为如下```C:\Users\Administrator\AppData\Roaming\npm 改为 D:\Program\nodejs\node_data```
-![20200628-nodejs-05.png](/images/20200628-nodejs-05.png)
+![20200628-nodejs-05.png](/img/20200628-nodejs-05.png)
 
 添加系统变量 NODE_PATH 路径为 D:\Program\nodejs\node_data\node_modules
-![20200628-nodejs-06.png](/images/20200628-nodejs-06.png)
+![20200628-nodejs-06.png](/img/20200628-nodejs-06.png)
 
 注意这俩个指向需要改为我们刚刚新建的俩个文件夹 , 路径不要拷贝上面的 ,写你自己保存的地方，配置完成后点击保存。
 测试，判断是否配置陈工
@@ -48,7 +48,7 @@ npm config set cache D:\Program\nodejs\node_cache
 node -v
 npm -v
 ```
-![20200628-nodejs-07.png](/images/20200628-nodejs-07.png)
+![20200628-nodejs-07.png](/img/20200628-nodejs-07.png)
 
 输入 node -v 与 npm -v 这一次我们没有在 nodejs 文件夹中运行这俩个命令 ,如果命令能够正确输出则表示环境配置成功
 
@@ -57,9 +57,9 @@ npm -v
 ```
 npm install ‐g cnpm ‐‐registry=https://registry.npm.taobao.org
 ```
-![20200628-nodejs-08.png](/images/20200628-nodejs-08.png)
+![20200628-nodejs-08.png](/img/20200628-nodejs-08.png)
 检查是否配置成功
-![20200628-nodejs-09.png](/images/20200628-nodejs-09.png)
+![20200628-nodejs-09.png](/img/20200628-nodejs-09.png)
 
 
 

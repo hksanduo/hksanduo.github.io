@@ -14,7 +14,7 @@ categories:
 ## 背景
 拷贝centos7虚拟机导入到客户的虚拟集群，导入过程不多讲，一起正常，在启动过程中，出现 **dracut-initqueue timeout**，通过分析启动日志，发现内核无法加载硬盘，dracut提供shell中工具不多，也无法定位问题具体出在那里，由于磁盘使用lvm的形式，个人猜测可能是由于硬件发生变化，缺乏驱动，导致无法启动。重启以后使用单用户模式登录系统，一些正常，可以直接挂在磁盘并引导系统，可能某些模块无法加载导致的，个人太菜，实在无法定位。
 
-![dracut-initqueue timeout](/images/20200910-01.png)
+![dracut-initqueue timeout](/img/20200910-01.png)
 
 ## 修复
 重启系统，grub选择救援模式（recure)选项，进入救援模式，然后执行

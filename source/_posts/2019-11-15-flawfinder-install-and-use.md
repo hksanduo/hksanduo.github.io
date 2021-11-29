@@ -41,7 +41,7 @@ cp --parents `find 程序目录/-name *.c`  指定扫描目录
 flawfinder --csv > result.csv 指定扫描目录
 ```
 导出csv文件内容展示如下
-![flawfinder-csv.png](/images/flawfinder-csv.png)
+![flawfinder-csv.png](/img/flawfinder-csv.png)
 
 ## flawfinder分析
 Flawfinder 不是类似于fortify那样复杂的工具,它是一个简单并有意义工具。Flawfinder通过使用内置的C/C++函数数据库来工作，该数据库具有众所周知的安全风险，例如缓冲区溢出风险（例如strcpy()，strcat()，gets()，sprintf()和scanf()），格式字符串问题（printf()，snprintf()和syslog()），竞争条件（例如access()，chown()，chgrp()，chmod()，tmpfile()，tmpnam()，tempnam()和mktemp()），潜在的远程命令执行风险（大多数exec()系列，system()，popen()）和较差的随机数获取方法（例如random()）。
@@ -52,17 +52,17 @@ Flawfinder生成按风险分类的（潜在安全漏洞）列表；默认情况�
 ### UnicodeDecodeError: 'utf-8' codec can't decode byte 0xff in position 0: invalid start byte
 在运行过程中，会出现解码出错，官方给出的建议是通过强制转换扫描文档的格式为utf-8，我们可以直接忽略
 `UnicodeDecodeError: 'utf-8' codec can't decode byte 0xff in position 0: invalid start byte`
-![flawfinder-error.png](/images/flawfinder-error.png)
+![flawfinder-error.png](/img/flawfinder-error.png)
 
 #### 官方修复建议
-![flawfinder-office-advice.png](/images/flawfinder-office-advice.png)
+![flawfinder-office-advice.png](/img/flawfinder-office-advice.png)
 将操作系统的编码格式设置成`utf-8`，将程序编码格式强制转换为utf-8，官方推荐的工具为`
 cvt2utf`，可以根据实际情况自行修改。
 
 #### 个人修复建议
-![flawfinder-persional-advice1.png](/images/flawfinder-persional-advice1.png)
+![flawfinder-persional-advice1.png](/img/flawfinder-persional-advice1.png)
 个人这个就有点儿暴力，直接在打开文件的那一步设定，如果出现错误直接忽略。flawfinder如果使用pip安装，安装的位置位于`/usr/local/bin/flawfinder`，其他安装方式，请根据实际情况进行查找。
-![flawfinder-persional-advice2.png](/images/flawfinder-persional-advice2.png)
+![flawfinder-persional-advice2.png](/img/flawfinder-persional-advice2.png)
 
 ### UnicodeDecodeError: 'ascii' codec can't decode byte 0xe6 in position 29: ordinal not in range(128)
 #### 错误原因

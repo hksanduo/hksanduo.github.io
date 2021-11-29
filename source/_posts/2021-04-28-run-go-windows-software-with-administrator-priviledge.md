@@ -14,7 +14,7 @@ go windows程序使用管理员权限运行
 
 ## 背景
 写了一个windows日志收集的小工具，部分操作需要管理员权限，从网上找了几篇文章，思路都是通过Windows的.Manifest xml文件构建syso，然后打包运行即可，在此参考了几篇文章，CSDN居多，不止百度，谷歌上CSDN的文章也排名也比较靠前，但是部分文章思路没问题，但是你们的.manifest配置文件xml数据都没有闭合，导致博主在实验的时候走了不少弯路，对你们各种不负责转载的现象进行批评。以下是搜索引擎截图，部分manifest文件内容缺失，会导致程序抛出异常，对于新手，这很不友好。
-![20210428-01](/images/20210428-01.png)
+![20210428-01](/img/20210428-01.png)
 ## windows manifest文件介绍
 > 引用微软官方docs
 > An application manifest is an XML file that describes and identifies the shared and private side-by-side assemblies that an application should bind to at run time. These should be the same assembly versions that were used to test the application. Application manifests may also describe metadata for files that are private to the application.
@@ -41,7 +41,7 @@ go get github.com/akavel/rsrc
 </assembly>
 ```
 网上部分转载摘抄的文章中有的少抄了最后一行，会导致程序抛出异常，`报错：应用程序无法启动，因为应用程序的并行配置不正确。有关详细信息，请参阅应用程序事件日志，或使用命令行 sxstrace.exe 工具。`
-![20210428-02](/images/20210428-02.png)
+![20210428-02](/img/20210428-02.png)
 
 ### 2、编译 *.syso
 编译命令如下:

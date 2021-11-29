@@ -22,7 +22,7 @@ run格式文件破解
 ## 如果构建run文件
 
 run程序安装包实质上是一个安装脚本加要安装的程序，如下图所示：
-![20200528-crack-run-program-01.png](/images/20200528-crack-run-program-01.png)
+![20200528-crack-run-program-01.png](/img/20200528-crack-run-program-01.png)
 
 通常为了方便，只放一个程序或者是一个压缩包，理论上可以放多个，但是会很恶心的。
 
@@ -55,10 +55,10 @@ $ cat install.sh helloworld.tar.gz > myinstall.run
 ```
 这样就得到了myinstall.run文件，它的结构如下：
 
-![20200528-crack-run-program-05.png](/images/20200528-crack-run-program-05.png)
+![20200528-crack-run-program-05.png](/img/20200528-crack-run-program-05.png)
 
 我们在notepad++中打开我们生成的安装文件
-![20200528-crack-run-program-02.png](/images/20200528-crack-run-program-02.png)
+![20200528-crack-run-program-02.png](/img/20200528-crack-run-program-02.png)
 
 运行myinstall.run时，运行到第5行的exit 0脚本就退出了，所以不会去运行第6行以下的二进制数据(即helloworld.tar.gz文件)，而我们用了tail巧妙地把第7行以下的数据重新生成了一个helloworld.tar.gz文件。再执行安装。run安装包制作较小的程序包是很好的选择，但是它也有缺点，做逻辑比较复杂的安装包，写的安装脚本将会很麻烦。
 
@@ -68,14 +68,14 @@ $ cat install.sh helloworld.tar.gz > myinstall.run
 ### 确定文件结构
 使用notepadd++，winhex等文本编辑工具打开run文件，获取安装shell脚本，小文件可以直接用notepad++查看，大文件建议先用winhex,010editor等工具打开，将shell文件拷贝出来再进行分析
 
-![20200528-crack-run-program-03.png](/images/20200528-crack-run-program-03.png)
+![20200528-crack-run-program-03.png](/img/20200528-crack-run-program-03.png)
 
 通过分析myinstall.run文件中的shell脚本，重点关注第二行，通过这行我们能确认具体安装程序从第6行开始。
 
 ### 解压文件
 通过tail工具，我们可以直接获取我们helloworld.tar.gz，进而查看程序内容。
 
-![20200528-crack-run-program-04.png](/images/20200528-crack-run-program-04.png)
+![20200528-crack-run-program-04.png](/img/20200528-crack-run-program-04.png)
 
 命令可以参考以下，根据实际情况修改。
 ```

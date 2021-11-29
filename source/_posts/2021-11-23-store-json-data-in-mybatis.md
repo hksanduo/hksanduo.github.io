@@ -210,7 +210,7 @@ mybatis.type-handlers-package=cn.blingsec.engine.utils.JsonArrayHandler,cn.bling
 
 >```
 运行结果：
-![20211123-01.png](/images/20211123-01.png)
+![20211123-01.png](/img/20211123-01.png)
 
 ## 参考
 - [https://www.cnblogs.com/han-guang-xue/p/12832074.html](https://www.cnblogs.com/han-guang-xue/p/12832074.html)【mybatis中typeHandler自定义实现json的读写 】

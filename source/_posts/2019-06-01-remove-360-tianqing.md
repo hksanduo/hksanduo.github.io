@@ -19,15 +19,15 @@ categories:
 由于360安装目录下的文件禁止被更改，个人学艺不精，不清楚如何在windows上修改对应的文件，只能通过PE或者linux系统对360的配置文件进行修改
 ### 修改配置文件
 360的配置文件位于360\360Safe\EntClient\conf\ExtBase.dat，将其中的uipass置空即可
-![360sage-config.png](/images/360sage-config.png)
+![360sage-config.png](/img/360sage-config.png)
 ## 方法二
 ### 粉碎相关配置文件
 使用第三方的文件粉碎器，强行移除360\360Safe\EntClient\conf\ExtBase.dat文件
 ## 卸载
 1、重新进入windows系统后，进入360的安装目录，找到360Safe\uninst.exe，点击运行，然后进行卸载即可
-![360-uninstall.png](/images/360-uninstall.png)
+![360-uninstall.png](/img/360-uninstall.png)
 2、或者直接使用控制面板里的程序和功能模块下的卸载或更改程序进行卸载
-![360-uninstall-control.png](/images/360-uninstall-control.png)
+![360-uninstall-control.png](/img/360-uninstall-control.png)
 ## 重启
 卸载完成以后需要重启，重启以后才能移除剩余文件
 

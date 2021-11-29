@@ -15,7 +15,7 @@ dwr框架代码审计
 
 ## 简述
 在做测试的过程中发现一个老系统提交的请求包比较奇怪，通过检索，发现是早期java web研发人员常用的DWR框架，dwr框架比较古老，可以帮助用户实现Ajax网站，可以让你在浏览器中的Javascript代码调用Web服务器上的Java，就像在Java代码就在浏览器中一样。</br>
-![20210301-01](/images/20210301-01.png)
+![20210301-01](/img/20210301-01.png)
 
 DWR 主要包括两部分：
 
@@ -95,9 +95,9 @@ dwr.xml 是 dwr 的核心配置文件，主要的标签有：\<converter\>、\<c
 ## 审计
 DWR框架对于审计人员比较友好，通过分析web.xml和dwr配置文件，我们可以迅速定位到源代码的位置。
 首先分析web.xml
-![20210301-02](/images/20210301-02.png)
+![20210301-02](/img/20210301-02.png)
 获取dwr配置文件目录
-![20210301-03](/images/20210301-03.png)
+![20210301-03](/img/20210301-03.png)
 这里查找scriptName为：CaUsermanAjax，方法名为：getTysfyhbList的具体实现的代码。
 本次审计的dwr框架配置文件使用spring模式，使用spring框架访问bean,并且使用dwr-signatures的配置模式，signatures段使DWR能确定集合中存放的数据类型。
 signatures段允许我们暗示DWR应该用什么类型去处理。格式对以了解JDK5的泛型的人来说很容易理解。
@@ -116,9 +116,9 @@ signatures段允许我们暗示DWR应该用什么类型去处理。格式对以�
 ```
 <signatures>标签是用来声明java方法中List、Set或者Map参数所包含的确切类，以便java代码作出判断。
 通过查找com.zfsoft.cacommon.username.ajax.UsermanAjax对象，我们找到getTysfyhbList方法。
-![20210301-04](/images/20210301-04.png)
+![20210301-04](/img/20210301-04.png)
 通过对比捕获的数据包我们可以了解到数据包的格式
-![20210301-05](/images/20210301-05.png)
+![20210301-05](/img/20210301-05.png)
 
 请求地址为:
 ```

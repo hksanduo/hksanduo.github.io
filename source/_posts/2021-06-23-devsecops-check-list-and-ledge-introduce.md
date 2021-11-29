@@ -16,7 +16,7 @@ Ledge （from Know-Ledge，意指承载物）知识和工具平台，是我们�
 
 DevOps 运动的主要特点是强烈倡导对构建软件的所有环节 (从集成、测试、发布到部署和基础架构管理) 进行全面的自动化和监控。DevOps 元素周期表 协助选择 DevOps 工具，由于工具​列表会不断更新，请参考最新版本。
 
-![20210623-01.png](/images/20210623-01.png)
+![20210623-01.png](/img/20210623-01.png)
 
 您可以在这个平台上看到：
 * **工具元素周期表**。帮助您进行数字化时代的 DevOps 工具选型。
@@ -38,7 +38,7 @@ ledge github 地址：https://github.com/phodal/ledge
 ## DevSecOps 介绍
 
 DevOps是Development和Operations的缩写，而DevSecOps则是Development、Security和Operations的缩写。John Willis(DevOps Cookbook合著者之一)称Patrick Debois是DevOps的缔造者，而DevOps的传道者们认为，DevSecOps的基本理念是让每一个解决方案、开发测试的多个跨部门协作人员都融入开发运维和安全的理念，并正确地理解DevOps的做法与含义。也就是说DevSecOps是一个项目组织方式，因此并不不存在DevOps者，更不是说将开发环境和生产环境整合在一起的意思，DevSecOps是一个群体做法，核心理念是：“安全是整个IT团队（包括开发、运维及安全团队）所有成员的责任，需要贯穿整个业务生命周期（从开发到运营）的每一个环节。”
-![20210623-02.png](/images/20210623-02.png)
+![20210623-02.png](/img/20210623-02.png)
 
 将安全整合到DevOps的“DevSecOps”会带来思维方式、流程和技术的整体变化。安全和风险管理的领导者，必须坚持合作，DevOps的敏捷性意味着其在开发过程是无缝的和透明的，同理，“DevSecOps”中的“安全”也应当是沉默的。
 
@@ -63,7 +63,7 @@ Ledge提供DevSecOps检查清单，可以作为参考：
 数据来源于新思科技（Synopsys）的 《Building your DevSecOps pipeline:5 essential activities 》
 
 下图列述了DevSecOps流水线的五个关键节点，每一个节点的用途，优势，关键推动因素和用例：
-![20210623-03.png](/images/20210623-03.png)
+![20210623-03.png](/img/20210623-03.png)
  
 ### DevSecOps 检查清单
 

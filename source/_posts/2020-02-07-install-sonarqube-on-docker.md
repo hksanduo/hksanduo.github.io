@@ -47,17 +47,17 @@ docker run --name sonarqube -d -p 9000:9000 -e SONARQUBE_JDBC_USERNAME=sonar -e 
 ```
 ### 查看是否安装成功
 执行```docker ps```
-![docker-ps.png](/images/20200207-docker-ps.png)
+![docker-ps.png](/img/20200207-docker-ps.png)
 查看sonar和postgres实例进程是否正常
 
 ## 访问
 在宿主机上直接访问  http://localhost:9000, 账户和密码均为admin.如果需要开放宿主机端口供其他主机访问,请使用iptables或者firewall-cmd自行增加防火墙规则,这里就不在赘述了.
-![sonarqube-login.png](/images/20200207-sonar-login.png)
+![sonarqube-login.png](/img/20200207-sonar-login.png)
 
 ## 遇到的坑
 ### 1.使用容器自定义网络,sonarqube jdbc连接失败.
 我最初使用官方提供的方式,设置容器网络进行通信,但是sonarqube使用jdbc链接postgres数据库时总会出现连接数据库失败的提示,目前我没有找到原因,只能使用固定ip进行访问,有点儿失败.
-![sonarqube-connect-error.png](/images/20200207-sonarqube-connect-error.png)
+![sonarqube-connect-error.png](/img/20200207-sonarqube-connect-error.png)
 
 以下是我安装的步骤,如果哪位大佬有解决方法,烦请不吝赐教,毕竟使用固定ip访问数据库不是一件长久的事情.
 #### 为sonarqube和postgres创建相应的容器网络
@@ -80,7 +80,7 @@ docker run --name sonarqube -p 9000:9000 -e SONARQUBE_JDBC_USERNAME=sonar -e SON
 
 ### 2.elasticsearch 无法启动
 bootstrap checks failed主要原因是elasticsearch启动失败,elasticsearch需要的vm.max_map_count至少为262144
-![20200207-bootstrap-checks-failed.png](/images/20200207-bootstrap-checks-failed.png)
+![20200207-bootstrap-checks-failed.png](/img/20200207-bootstrap-checks-failed.png)
 
 ```
 max virtual memory areas vm.max_map_count [65530] is too low, increase to at least [262144]
@@ -99,7 +99,7 @@ firewall-cmd --reload
 ```
 需要注意：在启动sonarqube服务器过程中，如果未设置数据库，sonarqube的web服务会正常启动，如果配置了数据库，但是由于种种原因，数据库无法被访问到，sonarqube的web服务是失效的，在调试防火墙的过程中先确定当前sonarqube是否成功运行，可以使用指令 ``` docker logs ${sonarqube容器名称} ``` 来查看sonarqube容器启动日志。连接错误日志如下：
 
-![20200207-fail-to-connect-to-database.png](/images/20200207-fail-to-connect-to-database.png)
+![20200207-fail-to-connect-to-database.png](/img/20200207-fail-to-connect-to-database.png)
 
 
 ## 参考

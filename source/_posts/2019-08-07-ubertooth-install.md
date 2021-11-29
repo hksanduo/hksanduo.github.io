@@ -125,7 +125,7 @@ ImportError: No module named PySide2
 ```
 这个是由于pyside分为pyside和pyside2，官方提供安装列表中仅安装pyside，所以python-pyside2需要我们手动进行安装，
 懒得去查看系统到底需要那些模块，这里大力出奇迹，安装apt源中所有的pyside2相关软件包。
-![image](/images/ubertooth-specan-ui.png)
+![image](/img/ubertooth-specan-ui.png)
 大功告成。
 # 结尾
 文章主要是个人参考官方安装ubertooth常见的工具，为蓝牙测试做准备。

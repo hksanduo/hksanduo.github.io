@@ -27,7 +27,7 @@ firewall-cmd --permanent --add-port=6666/tcp
 ```
 
 个人本地代理服务器配置如下：
-![20200307-proxy-client.png](/images/20200307-proxy-client.png)
+![20200307-proxy-client.png](/img/20200307-proxy-client.png)
 宿主机本地的代理端口为：6666，未设置验证用户名和密码
 可以使用局域网中其他主机测试一下，宿主机本地代理服务器是否配置成功，测试过程这里就不在赘述了。
 
@@ -96,7 +96,7 @@ polipo未设置自启动，需要手动运行
 ```
 curl cip.cc
 ```
-![20200307-proxy-test.png](/images/20200307-proxy-test.png)
+![20200307-proxy-test.png](/img/20200307-proxy-test.png)
 显示得ip位于国外，代理成功，可以开心编译openwrt了。
 
 ## 注意

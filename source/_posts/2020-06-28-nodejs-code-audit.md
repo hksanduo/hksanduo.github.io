@@ -247,7 +247,7 @@ app.get('/:name/:pwd', filter, (req, res) => {
 ```
 $ npm audit
 ```
-![20200624-nodejs-code-review-02.png](/images/20200624-nodejs-code-review-02.png)
+![20200624-nodejs-code-review-02.png](/img/20200624-nodejs-code-review-02.png)
 
 修复组件安全风险
 ```
@@ -270,7 +270,7 @@ dependency 5.3.2下载地址:[https://dl.bintray.com/jeremy-long/owasp/dependenc
 使用方式：
 在bin目录下面有bat和shell两个脚本，根据操作系统运行对应的脚本
 
-![20200624-nodejs-code-review-03.png](/images/20200624-nodejs-code-review-03.png)
+![20200624-nodejs-code-review-03.png](/img/20200624-nodejs-code-review-03.png)
 ```
 $ .\dependency-check.bat --help
 usage: Dependency-Check Core [--advancedHelp] [--enableExperimental]
@@ -331,7 +331,7 @@ the CVE and CPE data files from nvd.nist.gov.
 注意一点，dependency check扫描nodejs，需要使用`node install`命令先安装相关依赖包，然后才可以使用dependency check进行扫描
 #### 分析扫描结果
 dependency check会匹配当前依赖对应的CVE及CWE漏洞，分析这些风险问题，会花费很长时间，建议对高风险以上问题进行分析，确定漏洞是否存在。
-![20200624-nodejs-code-review-04.png](/images/20200624-nodejs-code-review-04.png)
+![20200624-nodejs-code-review-04.png](/img/20200624-nodejs-code-review-04.png)
 
 ### fortify sca
 #### 介绍
@@ -347,7 +347,7 @@ sourceanalyzer -b nodejs -scan -Dcom.fortify.sca.Phase0HigherOrder.Languages=jav
 ```
 #### 分析扫描结果
 和其他SCA工具分析的思路一样，按照漏洞风险，从高到低，逐条分析。
-![fortify scan result analysis](/images/20200624-nodejs-code-review-01.png)
+![fortify scan result analysis](/img/20200624-nodejs-code-review-01.png)
 
 ### nodejsscan
 #### 介绍
@@ -360,14 +360,14 @@ docker run -it -p 9090:9090 opensecurity/nodejsscan:latest
 ```
 访问对应站点，上传被扫描程序
 
-![nodejsscan upload file](/images/20200624-nodejs-code-review-05.png)
+![nodejsscan upload file](/img/20200624-nodejs-code-review-05.png)
 
 等待片刻，获取扫描结果，进行分析
 
-![nodejsscan result](/images/20200624-nodejs-code-review-06.png)
-![nodejsscan result](/images/20200624-nodejs-code-review-07.png)
-![nodejsscan result](/images/20200624-nodejs-code-review-08.png)
-![nodejsscan result](/images/20200624-nodejs-code-review-09.png)
+![nodejsscan result](/img/20200624-nodejs-code-review-06.png)
+![nodejsscan result](/img/20200624-nodejs-code-review-07.png)
+![nodejsscan result](/img/20200624-nodejs-code-review-08.png)
+![nodejsscan result](/img/20200624-nodejs-code-review-09.png)
 #### 分析扫描结果
 个人感觉nodejsscan对于漏洞识别能力一般，但是还是可以辅助安全人员发现漏洞，毕竟没多少可以用的，有就不错了。
 
@@ -379,7 +379,7 @@ Retire.js通过扫描Web应用程序判断是否使用易受攻击的JavaScript�
 ```
 $ npm install -g retire
 ```
-![retire install](/images/20200624-nodejs-code-review-10.png)
+![retire install](/img/20200624-nodejs-code-review-10.png)
 使用：
 在项目的目录下执行以下指令，即可扫描。
 ```

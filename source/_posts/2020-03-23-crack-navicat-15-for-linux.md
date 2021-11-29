@@ -334,7 +334,7 @@ $ mv ~/Desktop/navicat15-premium-en-patched.AppImage ~/Desktop/navicat15-premium
 sudo chmod +x /usr/local/share/navicat15-premium-en.AppImage
 sudo ln -sf /usr/local/share/navicat15-premium-en.AppImage /usr/local/bin/navicat15
 ```
-![20200323-crack-navicat-15-for-linux.png](/images/20200323-crack-navicat-15-for-linux.png)
+![20200323-crack-navicat-15-for-linux.png](/img/20200323-crack-navicat-15-for-linux.png)
 
 ## 参考内容
 - [https://gitee.com/yangzhuoming/navicat-keygen](https://gitee.com/yangzhuoming/navicat-keygen)
