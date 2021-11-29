@@ -22,7 +22,7 @@ jobs:
     - name: Setup Node            # 安装 Node 环境
       uses: actions/setup-node@v1
       with:
-        node-version: "10.x"
+        node-version: "17.x"
 
     - name: Hexo Generate         # 安装 Hexo 依赖并且生成静态文件
       run: |
