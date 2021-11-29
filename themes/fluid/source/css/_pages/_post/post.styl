@@ -1,20 +1,32 @@
-.post-content
+.post-content, post-custom
   box-sizing border-box
   padding-left 10%
   padding-right 10%
 
 @media (max-width: 767px)
-  .post-content
+  .post-content, post-custom
     padding-left 2rem
     padding-right 2rem
 
 @media (max-width: 424px)
-  .post-content
+  .post-content, post-custom
     padding-left 1rem
     padding-right 1rem
 
-.post-content h1, h2, h3, h4, h5, h6
-  anchor-offset()
+.post-content
+    h1, h2, h3, h4, h5, h6
+      anchor-offset()
+
+.page-content, .post-content
+  strong
+    font-weight bold
+
+  & > *:first-child
+    margin-top 0
+
+  img
+    object-fit cover
+    max-width 100%
 
 .post-metas
   display flex
@@ -31,7 +43,10 @@
 .post-prevnext
   margin-top 2rem
   display flex
+  flex-wrap wrap
   justify-content space-between
+  margin-left -0.5rem
+  margin-right -0.5rem
 
   .post-prev, .post-next
     display flex
@@ -40,11 +55,6 @@
 
     i
       font-size 1.5rem
-      -webkit-transform translateZ(0)
-      -moz-transform translateZ(0)
-      -ms-transform translateZ(0)
-      -o-transform translateZ(0)
-      transform translateZ(0)
 
     a
       display flex
@@ -121,7 +131,6 @@
   position sticky
   top 2rem
   padding 3rem 0 0 0
-  max-height 80%
   visibility hidden
 
 .toc-header
@@ -132,8 +141,8 @@
   &, & > i
     font-size 1.25rem
 
-#tocbot
-  max-height 100%
+.toc-body
+  max-height 75vh
   overflow-y auto
   overflow -moz-scrollbars-none
   -ms-overflow-style none
@@ -154,40 +163,42 @@
     font-size 0.95rem
 
 .tocbot-link
-  color $tocbot-link-color
+  color var(--text-color)
 
 .tocbot-active-link
   font-weight bold
-  color $tocbot-link-active-color
+  color var(--link-hover-color)
 
 .tocbot-is-collapsed
   max-height 0
 
 .tocbot-is-collapsible
   overflow hidden
-  transition all 300ms ease-in-out
+  transition all .3s ease-in-out
 
 @media (max-width: 1024px)
   .toc-container
     padding-left 0
     padding-right 0
 
+.markdown-body .image-caption
+  font-size .8rem
+  color var(--post-text-color)
+  opacity 0.65
+  line-height 1
+  margin -0.75rem auto 2rem
+  text-align center
+
 .custom, .comments
   margin-top 2rem
 
-.katex-block
-  overflow-x auto
+.comments
+  noscript
+    display block
+    text-align center
+    padding 2rem 0
 
-.katex, .mjx-mrow
-  white-space pre-wrap !important
-
-.mjx-char
-  line-height 1
-
-mjx-container
-  overflow-x auto
-  overflow-y hidden !important
-  padding .5em 0
-
-  &:focus, svg:focus
-    outline none
+.visitors
+  font-size .8em
+  padding .45rem
+  float right

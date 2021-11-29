@@ -9,6 +9,7 @@
     object-fit cover
     box-shadow 0 5px 11px 0 rgba(0, 0, 0, 0.18), 0 4px 15px 0 rgba(0, 0, 0, 0.15)
     border-radius .25rem
+    background-color transparent
 
 .index-info
   display flex
@@ -18,21 +19,28 @@
   padding-bottom .5rem
 
 .index-header
+  color var(--text-color)
   font-size 1.5rem
   font-weight bold
-  line-height 1.2
+  line-height 1.4
   white-space nowrap
   overflow hidden
   text-overflow ellipsis
+  margin-bottom .25rem
+
+  .index-pin
+    color var(--text-color)
+    font-size 1.5rem
+    margin-right .15rem
 
 .index-btm
-  color $sec-text-color
+  color var(--sec-text-color)
 
   a
-    color $sec-text-color
+    color var(--sec-text-color)
 
 .index-excerpt
-  color $sec-text-color
+  color var(--sec-text-color)
 
   margin 0.5rem 0 0.5rem 0
   max-height calc(1.4rem * 3)
@@ -60,3 +68,6 @@
     display -webkit-box
     -webkit-box-orient vertical
     -webkit-line-clamp 2
+
+    .index-pin
+      font-size 1.25rem

@@ -126,6 +126,11 @@ burpsuite响应包中将appName替换成 ```com.x7890.shortcutcreator```,appurl�
 ![20211109-28.jpg](/images/20211109-28.jpg)
 到这里就可以启用酷安apk安装未知应用的权限，同样的方法也可以用到启用文件管理器上，启用文件管理器的安全未知应用权限，这样就可以通过文件管理器安装第三方应用。
 
+------
+### 2021年12月12日更新
+系统更新到10.6.0.93以后，使用以上的教程会出现安装失败的问题，后续分析发现，新版系统安装包的构建方式不一样，旧版是直接更改apk包名后缀为zip，新版需要将apk包压缩成zip格式，与之前不一样的是，多了两个文本配置文件，进过测试，没有也可以成功安装。所以在构造apk下载服务时需要注意，将需要安装的apk包直接压缩成zip格式，其他步骤不变。
+感谢网友@阿辉的反馈，进过测试，在Ireader smart2 (系统版本为：10.6.0.93)上同样可以利用以上方法成功安装第三方软件。
+
 ## 参考
 - [http://store.ireader.com/product/index?type=Smart&id=383890&source=](http://store.ireader.com/product/index?type=Smart&id=383890&source=)【ireader smart xs pro】
 - [https://www.coolapk.com/apk/com.x7890.shortcutcreator](https://www.coolapk.com/apk/com.x7890.shortcutcreator)【创建快捷方式apk】
