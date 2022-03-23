@@ -101,6 +101,52 @@ firewall-cmd --reload
 
 ![20200207-fail-to-connect-to-database.png](/img/20200207-fail-to-connect-to-database.png)
 
+## 进阶
+最近为了方便，也免得之前的做法扰乱大家的思路，我直接构建了一个docker-componse.yml，方便大家直接构建。docker-componse.yml如下：
+```
+version: '3'
+
+services:
+  postgres-db:
+    image: postgres:latest
+    container_name: sonar-postgres
+    ports:
+      - 5432:5432
+    volumes:
+      - ./data/postgres:/data/postgres
+    environment:
+      POSTGRES_USER: sonar
+      POSTGRES_PASSWORD: 1qaz@WSX
+      PGDATA: /data/postgres
+    networks:
+      - sonarqube
+    restart: unless-stopped
+
+  sonarqube:
+    image: sonarqube:latest
+    container_name: sonarqube
+    ports:
+      - 9000:9000
+    depends_on:
+      - postgres-db
+    environment:
+      SONARQUBE_JDBC_USERNAME: sonar
+      SONARQUBE_JDBC_PASSWORD: 1qaz@WSX
+      SONARQUBE_JDBC_URL: jdbc:postgresql://postgres-db:5432/sonar
+    volumes:
+      - ./data/sonarqube/sonarqube_data:/opt/sonarqube/data
+      - ./data/sonarqube/sonarqube_extensions:/opt/sonarqube/extensions
+      - ./data/sonarqube/sonarqube_logs:/opt/sonarqube/logs
+    networks:
+      - sonarqube
+    restart: unless-stopped
+
+networks:
+  sonarqube:
+    driver: bridge
+
+```
+使用sonarqube和postgres结合的方式，数据库的用户名为：sonar,密码各位看官自行配置即可，数据已做了本地映射
 
 ## 参考
 * [https://hub.docker.com/_/sonarqube](https://hub.docker.com/_/sonarqube)
