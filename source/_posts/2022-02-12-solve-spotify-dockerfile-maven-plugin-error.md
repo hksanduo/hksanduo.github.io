@@ -69,6 +69,69 @@ mvn clean package dockerfile:build -Dmaven.test.skip=true
 ```     
 ![maven build success](/img/20220212-03.png)
 
+## 更新
+###  repository does not exist or may require 'docker login': denied: requested access to the resource is denied
+之前使用的镜像文件一直是dockerhub上的，最近需要使用自行构建的镜像，重新编辑dockerfile，使用mvn命令编译项目，打包镜像过程中遇到了以下问题：
+```
+[ERROR] pull access denied for hksanduo/oracle-jdk-8, repository does not exist or may require 'docker login': denied: requested access to the resource is denied
+[WARNING] An attempt failed, will retry 1 more times
+org.apache.maven.plugin.MojoExecutionException: Could not build image
+    at com.spotify.plugin.dockerfile.BuildMojo.buildImage (BuildMojo.java:247)
+    at com.spotify.plugin.dockerfile.BuildMojo.execute (BuildMojo.java:135)
+    at com.spotify.plugin.dockerfile.AbstractDockerMojo.tryExecute (AbstractDockerMojo.java:265)
+    at com.spotify.plugin.dockerfile.AbstractDockerMojo.execute (AbstractDockerMojo.java:254)
+    at org.apache.maven.plugin.DefaultBuildPluginManager.executeMojo (DefaultBuildPluginManager.java:137)
+    at org.apache.maven.lifecycle.internal.MojoExecutor.execute (MojoExecutor.java:210)
+    at org.apache.maven.lifecycle.internal.MojoExecutor.execute (MojoExecutor.java:156)
+    at org.apache.maven.lifecycle.internal.MojoExecutor.execute (MojoExecutor.java:148)
+    at org.apache.maven.lifecycle.internal.LifecycleModuleBuilder.buildProject (LifecycleModuleBuilder.java:117)
+    at org.apache.maven.lifecycle.internal.LifecycleModuleBuilder.buildProject (LifecycleModuleBuilder.java:81)
+    at org.apache.maven.lifecycle.internal.builder.singlethreaded.SingleThreadedBuilder.build (SingleThreadedBuilder.java:56)
+    at org.apache.maven.lifecycle.internal.LifecycleStarter.execute (LifecycleStarter.java:128)
+    at org.apache.maven.DefaultMaven.doExecute (DefaultMaven.java:305)
+    at org.apache.maven.DefaultMaven.doExecute (DefaultMaven.java:192)
+    at org.apache.maven.DefaultMaven.execute (DefaultMaven.java:105)
+    at org.apache.maven.cli.MavenCli.execute (MavenCli.java:972)
+    at org.apache.maven.cli.MavenCli.doMain (MavenCli.java:293)
+    at org.apache.maven.cli.MavenCli.main (MavenCli.java:196)
+    at jdk.internal.reflect.NativeMethodAccessorImpl.invoke0 (Native Method)
+    at jdk.internal.reflect.NativeMethodAccessorImpl.invoke (NativeMethodAccessorImpl.java:62)
+    at jdk.internal.reflect.DelegatingMethodAccessorImpl.invoke (DelegatingMethodAccessorImpl.java:43)
+    at java.lang.reflect.Method.invoke (Method.java:566)
+    at org.codehaus.plexus.classworlds.launcher.Launcher.launchEnhanced (Launcher.java:282)
+    at org.codehaus.plexus.classworlds.launcher.Launcher.launch (Launcher.java:225)
+    at org.codehaus.plexus.classworlds.launcher.Launcher.mainWithExitCode (Launcher.java:406)
+    at org.codehaus.plexus.classworlds.launcher.Launcher.main (Launcher.java:347)
+Caused by: com.spotify.docker.client.exceptions.DockerException: pull access denied for hksanduo/oracle-jdk-8, repository does not exist or may require 'docker login': denied: requested access to the resource is denied
+```
+通过错误，可以看出，从公共镜像中找不到hksanduo/oracle-jdk-8,登录失败，也无法获取私有镜像，直接抛出异常，博主本人本地镜像源中是有hksanduo/oracle-jdk-8这个镜像的，这个镜像是博主自行打包的，但是尚未提交的dockerhub，相当于在当前情况下，使用spotify dockerfile maven plugin无法使用本地的镜像源，每次只获取最新的镜像源进行构建。   
+通过翻阅资料和代码，找到一个配置属性，可以跳过，在pom.xml中增加配置信息，具体配置属性名称为：```pullNewerImage```，将值设置成 **false** 即可，配置参考：
+```
+            <plugin>
+                <groupId>com.spotify</groupId>
+                <artifactId>dockerfile-maven-plugin</artifactId>
+                <version>1.4.12</version>
+                <executions>
+                    <execution>
+                        <id>default</id>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>build</goal>
+                        </goals>
+                    </execution>
+                </executions>
+                <configuration>
+                    <repository>hksanduo/${project.artifactId}</repository>
+                    <tag>${project.version}</tag>
+                    <dockerfile>src/main/docker/Dockerfile</dockerfile>
+                    <buildArgs>
+                        <JAR_FILE>target/${project.build.finalName}.jar</JAR_FILE>
+                        <SCA_CLIENT>client/sca-client</SCA_CLIENT>
+                    </buildArgs>
+                    <pullNewerImage>false</pullNewerImage>
+                </configuration>
+            </plugin>
+```
 
 ## 参考
 - [https://github.com/spotify/dockerfile-maven](https://github.com/spotify/dockerfile-maven)【dockerfile-maven】
