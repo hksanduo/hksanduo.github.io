@@ -21,7 +21,7 @@ categories:
 从互联网上找到了checkmarx 8.7的按照包和激活工具，但是没有激活教程，网上也没找到，只能自己摸索着来，希望激活工具管用，百度云链接详见参考。
 
 ![20201030-01](/img/20201030-01.png)
-由于checkmarx耗费资源不少，使用内部的一台虚拟的windows server 2012来安装，由于某些杀软会删除checkmarx部分dll文件，需要先关闭杀软，我的这台内网服务器也没安装杀软，具体情况我也不清楚，官方安装文档中说明的，可详见Checkmarx安装说明文档8.7.pdf
+由于checkmarx耗费资源不少，使用内部的一台虚拟的windows server 2012来安装，由于某些杀软会删除checkmarx部分dll文件，需要先关闭杀软，我的这台内网服务器也没安装杀软，具体情况我也不清楚，官方安装文档中说明的，可详见Checkmarx安装说明文档8.7.pdf(该文档位于百度云压缩包中)
 
 ## 安装
 首先解压CxSAST.870.Release.Setup_8.7.0.57.zip，获取CxSetup.exe,使用管理员权限运行该安装文件。
@@ -89,6 +89,9 @@ checkmarx 使用很友好，通过创建项目，上传扫描源代码压缩包�
 
 ## 遇到的错误
 我遇到的错误就是使用激活软件未修改授权有效期，只生成了当天的证书，当我第二天准备再试用一下，发现checkmarx多个进程无法启动，强制启动就会报错，相当尴尬，找了半天才发现是证书授权问题，好多时间被浪费了。
+
+### 20220331 更新
+有同学加我好友询问安装包解压密码，密码在《Checkmarx安装说明文档8.7.pdf》文档当中，checkmarx在互联网企业中使用的较多，博主从20年到现在，使用checkmarx比较少，并且尚未获取到最新的checkmarx安装版本，据某大厂的朋友说，由于checkmarx的规则一般，但是检测引擎集相关配套设施比较不错，他们自行在优化规则。
 
 ## 参考
 - [链接：https://pan.baidu.com/s/1mQjsUTWuhRuQyXvHL5smzQ 提取码：vlfk ](https://pan.baidu.com/s/1mQjsUTWuhRuQyXvHL5smzQ)【checkmarx 百度云】
