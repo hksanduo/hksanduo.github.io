@@ -689,9 +689,9 @@ disqus:
 # Based on GitHub Issues
 # See: https://github.com/gitalk/gitalk#options
 gitalk:
-  clientID: be14fbeeae5d109fc370
-  clientSecret: 435ce16e4168507c36e8638170f52db128e04c03
-  repo: https://github.com/hksanduo/hksanduo.github.io/issues  
+  clientID: bb552a90c24f089f52f1
+  clientSecret: d572f470d3e29bdb03b9fb2a9a16e18c1b538245
+  repo: https://github.com/hksanduo/hksanduo.github.io  
   owner: hksanduo
   admin: ['hksanduo']
   language: zh-CN
