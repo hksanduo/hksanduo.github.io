@@ -3,7 +3,7 @@ title: "敏捷代码审计之代码硬编码"
 date:   2022-09-09  16:57:00 +0800
 layout: post
 tag:
-- Api
+- Code Audit
 categories:
 - Security
 ---
