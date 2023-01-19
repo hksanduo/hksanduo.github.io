@@ -66,8 +66,10 @@ mvn调试输出内容：
 执行以下命令进行构建：
 ```
 mvn clean package dockerfile:build -Dmaven.test.skip=true 
-```     
-![maven build success](/img/20220212-03.png)
+```
+
+![maven build success](/img/20220212-03.png)        
+
 
 ## 更新
 ###  repository does not exist or may require 'docker login': denied: requested access to the resource is denied
