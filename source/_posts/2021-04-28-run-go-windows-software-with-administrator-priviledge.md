@@ -24,7 +24,7 @@ go windows程序使用管理员权限运行
 ## go windows程序使用管理员权限运行
 ### 1、获取rsrc
 ```
-go get github.com/akavel/rsrc 
+go install github.com/akavel/rsrc@latest
 ```
 在项目根目录中创建*.manifest文件（文件名没有过多局限，不过按照要求来也没错）
 文件内容如下：
