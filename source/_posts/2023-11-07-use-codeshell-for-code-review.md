@@ -1,6 +1,6 @@
 ---
 title: "使用codeshell进行代码安全评估"
-date:   2023-11-17  17:00:00 +0800
+date:   2023-11-07  17:00:00 +0800
 layout: post
 tag:
 - ML
@@ -160,15 +160,16 @@ public class rcecontroller {
 
 ## 使用vscode插件
 ### 安装配置
-vscode应用市场检索：CodeShell VSCode，直接安装即可，也可以自行编译安装。
+vscode应用市场检索：CodeShell VSCode，直接安装即可，也可以自行编译安装。    
 ![vscode插件](/img/20231107-06.png)
 使用vscode组件，有两种模式，一种使用CPU，采用llama_cpp量化的形式加载，速度稍微缓慢一些，另外一种是使用text-generation-inference(TGI)加载模型。详情详解项目README。
 
-插件配置如下：
+插件配置如下：      
 ![插件配置](/img/20231107-07.png)
+
 注意：
-1.正常配置地址和端口
-2.这里只支持llama.cpp和tgi两种连接方式，目前(2023-11-07)不支持openai格式，需要手动修改插件
+1.正常配置地址和端口    
+2.这里只支持llama.cpp和tgi两种连接方式，目前(2023-11-07)不支持openai格式，需要手动修改插件      
 3.tokens根据实际情况修改
 
 ### 编译运行llama_cpp_for_codeshell
@@ -199,17 +200,18 @@ docker run --gpus 'all' --shm-size 1g -p 9090:80 -v /data/models:/data \
         --max-stop-sequences 12 --trust-remote-code
 ```
 
-这里使用南大的ghcr镜像源，速度不错，推荐给大家。个人设备是24G显存，使用TGI加载模型会爆显存。
+这里使用南大的ghcr镜像源，速度不错，推荐给大家。个人设备是24G显存，使用TGI加载模型会爆显存。        
 ![oom](/img/20231107-09.png)
 
 ### 测试
-我这里由于操作系统的语言是英文，导致返回的结果为英文，codeshell是支持中文的。对于代码自动补全我就不演示了，各位自行摸索。
+我这里由于操作系统的语言是英文，导致返回的结果为英文，codeshell是支持中文的。对于代码自动补全我就不演示了，各位自行摸索。  
 ![测试](/img/20231107-08.png)
 
 
 ## 总结
-1、可以辅助代码审计人员分析代码，只能辅助，没当作SAST来使用，再说SAST也有大量误报，都需要人工来复核
-2、由于codeshell 上下文token限制，没法去分析业务系统，代码释义可能不准确，这些在使用的过程中需要注意
+
+1、可以辅助代码审计人员分析代码，只能辅助，没当作SAST来使用，再说SAST也有大量误报，都需要人工来复核。   
+2、由于codeshell 上下文token限制，没法去分析业务系统，代码释义可能不准确，这些在使用的过程中需要注意。  
 3、codeshell是首个支持代码安全分析的大模型，相当不容易。
 
 ## 参考
