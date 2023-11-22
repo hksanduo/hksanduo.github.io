@@ -298,6 +298,12 @@ wait || :
 稍等片刻，访问：http://{your server ip}:10610/ 如果能够正常加载HBase Master web 界面证明运行成功。  
 ![ master status ](/img/20231121-03.png)
 
+### 错误
+#### NotImplementedError: fstat unimplemented unsupported or native support failed to load; see https://github.com/jruby/jruby/wiki/Native-Libraries
+![错误](/img/20231121-05.png)
+本次使用的基础镜像`harisekhon/alpine-java:jre8`已经好多年没更新了，安装低版本hbase(<=2.5.6)以下，并不会遇到这个问题，如果手动将alpine配置成3.13以上或者安装jruby(>=9.2.13)以上，就会遇到这个问题，这个问题网上的解决方案都是安装jruby和asciidoctor来解决，我们这里已经安装，同样这个问题可能是jruby过高而导致的兼容性问题，遇到这个问题，可以将hbase的安装下载回来，解压查看 hbase-{version}/lib/ruby 下jruby-complete版本，只要安装的jruby版本不高于jruby-complete即可，这个修复方案可能随着时间发展，兼容更强，各位谨慎参考。
+
+![ jruby-complete ](/img/20231121-04.png)
 
 ## 参考
 - [https://github.com/harisekhon/Dockerfiles](https://github.com/harisekhon/Dockerfiles)【harisekhon hbase github】
