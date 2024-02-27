@@ -44,15 +44,15 @@ export OLLAMA_HOST=0.0.0.0
 ollama run gemma:7b
 ```
 
-![加载gemma](/img/2024027-01.png)
+![加载gemma](/img/20240227-01.png)
 
 * 魔法上网，效果更好。
 
-![加载成功](/img/2024027-02.png)
+![加载成功](/img/20240227-02.png)
 
 ollama会将缓冲保存到本地用户目录下：`~/.ollama/models` 文件保存类似于docker存储方式
 
-![缓存](/img/2024027-03.png)
+![缓存](/img/20240227-03.png)
 
 如果想从当前服务中移除运行的镜像，有两种方法，1、重启ollama 服务  2、使用rm删除当前镜像，第二种方法有个问题就是镜像得重新下载。
 
@@ -188,11 +188,11 @@ safetensors_rust.SafetensorError: Error while deserializing header: HeaderTooLar
 
 执行转换，占用的是CPU，无GPU占用
 
-![cpu占用率](/img/2024027-04.png)
+![cpu占用率](/img/20240227-04.png)
 
 cover成功
 
-![转换成功](/img/2024027-05.png)
+![转换成功](/img/20240227-05.png)
 
 7、量化模型
 
@@ -208,7 +208,7 @@ llm/llama.cpp/quantize converted.bin qwen_v1.5_quantized_int8.bin q8_0
 
 成功
 
-![量化成功](/img/2024027-06.png)
+![量化成功](/img/20240227-06.png)
 
 8、构造文件 **`Modelfile`**
 
@@ -231,7 +231,7 @@ ollama create example -f Modelfile
 ollama create qwen1.5-int8 -f Modelfile
 ```
 
-![创建模型](/img/2024027-07.png)
+![创建模型](/img/20240227-07.png)
 
 10、运行你的模型
 
@@ -239,7 +239,7 @@ ollama create qwen1.5-int8 -f Modelfile
 ollama run qwen1.5-int8 "who are you?"
 ```
 
-![运行模型](/img/2024027-08.png)
+![运行模型](/img/20240227-08.png)
 
 接口测试
 
@@ -250,7 +250,7 @@ curl http://192.168.3.199:11434/api/generate -d '{
 }'
 ```
 
-![api测试结果](/img/2024027-09.png)
+![api测试结果](/img/20240227-09.png)
 
 继续测试（No streaming）
 
@@ -262,11 +262,11 @@ curl http://192.168.3.199:11434/api/generate -d '{
 }'
 ```
 
-![api测试结果](/img/2024027-10.png)
+![api测试结果](/img/20240227-10.png)
 
 消耗资源
 
-![GPU占用资源](/img/2024027-11.png)
+![GPU占用资源](/img/20240227-11.png)
 
 此处显存是同时加载：gemma:7b和Qwen1.5-14B-Chat-GPTQ-Int8
 
