@@ -2,6 +2,7 @@
 title: "安装ollama并运行QWEN1.5模型"
 date:   2024-02-27  14:27:00 +0800
 layout: post
+tag:
 - ML
 categories:
 - Linux
@@ -268,6 +269,8 @@ curl http://192.168.3.199:11434/api/generate -d '{
 ![GPU占用资源](/img/20231211-11.png)
 
 此处显存是同时加载：gemma:7b和Qwen1.5-14B-Chat-GPTQ-Int8
+
+更多接口格式，请参考ollama官方文档。
 
 ### 注意
 
