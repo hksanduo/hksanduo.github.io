@@ -15,8 +15,8 @@ categories:
 ## 背景介绍
 最近在学习车联网相关知识，碰巧媳妇公司CTF题目中有一道车联网的题目，题目方向是MQTT，正好可以深入研究一下。
 
-## mqtss介绍
-mqtss是一款mqtt安全测试工具，github地址：https://github.com/SPuerBRead/mqtts
+## mqtts介绍
+mqtts是一款mqtt安全测试工具，github地址：https://github.com/SPuerBRead/mqtts
 
 主要功能包括如下：
 
