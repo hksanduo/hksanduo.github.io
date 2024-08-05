@@ -29,7 +29,7 @@ Scorecard已在数千个项目上运行，以监控和跟踪安全指标。主�
 
 ## 查看项目的评分
 要查看Scorecard定期扫描的项目评分，请访问webviewer，并替换占位符文本为平台、用户/组织和存储库名称：
-https://scorecard.dev/viewer/?uri=<github_or_gitlab>.com/<user_name_or_org>/<repository_name>
+`https://scorecard.dev/viewer/?uri=<github_or_gitlab>.com/<user_name_or_org>/<repository_name>`
 
 例如：
 
