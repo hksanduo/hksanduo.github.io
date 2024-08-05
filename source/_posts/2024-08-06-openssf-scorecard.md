@@ -8,7 +8,7 @@ categories:
 - Security
 ---
 
-# 软件供应链健康度评估之scorecard"
+# 软件供应链健康度评估之scorecard 
 
 ------
 # Scorecard介绍
@@ -81,12 +81,16 @@ docker pull gcr.io/openssf/scorecard:v3.2.1
 ```
 #### 本地安装
 自行编译，或者直接从release下载对应的二进制文件即可
+```
+make build
+```
 
 使用包管理器
-包管理器	支持的分发版	命令
-Nix	NixOS	nix-shell -p nixpkgs.scorecard
-AUR helper	Arch Linux	使用的AUR助手安装scorecard
-Homebrew	macOS或Linux	brew install scorecard
+| 包管理器 | 支持的分发版 |	命令 |
+| --- | --- | --- |
+| Nix	| NixOS	| nix-shell -p nixpkgs.scorecard |
+| AUR 	| Arch Linux |	yaourt install scorecard |
+| Homebrew	| macOS或Linux	| brew install scorecard |
 
 ### 获取github 授权 token
 GitHub对未经认证的请求实施api速率限制。为了避免这些限制，必须在运行Scorecard之前对的请求进行认证。有两种方法可以认证的请求：创建GitHub个人访问令牌或创建GitHub App安装。
@@ -260,12 +264,12 @@ scorecard --repo=<repo_url> --format json --show-details > results.json
 
 ## 总结
 ### 企业实践
-1、使用 Scorecard 对第三方开源项目进行安全性评估，综合判断引入的第三方组件的健壮性。
+1、使用 Scorecard 对第三方开源项目进行安全性评估，综合判断引入的第三方组件的健壮性。    
 2、对企业开源的项目进行评估，提高被维护项目的安全性。
 
 ### 开发者
-1、对自己开发的项目进行评估，综合提供项目安全性。
-2、评估引入的第三方组件，提高项目整理健壮性
+1、对自己开发的项目进行评估，综合提高项目安全性。   
+2、评估引入的第三方组件，提高项目整理健壮性。
 
 ## 参考
 * https://deps.dev/
