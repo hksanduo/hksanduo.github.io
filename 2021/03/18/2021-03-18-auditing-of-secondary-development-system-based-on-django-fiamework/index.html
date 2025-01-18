@@ -1,0 +1,576 @@
+
+
+<!DOCTYPE html>
+<html lang="zh-CN" data-default-color-scheme=auto>
+
+
+
+<head>
+  <meta charset="UTF-8">
+  <link rel="apple-touch-icon" sizes="76x76" href="/img/favicon.png">
+  <link rel="icon" href="/img/favicon.png">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, shrink-to-fit=no">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  
+  <meta name="theme-color" content="#2f4154">
+  <meta name="description" content="">
+  <meta name="author" content="sanduo">
+  <meta name="keywords" content="">
+  <meta name="description" content="记一次基于django二次开发系统业务源代码审计  简述突然被领导拉去协助产研的同学做代码审计，审计的系统是一个后端业务系统，系统基于django框架做的二次开发，我只负责审计业务代码即可。审计过程中遇到一个文件上传点未按照编码规范，使用拼接的形式查询数据而导致的sql注入漏洞，听起来很魔幻，又因为在审计过程中对于postgresql语法生疏，一定要记录一下，否则后续还得花费时间学习。 djang">
+<meta property="og:type" content="article">
+<meta property="og:title" content="记一次基于django二次开发系统业务源代码审计">
+<meta property="og:url" content="https://hksanduo.github.io/2021/03/18/2021-03-18-auditing-of-secondary-development-system-based-on-django-fiamework/index.html">
+<meta property="og:site_name" content="sanduo blog">
+<meta property="og:description" content="记一次基于django二次开发系统业务源代码审计  简述突然被领导拉去协助产研的同学做代码审计，审计的系统是一个后端业务系统，系统基于django框架做的二次开发，我只负责审计业务代码即可。审计过程中遇到一个文件上传点未按照编码规范，使用拼接的形式查询数据而导致的sql注入漏洞，听起来很魔幻，又因为在审计过程中对于postgresql语法生疏，一定要记录一下，否则后续还得花费时间学习。 djang">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://hksanduo.github.io/img/20210318-02.png">
+<meta property="og:image" content="https://hksanduo.github.io/img/20210318-01.png">
+<meta property="og:image" content="https://hksanduo.github.io/img/20210318-03.png">
+<meta property="og:image" content="https://hksanduo.github.io/img/20210318-04.png">
+<meta property="og:image" content="https://hksanduo.github.io/img/20210318-05.png">
+<meta property="og:image" content="https://hksanduo.github.io/img/20210318-06.png">
+<meta property="article:published_time" content="2021-03-18T06:30:00.000Z">
+<meta property="article:modified_time" content="2025-01-18T14:54:10.079Z">
+<meta property="article:author" content="sanduo">
+<meta property="article:tag" content="Code">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:image" content="https://hksanduo.github.io/img/20210318-02.png">
+  
+  <title>记一次基于django二次开发系统业务源代码审计 - sanduo blog</title>
+
+  <link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4/dist/css/bootstrap.min.css" />
+
+
+  <link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/github-markdown-css@4/github-markdown.min.css" />
+  <link  rel="stylesheet" href="/lib/hint/hint.min.css" />
+
+  
+    
+    
+      
+      <link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/highlight.js@10/styles/github-gist.min.css" />
+    
+  
+
+  
+    <link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fancyapps/fancybox@3/dist/jquery.fancybox.min.css" />
+  
+
+
+<!-- 主题依赖的图标库，不要自行修改 -->
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1749284_ba1fz6golrf.css">
+
+
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1736178_kmeydafke9r.css">
+
+
+<link  rel="stylesheet" href="/css/main.css" />
+
+<!-- 自定义样式保持在最底部 -->
+
+
+  <script id="fluid-configs">
+    var Fluid = window.Fluid || {};
+    var CONFIG = {"hostname":"hksanduo.github.io","root":"/","version":"1.8.12","typing":{"enable":true,"typeSpeed":70,"cursorChar":"_","loop":false},"anchorjs":{"enable":true,"element":"h1,h2,h3,h4,h5,h6","placement":"right","visible":"hover","icon":""},"progressbar":{"enable":true,"height_px":3,"color":"#29d","options":{"showSpinner":false,"trickleSpeed":100}},"copy_btn":true,"image_zoom":{"enable":true,"img_url_replace":["",""]},"toc":{"enable":true,"headingSelector":"h1,h2,h3,h4,h5,h6","collapseDepth":0},"lazyload":{"enable":true,"loading_img":"/img/loading.gif","onlypost":false,"offset_factor":2},"web_analytics":{"enable":true,"baidu":null,"google":"UA-167858469-1","gtag":null,"tencent":{"sid":null,"cid":null},"woyaola":null,"cnzz":null,"leancloud":{"app_id":null,"app_key":null,"server_url":null,"path":"window.location.pathname"}},"search_path":"/local-search.xml"};
+  </script>
+  <script  src="/js/utils.js" ></script>
+  <script  src="/js/color-schema.js" ></script>
+<meta name="generator" content="Hexo 5.4.2"></head>
+
+
+<body>
+  <header style="height: 70vh;">
+    <nav id="navbar" class="navbar fixed-top  navbar-expand-lg navbar-dark scrolling-navbar">
+  <div class="container">
+    <a class="navbar-brand" href="/">
+      <strong>Welcome To Sanduo&#39;s Blog</strong>
+    </a>
+
+    <button id="navbar-toggler-btn" class="navbar-toggler" type="button" data-toggle="collapse"
+            data-target="#navbarSupportedContent"
+            aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+      <div class="animated-icon"><span></span><span></span><span></span></div>
+    </button>
+
+    <!-- Collapsible content -->
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+      <ul class="navbar-nav ml-auto text-center">
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/">
+                <i class="iconfont icon-home-fill"></i>
+                首页
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/archives/">
+                <i class="iconfont icon-archive-fill"></i>
+                归档
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/categories/">
+                <i class="iconfont icon-category-fill"></i>
+                分类
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/tags/">
+                <i class="iconfont icon-tags-fill"></i>
+                标签
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/about/">
+                <i class="iconfont icon-user-fill"></i>
+                关于
+              </a>
+            </li>
+          
+        
+        
+          <li class="nav-item" id="search-btn">
+            <a class="nav-link" target="_self" href="javascript:;" data-toggle="modal" data-target="#modalSearch" aria-label="Search">
+              &nbsp;<i class="iconfont icon-search"></i>&nbsp;
+            </a>
+          </li>
+        
+        
+          <li class="nav-item" id="color-toggle-btn">
+            <a class="nav-link" target="_self" href="javascript:;" aria-label="Color Toggle">&nbsp;<i
+                class="iconfont icon-dark" id="color-toggle-icon"></i>&nbsp;</a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+</nav>
+
+    <div class="banner" id="banner" parallax=true
+         style="background: url('/img/default.png') no-repeat center center;
+           background-size: cover;">
+      <div class="full-bg-img">
+        <div class="mask flex-center" style="background-color: rgba(0, 0, 0, 0.3)">
+          <div class="page-header text-center fade-in-up">
+            <span class="h2" id="subtitle" title="记一次基于django二次开发系统业务源代码审计">
+              
+            </span>
+
+            
+              <div class="mt-3">
+  
+  
+    <span class="post-meta">
+      <i class="iconfont icon-date-fill" aria-hidden="true"></i>
+      <time datetime="2021-03-18 06:30" pubdate>
+        2021年3月18日 早上
+      </time>
+    </span>
+  
+</div>
+
+<div class="mt-1">
+  
+    <span class="post-meta mr-2">
+      <i class="iconfont icon-chart"></i>
+      3.2k 字
+    </span>
+  
+
+  
+    <span class="post-meta mr-2">
+      <i class="iconfont icon-clock-fill"></i>
+      
+      
+      10 分钟
+    </span>
+  
+
+  
+  
+</div>
+
+            
+          </div>
+
+          
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <main>
+    
+      
+
+<div class="container-fluid nopadding-x">
+  <div class="row nomargin-x">
+    <div class="d-none d-lg-block col-lg-2"></div>
+    <div class="col-lg-8 nopadding-x-md">
+      <div class="container nopadding-x-md" id="board-ctn">
+        <div class="py-5" id="board">
+          <article class="post-content mx-auto">
+            <!-- SEO header -->
+            <h1 style="display: none">记一次基于django二次开发系统业务源代码审计</h1>
+            
+            <div class="markdown-body">
+              <p>记一次基于django二次开发系统业务源代码审计</p>
+<hr>
+<h2 id="简述"><a href="#简述" class="headerlink" title="简述"></a>简述</h2><p>突然被领导拉去协助产研的同学做代码审计，审计的系统是一个后端业务系统，系统基于django框架做的二次开发，我只负责审计业务代码即可。审计过程中遇到一个文件上传点未按照编码规范，使用拼接的形式查询数据而导致的sql注入漏洞，听起来很魔幻，又因为在审计过程中对于postgresql语法生疏，一定要记录一下，否则后续还得花费时间学习。</p>
+<h2 id="django-如何防止sql注入"><a href="#django-如何防止sql注入" class="headerlink" title="django 如何防止sql注入"></a>django 如何防止sql注入</h2><blockquote>
+<p>防御 SQL 注入</p>
+<p>SQL 注入是一种让恶意用户能在数据库中执行任意 SQL 代码的攻击方式。这将导致记录被删除或泄露。<br>Django 的 querysets 在被参数化查询构建出来时就被保护而免于 SQL 注入。查询的 SQL 代码与查询的参数是分开定义的。参数可能来自用户从而不安全，因此它们由底层数据库引擎进行转义。<br>Django 也为开发者提供了书写 raw queries 或执行 custom sql 的权利。应当尽可能少地使用这些方法，并且您应该小心并准确的转义一切用户可控的参数。另外，在使用 extra() 和 RawSQL 时应当小心谨慎。<br>参数化查询在Django的ORM中无处不在，因此对于SQLi具有很强的防御能力，但是，在一些情况下，还是得注意注入，极少数的API并非100%安全。</p>
+</blockquote>
+<p>有时django ORM不足以满足业务复杂度需求，需要使用原生SQL。不过在此之前，还请考虑是否有避免这种情况的方法。当然某些情况下，无法避免原生SQL，虽说可以通过一些django API来实现，不过不够保证安全。</p>
+<h3 id="执行原生查询"><a href="#执行原生查询" class="headerlink" title="执行原生查询"></a>执行原生查询</h3><p>可以使用 Manager.raw() 来执行原生查询并返回模型实例，如下：</p>
+<figure class="highlight routeros"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs routeros">Manager.raw(raw_query, <span class="hljs-attribute">params</span>=None, <span class="hljs-attribute">translations</span>=None)¶<br></code></pre></td></tr></table></figure>
+<p>该方法接受一个原生 SQL 查询语句，执行它，并返回一个 django.db.models.query.RawQuerySet 实例。这个 RawQuerySet 能像普通的 QuerySet 一样被迭代获取对象实例。<br>例如：<br><img src="/img/20210318-02.png" srcset="/img/loading.gif" lazyload alt="20210318-02"></p>
+<p>对于具体用法我们不过多说明，这里重点强调的是将参数传给raw(),可以使用 raw() 的 params 参数:</p>
+<figure class="highlight python-repl"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><code class="hljs python-repl"><span class="hljs-meta prompt_">&gt;&gt;&gt;</span> <span class="language-python">lname = <span class="hljs-string">&#x27;Doe&#x27;</span></span><br><span class="hljs-meta prompt_">&gt;&gt;&gt;</span> <span class="language-python">Person.objects.raw(<span class="hljs-string">&#x27;SELECT * FROM myapp_person WHERE last_name = %s&#x27;</span>, [lname])</span><br></code></pre></td></tr></table></figure>
+<p>params 是一个参数字典。你将用一个列表替换查询字符串中 %s 占位符，或用字典替换 %(key)s 占位符（key 被字典 key 替换），不论你使用哪个数据库引擎。这些占位符会被 params 参数的值替换。</p>
+<p>特别强调一下，不要对原生查询或SQL字符串中的引号占位符使用字符串格式化，反例如下：</p>
+<figure class="highlight python-repl"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><code class="hljs python-repl"><span class="hljs-meta prompt_">&gt;&gt;&gt;</span> <span class="language-python">query = <span class="hljs-string">&#x27;SELECT * FROM myapp_person WHERE last_name = %s&#x27;</span> % lname</span><br><span class="hljs-meta prompt_">&gt;&gt;&gt;</span> <span class="language-python">Person.objects.raw(query)</span><br></code></pre></td></tr></table></figure>
+<p>这样相当于直接将lname参数拼接到sql语句中，进而导致了sql注入</p>
+<h3 id="直接执行自定义SQL"><a href="#直接执行自定义SQL" class="headerlink" title="直接执行自定义SQL"></a>直接执行自定义SQL</h3><blockquote>
+<p>有时候，甚至 Manager.raw() 都无法满足需求：你可能要执行不明确映射至模型的查询语句，或者就是直接执行 UPDATE， INSERT 或 DELETE 语句。<br>这些情况下，你总是能直接访问数据库，完全绕过模型层。<br>对象 django.db.connection 代表默认数据库连接。要使用这个数据库连接，调用 connection.cursor() 来获取一个指针对象。然后，调用 cursor.execute(sql, [params]) 来执行该 SQL 和 cursor.fetchone()，或 cursor.fetchall() 获取结果数据<br>以上是官方wiki中说明的直接执行自定义SQL方法，对于参数的传递同样使用占位符的形式，wiki中并未提及extra方法。</p>
+</blockquote>
+<figure class="highlight routeros"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs routeros">extra(<span class="hljs-attribute">select</span>=None, <span class="hljs-attribute">where</span>=None, <span class="hljs-attribute">params</span>=None, <span class="hljs-attribute">tables</span>=None, <span class="hljs-attribute">order_by</span>=None, <span class="hljs-attribute">select_params</span>=None)<br></code></pre></td></tr></table></figure>
+<p>extra()函数提供QuerySet修改机制，它能在 QuerySet生成的SQL从句中注入新子句。</p>
+<p>extra可以指定一个或多个 参数,例如 select, where or tables. 这些参数都不是必须的，但是你至少要使用一个，研发前辈给的建议是，要注意这些额外的方式对不同的数据库引擎可能存在移植性问题(因为你在显式的书写SQL语句),除非万不得已,尽量避免这样做。如果在审计过程中遇到，一定打起十二分的精神去分析。</p>
+<h2 id="缺陷代码分析"><a href="#缺陷代码分析" class="headerlink" title="缺陷代码分析"></a>缺陷代码分析</h2><p>通过url的映射关系，找到了文件上传的入口。<br><img src="/img/20210318-01.png" srcset="/img/loading.gif" lazyload alt="20210318-01"><br>跟踪Upload对象，查看post方法实现<br><img src="/img/20210318-03.png" srcset="/img/loading.gif" lazyload alt="20210318-03"><br>分析文件上传post方法接口，第338行获取上传文件对象，第342行将上传文件文件名赋值给server_file_name，进过文件类型和空文件判断后，调用351行，拼接sql查询语句，调用第353行查询当前文件名是否存在，主要目的是文件重复判断。由于使用django objects.raw这种可以直接使用原生sql查询的方式，通过拼接sql语句并且系统中未设置任何sql过滤器，所以此处存在sql注入风险。</p>
+<h3 id="JSON-函数和操作符"><a href="#JSON-函数和操作符" class="headerlink" title="JSON 函数和操作符"></a>JSON 函数和操作符</h3><p>看到下面这条语句，第一反应是肯定有问题，但是对postgresql不怎么了解，对其sql语法也是一知半解，以下只是个人总结记录，看官请自行判断。</p>
+<figure class="highlight n1ql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><code class="hljs n1ql">sql = &quot;<span class="hljs-keyword">select</span> * <span class="hljs-keyword">from</span> %s.honey_trap_template <span class="hljs-keyword">where</span> (trap_info::json#&gt;&gt;<span class="hljs-string">&#x27;&#123;file_name&#125;&#x27;</span>)::text = <span class="hljs-string">&#x27;%s&#x27;</span><span class="hljs-string">&quot; % (</span><br><span class="hljs-string">                SCHEMA_NAME, server_file_name)</span><br></code></pre></td></tr></table></figure>
+<p>#&gt;&gt; 操作符是以文本形式获取在指定路径的 JSON 对象，例如：</p>
+<figure class="highlight applescript"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs applescript">&#x27;&#123;<span class="hljs-string">&quot;a&quot;</span>:[<span class="hljs-number">1</span>,<span class="hljs-number">2</span>,<span class="hljs-number">3</span>],<span class="hljs-string">&quot;b&quot;</span>:[<span class="hljs-number">4</span>,<span class="hljs-number">5</span>,<span class="hljs-number">6</span>]&#125;&#x27;::json<span class="hljs-comment">#&gt;&gt;&#x27;&#123;a,2&#125;&#x27;</span><br></code></pre></td></tr></table></figure>
+<p>运行的结果为3</p>
+<p>相当于直接使用json对象，来处理数据，对于 (trap_info::json#&gt;&gt;’{file_name}’)::text ，将trap_info转换成json对象，获取file_name数值，并将file_name参数格式化成text。</p>
+<h2 id="漏洞验证"><a href="#漏洞验证" class="headerlink" title="漏洞验证"></a>漏洞验证</h2><p>使用burpsuite构建数据包进行测试，通过修改filename参数，确定注入点（主要是我前期构造数据包一直以为name对应代码中的的文件名，发现不起作用才发现自己找错地方了，暴露了自己垃圾测试功底）。<br><img src="/img/20210318-04.png" srcset="/img/loading.gif" lazyload alt="20210318-04"><br>通过提交恶意参数，使系统抛出异常。<br><img src="/img/20210318-05.png" srcset="/img/loading.gif" lazyload alt="20210318-05"><br>需要注意一点儿，系统会先对文件名的后缀（文件类型）进行判断，所以构建在payload及数据包，需要保留合法的后缀（文件类型），这里有zip、office系列。这里有一个基于时间延迟的payload，供大家学习</p>
+<figure class="highlight ada"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs ada">&#x27;;<span class="hljs-keyword">SELECT</span> PG_SLEEP(<span class="hljs-number">5</span>)<span class="hljs-comment">--.zip</span><br></code></pre></td></tr></table></figure>
+<p>sqlmap运行截图<br><img src="/img/20210318-06.png" srcset="/img/loading.gif" lazyload alt="20210318-06"></p>
+<h2 id="后记"><a href="#后记" class="headerlink" title="后记"></a>后记</h2><p>该接口除了sql注入，同样对上传文件大小的上限未做限制，通过恶意上传大文件，可导致磁盘存储满载，进而导致拒绝服务。</p>
+<h2 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h2><ul>
+<li><a target="_blank" rel="noopener" href="https://docs.djangoproject.com/zh-hans/3.1/topics/db/sql/">https://docs.djangoproject.com/zh-hans/3.1/topics/db/sql/</a>【执行原生sql查询】</li>
+<li><a target="_blank" rel="noopener" href="http://www.postgres.cn/docs/10/functions-json.html">http://www.postgres.cn/docs/10/functions-json.html</a>【 JSON 函数和操作符】</li>
+</ul>
+
+            </div>
+            <hr>
+            <div>
+              <div class="post-metas mb-3">
+                
+                  <div class="post-meta mr-3">
+                    <i class="iconfont icon-category"></i>
+                    
+                      <a class="hover-with-bg" href="/categories/Security/">Security</a>
+                    
+                      <a class="hover-with-bg" href="/categories/Security/Code-Audit/">Code Audit</a>
+                    
+                  </div>
+                
+                
+                  <div class="post-meta">
+                    <i class="iconfont icon-tags"></i>
+                    
+                      <a class="hover-with-bg" href="/tags/Code/">Code</a>
+                    
+                  </div>
+                
+              </div>
+              
+                <p class="note note-warning">
+                  
+                    本博客所有文章除特别声明外，均采用 <a target="_blank" href="https://creativecommons.org/licenses/by-sa/4.0/deed.zh" rel="nofollow noopener noopener">CC BY-SA 4.0 协议</a> ，转载请注明出处！
+                  
+                </p>
+              
+              
+                <div class="post-prevnext">
+                  <article class="post-prev col-6">
+                    
+                    
+                      <a href="/2021/04/08/2021-04-08-vulnerability-mining-within-pentest/">
+                        <i class="iconfont icon-arrowleft"></i>
+                        <span class="hidden-mobile">在渗透测试过程中通过源代码审计进行漏洞挖掘</span>
+                        <span class="visible-mobile">上一篇</span>
+                      </a>
+                    
+                  </article>
+                  <article class="post-next col-6">
+                    
+                    
+                      <a href="/2021/03/01/2021-03-01-dwr-code-audit/">
+                        <span class="hidden-mobile">dwr框架代码审计</span>
+                        <span class="visible-mobile">下一篇</span>
+                        <i class="iconfont icon-arrowright"></i>
+                      </a>
+                    
+                  </article>
+                </div>
+              
+            </div>
+
+            
+              <!-- Comments -->
+              <article class="comments" id="comments" lazyload>
+                
+                  
+                
+                
+  <script type="text/javascript">
+    Fluid.utils.loadComments('#comments', function() {
+      var light = 'github-light';
+      var dark = 'github-dark';
+      var schema = document.documentElement.getAttribute('data-user-color-scheme');
+      if (schema === 'dark') {
+        schema = dark;
+      } else {
+        schema = light;
+      }
+      window.UtterancesThemeLight = light;
+      window.UtterancesThemeDark = dark;
+      var s = document.createElement('script');
+      s.setAttribute('src', 'https://utteranc.es/client.js');
+      s.setAttribute('repo', 'hksanduo/commit-utterances');
+      s.setAttribute('issue-term', 'title');
+      
+      s.setAttribute('label', 'utterances');
+      
+      s.setAttribute('theme', schema);
+      s.setAttribute('crossorigin', 'anonymous');
+      document.getElementById('comments').appendChild(s);
+    })
+  </script>
+  <noscript>Please enable JavaScript to view the comments</noscript>
+
+
+              </article>
+            
+          </article>
+        </div>
+      </div>
+    </div>
+    
+      <div class="d-none d-lg-block col-lg-2 toc-container" id="toc-ctn">
+        <div id="toc">
+  <p class="toc-header"><i class="iconfont icon-list"></i>&nbsp;目录</p>
+  <div class="toc-body" id="toc-body"></div>
+</div>
+
+      </div>
+    
+  </div>
+</div>
+
+<!-- Custom -->
+
+
+    
+
+    
+      <a id="scroll-top-button" aria-label="TOP" href="#" role="button">
+        <i class="iconfont icon-arrowup" aria-hidden="true"></i>
+      </a>
+    
+
+    
+      <div class="modal fade" id="modalSearch" tabindex="-1" role="dialog" aria-labelledby="ModalLabel"
+     aria-hidden="true">
+  <div class="modal-dialog modal-dialog-scrollable modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header text-center">
+        <h4 class="modal-title w-100 font-weight-bold">搜索</h4>
+        <button type="button" id="local-search-close" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body mx-3">
+        <div class="md-form mb-5">
+          <input type="text" id="local-search-input" class="form-control validate">
+          <label data-error="x" data-success="v"
+                 for="local-search-input">关键词</label>
+        </div>
+        <div class="list-group" id="local-search-result"></div>
+      </div>
+    </div>
+  </div>
+</div>
+    
+
+    
+  </main>
+
+  <footer class="text-center mt-5 py-3">
+  <div class="footer-content">
+     <a href="https://hexo.io" target="_blank" rel="nofollow noopener"><span>Hexo</span></a> <i class="iconfont icon-love"></i> <a href="https://github.com/fluid-dev/hexo-theme-fluid" target="_blank" rel="nofollow noopener"><span>Fluid</span></a> 
+  </div>
+  
+  <div class="statistics">
+    
+    
+
+    
+      
+        <!-- 不蒜子统计PV -->
+        <span id="busuanzi_container_site_pv" style="display: none">
+            总访问量 
+            <span id="busuanzi_value_site_pv"></span>
+             次
+          </span>
+      
+      
+        <!-- 不蒜子统计UV -->
+        <span id="busuanzi_container_site_uv" style="display: none">
+            总访客数 
+            <span id="busuanzi_value_site_uv"></span>
+             人
+          </span>
+      
+    
+  </div>
+
+
+  
+
+  
+</footer>
+
+
+  <!-- SCRIPTS -->
+  
+  <script  src="https://cdn.jsdelivr.net/npm/nprogress@0/nprogress.min.js" ></script>
+  <link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/nprogress@0/nprogress.min.css" />
+
+  <script>
+    NProgress.configure({"showSpinner":false,"trickleSpeed":100})
+    NProgress.start()
+    window.addEventListener('load', function() {
+      NProgress.done();
+    })
+  </script>
+
+
+<script  src="https://cdn.jsdelivr.net/npm/jquery@3/dist/jquery.min.js" ></script>
+<script  src="https://cdn.jsdelivr.net/npm/bootstrap@4/dist/js/bootstrap.min.js" ></script>
+<script  src="/js/events.js" ></script>
+<script  src="/js/plugins.js" ></script>
+
+<!-- Plugins -->
+
+
+  <script  src="/js/local-search.js" ></script>
+
+
+
+  
+    <script  src="/js/img-lazyload.js" ></script>
+  
+
+
+
+  
+
+
+
+  
+    <script  src="https://cdn.jsdelivr.net/npm/tocbot@4/dist/tocbot.min.js" ></script>
+  
+  
+    <script  src="https://cdn.jsdelivr.net/npm/@fancyapps/fancybox@3/dist/jquery.fancybox.min.js" ></script>
+  
+  
+    <script  src="https://cdn.jsdelivr.net/npm/anchor-js@4/anchor.min.js" ></script>
+  
+  
+    <script defer src="https://cdn.jsdelivr.net/npm/clipboard@2/dist/clipboard.min.js" ></script>
+  
+
+
+
+  <script defer src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js" ></script>
+
+
+
+
+  <script  src="https://cdn.jsdelivr.net/npm/typed.js@2/lib/typed.min.js" ></script>
+  <script>
+    (function (window, document) {
+      var typing = Fluid.plugins.typing;
+      var title = document.getElementById('subtitle').title;
+      
+      typing(title)
+      
+    })(window, document);
+  </script>
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+    <!-- Google Analytics -->
+    <script defer>
+      window.ga = window.ga || function () { (ga.q = ga.q || []).push(arguments) };
+      ga.l = +new Date;
+      ga('create', 'UA-167858469-1', 'auto');
+      ga('send', 'pageview');
+    </script>
+    <script async src='https://www.google-analytics.com/analytics.js'></script>
+  
+
+  
+
+  
+
+  
+
+  
+
+
+
+
+
+<!-- 主题的启动项 保持在最底部 -->
+<script  src="/js/boot.js" ></script>
+
+
+</body>
+</html>

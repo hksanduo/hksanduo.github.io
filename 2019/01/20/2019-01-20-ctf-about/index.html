@@ -1,0 +1,607 @@
+
+
+<!DOCTYPE html>
+<html lang="zh-CN" data-default-color-scheme=auto>
+
+
+
+<head>
+  <meta charset="UTF-8">
+  <link rel="apple-touch-icon" sizes="76x76" href="/img/favicon.png">
+  <link rel="icon" href="/img/favicon.png">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, shrink-to-fit=no">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  
+  <meta name="theme-color" content="#2f4154">
+  <meta name="description" content="">
+  <meta name="author" content="sanduo">
+  <meta name="keywords" content="">
+  <meta name="description" content="CTF 基础 CTF(Capture The Flag，夺旗赛），在网络安全领域中指安全人员之间进行技术竞技的一种比赛。 起源CTF起源于1996年DEFCON全球黑客大会，以代替之前黑客们通过互相发起真实攻击进行技术比拼的方式。发展至今，已经成为全球范围网络安全圈流行的竞赛形式，2013年全球举办了超过五十场国际性CTF赛事。而DEFCON作为CTF赛制的发源地，DEFCON CTF也成为了目前">
+<meta property="og:type" content="article">
+<meta property="og:title" content="CTF基础介绍">
+<meta property="og:url" content="https://hksanduo.github.io/2019/01/20/2019-01-20-ctf-about/index.html">
+<meta property="og:site_name" content="sanduo blog">
+<meta property="og:description" content="CTF 基础 CTF(Capture The Flag，夺旗赛），在网络安全领域中指安全人员之间进行技术竞技的一种比赛。 起源CTF起源于1996年DEFCON全球黑客大会，以代替之前黑客们通过互相发起真实攻击进行技术比拼的方式。发展至今，已经成为全球范围网络安全圈流行的竞赛形式，2013年全球举办了超过五十场国际性CTF赛事。而DEFCON作为CTF赛制的发源地，DEFCON CTF也成为了目前">
+<meta property="og:locale" content="zh_CN">
+<meta property="article:published_time" content="2019-01-20T10:00:00.000Z">
+<meta property="article:modified_time" content="2025-01-18T14:54:10.078Z">
+<meta property="article:author" content="sanduo">
+<meta property="article:tag" content="CTF">
+<meta name="twitter:card" content="summary_large_image">
+  
+  <title>CTF基础介绍 - sanduo blog</title>
+
+  <link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4/dist/css/bootstrap.min.css" />
+
+
+  <link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/github-markdown-css@4/github-markdown.min.css" />
+  <link  rel="stylesheet" href="/lib/hint/hint.min.css" />
+
+  
+    
+    
+      
+      <link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/highlight.js@10/styles/github-gist.min.css" />
+    
+  
+
+  
+    <link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fancyapps/fancybox@3/dist/jquery.fancybox.min.css" />
+  
+
+
+<!-- 主题依赖的图标库，不要自行修改 -->
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1749284_ba1fz6golrf.css">
+
+
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1736178_kmeydafke9r.css">
+
+
+<link  rel="stylesheet" href="/css/main.css" />
+
+<!-- 自定义样式保持在最底部 -->
+
+
+  <script id="fluid-configs">
+    var Fluid = window.Fluid || {};
+    var CONFIG = {"hostname":"hksanduo.github.io","root":"/","version":"1.8.12","typing":{"enable":true,"typeSpeed":70,"cursorChar":"_","loop":false},"anchorjs":{"enable":true,"element":"h1,h2,h3,h4,h5,h6","placement":"right","visible":"hover","icon":""},"progressbar":{"enable":true,"height_px":3,"color":"#29d","options":{"showSpinner":false,"trickleSpeed":100}},"copy_btn":true,"image_zoom":{"enable":true,"img_url_replace":["",""]},"toc":{"enable":true,"headingSelector":"h1,h2,h3,h4,h5,h6","collapseDepth":0},"lazyload":{"enable":true,"loading_img":"/img/loading.gif","onlypost":false,"offset_factor":2},"web_analytics":{"enable":true,"baidu":null,"google":"UA-167858469-1","gtag":null,"tencent":{"sid":null,"cid":null},"woyaola":null,"cnzz":null,"leancloud":{"app_id":null,"app_key":null,"server_url":null,"path":"window.location.pathname"}},"search_path":"/local-search.xml"};
+  </script>
+  <script  src="/js/utils.js" ></script>
+  <script  src="/js/color-schema.js" ></script>
+<meta name="generator" content="Hexo 5.4.2"></head>
+
+
+<body>
+  <header style="height: 70vh;">
+    <nav id="navbar" class="navbar fixed-top  navbar-expand-lg navbar-dark scrolling-navbar">
+  <div class="container">
+    <a class="navbar-brand" href="/">
+      <strong>Welcome To Sanduo&#39;s Blog</strong>
+    </a>
+
+    <button id="navbar-toggler-btn" class="navbar-toggler" type="button" data-toggle="collapse"
+            data-target="#navbarSupportedContent"
+            aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+      <div class="animated-icon"><span></span><span></span><span></span></div>
+    </button>
+
+    <!-- Collapsible content -->
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+      <ul class="navbar-nav ml-auto text-center">
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/">
+                <i class="iconfont icon-home-fill"></i>
+                首页
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/archives/">
+                <i class="iconfont icon-archive-fill"></i>
+                归档
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/categories/">
+                <i class="iconfont icon-category-fill"></i>
+                分类
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/tags/">
+                <i class="iconfont icon-tags-fill"></i>
+                标签
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/about/">
+                <i class="iconfont icon-user-fill"></i>
+                关于
+              </a>
+            </li>
+          
+        
+        
+          <li class="nav-item" id="search-btn">
+            <a class="nav-link" target="_self" href="javascript:;" data-toggle="modal" data-target="#modalSearch" aria-label="Search">
+              &nbsp;<i class="iconfont icon-search"></i>&nbsp;
+            </a>
+          </li>
+        
+        
+          <li class="nav-item" id="color-toggle-btn">
+            <a class="nav-link" target="_self" href="javascript:;" aria-label="Color Toggle">&nbsp;<i
+                class="iconfont icon-dark" id="color-toggle-icon"></i>&nbsp;</a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+</nav>
+
+    <div class="banner" id="banner" parallax=true
+         style="background: url('/img/default.png') no-repeat center center;
+           background-size: cover;">
+      <div class="full-bg-img">
+        <div class="mask flex-center" style="background-color: rgba(0, 0, 0, 0.3)">
+          <div class="page-header text-center fade-in-up">
+            <span class="h2" id="subtitle" title="CTF基础介绍">
+              
+            </span>
+
+            
+              <div class="mt-3">
+  
+  
+    <span class="post-meta">
+      <i class="iconfont icon-date-fill" aria-hidden="true"></i>
+      <time datetime="2019-01-20 10:00" pubdate>
+        2019年1月20日 上午
+      </time>
+    </span>
+  
+</div>
+
+<div class="mt-1">
+  
+    <span class="post-meta mr-2">
+      <i class="iconfont icon-chart"></i>
+      2.6k 字
+    </span>
+  
+
+  
+    <span class="post-meta mr-2">
+      <i class="iconfont icon-clock-fill"></i>
+      
+      
+      8 分钟
+    </span>
+  
+
+  
+  
+</div>
+
+            
+          </div>
+
+          
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <main>
+    
+      
+
+<div class="container-fluid nopadding-x">
+  <div class="row nomargin-x">
+    <div class="d-none d-lg-block col-lg-2"></div>
+    <div class="col-lg-8 nopadding-x-md">
+      <div class="container nopadding-x-md" id="board-ctn">
+        <div class="py-5" id="board">
+          <article class="post-content mx-auto">
+            <!-- SEO header -->
+            <h1 style="display: none">CTF基础介绍</h1>
+            
+            <div class="markdown-body">
+              <h1 id="CTF-基础"><a href="#CTF-基础" class="headerlink" title="CTF 基础"></a>CTF 基础</h1><hr>
+<p>CTF(Capture The Flag，夺旗赛），在网络安全领域中指安全人员之间进行技术竞技的一种比赛。</p>
+<h2 id="起源"><a href="#起源" class="headerlink" title="起源"></a>起源</h2><p>CTF起源于1996年DEFCON全球黑客大会，以代替之前黑客们通过互相发起真实攻击进行技术比拼的方式。发展至今，已经成为全球范围网络安全圈流行的竞赛形式，2013年全球举办了超过五十场国际性CTF赛事。而DEFCON作为CTF赛制的发源地，DEFCON CTF也成为了目前全球最高技术水平和影响力的CTF竞赛，类似于CTF赛场中的“世界杯” 。</p>
+<h2 id="CTF赛事"><a href="#CTF赛事" class="headerlink" title="CTF赛事"></a>CTF赛事</h2><blockquote>
+<ul>
+<li>ISCC(信息安全与对抗技术竞赛)</li>
+<li>ISG（中国网络安全技能竞赛）</li>
+<li>XCTF（XCTF国际网络攻防联赛）</li>
+<li>…</li>
+</ul>
+</blockquote>
+<h2 id="CTF竞赛模式"><a href="#CTF竞赛模式" class="headerlink" title="CTF竞赛模式"></a>CTF竞赛模式</h2><blockquote>
+<ul>
+<li>解题模式</li>
+<li>攻防模式</li>
+<li>防御模式</li>
+<li>混合模式</li>
+<li>综合模式</li>
+</ul>
+</blockquote>
+<h3 id="解题模式"><a href="#解题模式" class="headerlink" title="解题模式"></a>解题模式</h3><p>常见于线上选拨比赛，参赛队伍需要运用安全相关的理论知识及技术来解决问题，并获取一串被称为flag的字符串进行提交，以此来获取分数<br>特点：每一道题目都有相应的分值，同一类题目中难度越大分值越高。</p>
+<h3 id="综合模式"><a href="#综合模式" class="headerlink" title="综合模式"></a>综合模式</h3><p>综合靶场贴合行业用户业务系统架构，整个综合靶场由多台漏洞靶机构成。用户可以有多个攻防入口多种攻防路径选择，让参赛选手在大型真实的行业业务系统中进行挑战，难度较高。</p>
+<h3 id="攻防模式"><a href="#攻防模式" class="headerlink" title="攻防模式"></a>攻防模式</h3><p>每个参赛队伍既是攻击者又是防御者，保证自己的服务器不被攻击、服务不中断。通过漏洞挖掘、流量分析等方式找到可利用的漏洞，攻击其他队伍的服务器。</p>
+<h3 id="防御模式"><a href="#防御模式" class="headerlink" title="防御模式"></a>防御模式</h3><p>每个参赛队伍均是防御者，保证自己的服务器不被攻击、服务不中断。</p>
+<h3 id="混合模式"><a href="#混合模式" class="headerlink" title="混合模式"></a>混合模式</h3><p>结合解题模式与攻防模式的CTF赛制，如通过解题模式获取一些初始分数，然后通过攻防对抗进行得分增减的零和游戏。</p>
+<h2 id="现状"><a href="#现状" class="headerlink" title="现状"></a>现状</h2><p>由于国内重视网络安全法，从18年开始出现爆发时增长态势，各种层次不齐的CTF赛事层出不穷。</p>
+<h3 id="比赛形式"><a href="#比赛形式" class="headerlink" title="比赛形式"></a>比赛形式</h3><blockquote>
+<ul>
+<li>线上预选赛</li>
+<li>线下半决赛</li>
+<li>线下总决赛</li>
+</ul>
+</blockquote>
+<h3 id="价值体现"><a href="#价值体现" class="headerlink" title="价值体现"></a>价值体现</h3><p>行业选拔人才，提升重要行业部门，科研院校的网络安全实战能力；行业提高安全部门的入侵检测和防御能力，增加公司荣誉；个人提高就业机会和增加零花钱。</p>
+<h2 id="CTF-题型"><a href="#CTF-题型" class="headerlink" title="CTF 题型"></a>CTF 题型</h2><h3 id="Web"><a href="#Web" class="headerlink" title="Web"></a>Web</h3><p>SQL,XSS,文件上传，ssrf，远程命令执行等等</p>
+<blockquote>
+<ul>
+<li>一、爆破，包括包括md5、爆破随机数、验证码识别等</li>
+<li>二、绕WAF，包括花式绕Mysql、绕文件读取关键词检测之类拦截</li>
+<li>三、花式玩弄几个PHP特性，包括弱类型，strpos和&#x3D;&#x3D;&#x3D;，反序列化+destruct、\0截断、iconv截断、</li>
+<li>四、密码题，包括hash长度扩展、异或、移位加密各种变形、32位随机数过小</li>
+<li>五、各种找源码技巧，包括git、svn、xxx.php.swp、<em>www</em>.(zip|tar.gz|rar|7z)、xxx.php.bak</li>
+<li>六、文件上传，包括花式文件后缀 .php345 .inc .phtml .phpt .phps、各种文件内容检测&lt;?php &lt;? &lt;% <script language=php>、花式解析漏洞、</li>
+<li>七、Mysql类型差异，包括和PHP弱类型类似的特性,0x、0b、1e之类，varchar和integer相互转换</li>
+<li>八、open_basedir、disable_functions花式绕过技巧，包括dl、mail、imagick、bash漏洞、DirectoryIterator及各种二进制选手插足的方法</li>
+<li>九、条件竞争，包括竞争删除前生成shell、竞争数据库无锁多扣钱</li>
+<li>十、社工，包括花式查社工库、微博、QQ签名、whois</li>
+<li>十一、windows特性，包括短文件名、IIS解析漏洞、NTFS文件系统通配符、::$DATA，冒号截断</li>
+<li>十二、SSRF，包括花式探测端口，302跳转、花式协议利用、gophar直接取shell等</li>
+<li>十三、XSS，各种浏览器auditor绕过、富文本过滤黑白名单绕过、flash xss、CSP绕过</li>
+<li>十四、XXE，各种XML存在地方（rss/word/流媒体）、各种XXE利用方法（SSRF、文件读取）</li>
+<li>十五、协议，花式IP伪造 X-Forwarded-For/X-Client-IP/X-Real-IP/CDN-Src-IP、花式改UA，花式藏FLAG、花式分析数据包</li>
+<li>以上参考自：<a target="_blank" rel="noopener" href="https://weibo.com/ttarticle/p/show?id=2309403980950244591011">https://weibo.com/ttarticle/p/show?id=2309403980950244591011</a></li>
+</ul>
+</blockquote>
+<h3 id="PWN"><a href="#PWN" class="headerlink" title="PWN"></a>PWN</h3><ul>
+<li>攻击远程服务器的服务</li>
+<li>会提供服务程序的二进制文件</li>
+<li>分析漏洞并写出exp</li>
+<li>栈溢出、堆溢出</li>
+<li>绕过保护机制（ASLR,NX等）<br>给出一个有漏洞的程序，参赛者通过二进制漏洞挖掘与利用，如静态分析和动态分析来攻破该运行程序。如利用Buffer Overflow、Format String、命令执行等。使用的工具有：pwntools,IDA,GDB.....</li>
+</ul>
+<h3 id="逆向"><a href="#逆向" class="headerlink" title="逆向"></a>逆向</h3><p>主要考察选手对于源代码及二进制逆向分析能力，要求熟悉操作系统、汇编语言、加解密等知识</p>
+<ul>
+<li>逆向，破解程序的算法来得到程序中的flag</li>
+<li>对抗反调试、代码混淆等等<br>使用的工具有：IDA,onlydbg,GDB,Dex2jar.....</li>
+</ul>
+<h3 id="移动安全"><a href="#移动安全" class="headerlink" title="移动安全"></a>移动安全</h3><p>移动应用安全</p>
+<h3 id="杂项"><a href="#杂项" class="headerlink" title="杂项"></a>杂项</h3><ul>
+<li>Stego（隐写）<br>1.图片隐写<br>文件拼接，文件修复，LSB,EXIF,图片处理，图片内容等等。<br>2.音频隐写<br>隐藏在声音里（顺序、逆序）、隐藏在数据里、隐藏在声波和频谱里，常用的工具有：Audacity,Matlab.silienteye。<br>3,视频隐写<br>主要是在metadata，或者在帧里面，帧转化成图片隐写<br>主要工具：strings/010Editor、ffmpeg</li>
+<li>CRYPTO（解密）<br>常见编码、代码混淆与加密、古典密码、单向散列、现代密码、自定义加密、特殊密码</li>
+<li>PPC（编程）<br>考察快速编程能力。</li>
+<li>Forensics（取证）<br>1、网络流量分析，从数据流中取字符串，从数据流中取文件，从协议相关数据提取。<br>2、日志分析，SQL注入日志分析，结合web进行漏洞分析、WEBSHELL的查找、用户访问敏感路径的查找。<br>3、Office取证<br>藏在解压文件中、藏在doc十六进制中、文件爆破</li>
+<li>Other（其他）<br>文件修复、密码爆破、伪加密位、明文攻击、CRC32碰撞</li>
+</ul>
+<h2 id="CTF学习"><a href="#CTF学习" class="headerlink" title="CTF学习"></a>CTF学习</h2><p>CTF学习需要掌握计算机基础、web应用、数据库等知识，详细请参考[CTF学习]（<a href="https://hksanduo.github.io/security/2018/07/19/awesome-ctf-learning-lists/%EF%BC%89">https://hksanduo.github.io/security/2018/07/19/awesome-ctf-learning-lists/）</a></p>
+<hr>
+<p>附：有什么问题请及时联系本人，本人CTF新人，多谢关照。</p>
+
+            </div>
+            <hr>
+            <div>
+              <div class="post-metas mb-3">
+                
+                  <div class="post-meta mr-3">
+                    <i class="iconfont icon-category"></i>
+                    
+                      <a class="hover-with-bg" href="/categories/Security/">Security</a>
+                    
+                  </div>
+                
+                
+                  <div class="post-meta">
+                    <i class="iconfont icon-tags"></i>
+                    
+                      <a class="hover-with-bg" href="/tags/CTF/">CTF</a>
+                    
+                  </div>
+                
+              </div>
+              
+                <p class="note note-warning">
+                  
+                    本博客所有文章除特别声明外，均采用 <a target="_blank" href="https://creativecommons.org/licenses/by-sa/4.0/deed.zh" rel="nofollow noopener noopener">CC BY-SA 4.0 协议</a> ，转载请注明出处！
+                  
+                </p>
+              
+              
+                <div class="post-prevnext">
+                  <article class="post-prev col-6">
+                    
+                    
+                      <a href="/2019/06/01/2019-06-01-remove-360-tianqing/">
+                        <i class="iconfont icon-arrowleft"></i>
+                        <span class="hidden-mobile">移除360天擎</span>
+                        <span class="visible-mobile">上一篇</span>
+                      </a>
+                    
+                  </article>
+                  <article class="post-next col-6">
+                    
+                    
+                      <a href="/2019/01/20/2019-03-30-burpsuite-detail/">
+                        <span class="hidden-mobile">CTF基础介绍</span>
+                        <span class="visible-mobile">下一篇</span>
+                        <i class="iconfont icon-arrowright"></i>
+                      </a>
+                    
+                  </article>
+                </div>
+              
+            </div>
+
+            
+              <!-- Comments -->
+              <article class="comments" id="comments" lazyload>
+                
+                  
+                
+                
+  <script type="text/javascript">
+    Fluid.utils.loadComments('#comments', function() {
+      var light = 'github-light';
+      var dark = 'github-dark';
+      var schema = document.documentElement.getAttribute('data-user-color-scheme');
+      if (schema === 'dark') {
+        schema = dark;
+      } else {
+        schema = light;
+      }
+      window.UtterancesThemeLight = light;
+      window.UtterancesThemeDark = dark;
+      var s = document.createElement('script');
+      s.setAttribute('src', 'https://utteranc.es/client.js');
+      s.setAttribute('repo', 'hksanduo/commit-utterances');
+      s.setAttribute('issue-term', 'title');
+      
+      s.setAttribute('label', 'utterances');
+      
+      s.setAttribute('theme', schema);
+      s.setAttribute('crossorigin', 'anonymous');
+      document.getElementById('comments').appendChild(s);
+    })
+  </script>
+  <noscript>Please enable JavaScript to view the comments</noscript>
+
+
+              </article>
+            
+          </article>
+        </div>
+      </div>
+    </div>
+    
+      <div class="d-none d-lg-block col-lg-2 toc-container" id="toc-ctn">
+        <div id="toc">
+  <p class="toc-header"><i class="iconfont icon-list"></i>&nbsp;目录</p>
+  <div class="toc-body" id="toc-body"></div>
+</div>
+
+      </div>
+    
+  </div>
+</div>
+
+<!-- Custom -->
+
+
+    
+
+    
+      <a id="scroll-top-button" aria-label="TOP" href="#" role="button">
+        <i class="iconfont icon-arrowup" aria-hidden="true"></i>
+      </a>
+    
+
+    
+      <div class="modal fade" id="modalSearch" tabindex="-1" role="dialog" aria-labelledby="ModalLabel"
+     aria-hidden="true">
+  <div class="modal-dialog modal-dialog-scrollable modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header text-center">
+        <h4 class="modal-title w-100 font-weight-bold">搜索</h4>
+        <button type="button" id="local-search-close" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body mx-3">
+        <div class="md-form mb-5">
+          <input type="text" id="local-search-input" class="form-control validate">
+          <label data-error="x" data-success="v"
+                 for="local-search-input">关键词</label>
+        </div>
+        <div class="list-group" id="local-search-result"></div>
+      </div>
+    </div>
+  </div>
+</div>
+    
+
+    
+  </main>
+
+  <footer class="text-center mt-5 py-3">
+  <div class="footer-content">
+     <a href="https://hexo.io" target="_blank" rel="nofollow noopener"><span>Hexo</span></a> <i class="iconfont icon-love"></i> <a href="https://github.com/fluid-dev/hexo-theme-fluid" target="_blank" rel="nofollow noopener"><span>Fluid</span></a> 
+  </div>
+  
+  <div class="statistics">
+    
+    
+
+    
+      
+        <!-- 不蒜子统计PV -->
+        <span id="busuanzi_container_site_pv" style="display: none">
+            总访问量 
+            <span id="busuanzi_value_site_pv"></span>
+             次
+          </span>
+      
+      
+        <!-- 不蒜子统计UV -->
+        <span id="busuanzi_container_site_uv" style="display: none">
+            总访客数 
+            <span id="busuanzi_value_site_uv"></span>
+             人
+          </span>
+      
+    
+  </div>
+
+
+  
+
+  
+</footer>
+
+
+  <!-- SCRIPTS -->
+  
+  <script  src="https://cdn.jsdelivr.net/npm/nprogress@0/nprogress.min.js" ></script>
+  <link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/nprogress@0/nprogress.min.css" />
+
+  <script>
+    NProgress.configure({"showSpinner":false,"trickleSpeed":100})
+    NProgress.start()
+    window.addEventListener('load', function() {
+      NProgress.done();
+    })
+  </script>
+
+
+<script  src="https://cdn.jsdelivr.net/npm/jquery@3/dist/jquery.min.js" ></script>
+<script  src="https://cdn.jsdelivr.net/npm/bootstrap@4/dist/js/bootstrap.min.js" ></script>
+<script  src="/js/events.js" ></script>
+<script  src="/js/plugins.js" ></script>
+
+<!-- Plugins -->
+
+
+  <script  src="/js/local-search.js" ></script>
+
+
+
+  
+    <script  src="/js/img-lazyload.js" ></script>
+  
+
+
+
+  
+
+
+
+  
+    <script  src="https://cdn.jsdelivr.net/npm/tocbot@4/dist/tocbot.min.js" ></script>
+  
+  
+    <script  src="https://cdn.jsdelivr.net/npm/@fancyapps/fancybox@3/dist/jquery.fancybox.min.js" ></script>
+  
+  
+    <script  src="https://cdn.jsdelivr.net/npm/anchor-js@4/anchor.min.js" ></script>
+  
+  
+    <script defer src="https://cdn.jsdelivr.net/npm/clipboard@2/dist/clipboard.min.js" ></script>
+  
+
+
+
+  <script defer src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js" ></script>
+
+
+
+
+  <script  src="https://cdn.jsdelivr.net/npm/typed.js@2/lib/typed.min.js" ></script>
+  <script>
+    (function (window, document) {
+      var typing = Fluid.plugins.typing;
+      var title = document.getElementById('subtitle').title;
+      
+      typing(title)
+      
+    })(window, document);
+  </script>
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+    <!-- Google Analytics -->
+    <script defer>
+      window.ga = window.ga || function () { (ga.q = ga.q || []).push(arguments) };
+      ga.l = +new Date;
+      ga('create', 'UA-167858469-1', 'auto');
+      ga('send', 'pageview');
+    </script>
+    <script async src='https://www.google-analytics.com/analytics.js'></script>
+  
+
+  
+
+  
+
+  
+
+  
+
+
+
+
+
+<!-- 主题的启动项 保持在最底部 -->
+<script  src="/js/boot.js" ></script>
+
+
+</body>
+</html>

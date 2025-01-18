@@ -1,0 +1,639 @@
+
+
+<!DOCTYPE html>
+<html lang="zh-CN" data-default-color-scheme=auto>
+
+
+
+<head>
+  <meta charset="UTF-8">
+  <link rel="apple-touch-icon" sizes="76x76" href="/img/favicon.png">
+  <link rel="icon" href="/img/favicon.png">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, shrink-to-fit=no">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  
+  <meta name="theme-color" content="#2f4154">
+  <meta name="description" content="">
+  <meta name="author" content="sanduo">
+  <meta name="keywords" content="">
+  <meta name="description" content="init进程init的进程号为1,是所有进程的父进程，内核初始化完毕之后，init程序开始运行。其他软件也同时开始运行。init程序通过&#x2F;etc&#x2F;inittab文件进行配置。inittab文件的内容如下：引用内容： # inittab       This file describes how the INIT process should set up #">
+<meta property="og:type" content="article">
+<meta property="og:title" content="init进程">
+<meta property="og:url" content="https://hksanduo.github.io/2018/05/15/2018-05-15-linux-init/index.html">
+<meta property="og:site_name" content="sanduo blog">
+<meta property="og:description" content="init进程init的进程号为1,是所有进程的父进程，内核初始化完毕之后，init程序开始运行。其他软件也同时开始运行。init程序通过&#x2F;etc&#x2F;inittab文件进行配置。inittab文件的内容如下：引用内容： # inittab       This file describes how the INIT process should set up #">
+<meta property="og:locale" content="zh_CN">
+<meta property="article:published_time" content="2018-05-15T04:00:00.000Z">
+<meta property="article:modified_time" content="2025-01-18T14:54:10.077Z">
+<meta property="article:author" content="sanduo">
+<meta property="article:tag" content="Kernel">
+<meta name="twitter:card" content="summary_large_image">
+  
+  <title>init进程 - sanduo blog</title>
+
+  <link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4/dist/css/bootstrap.min.css" />
+
+
+  <link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/github-markdown-css@4/github-markdown.min.css" />
+  <link  rel="stylesheet" href="/lib/hint/hint.min.css" />
+
+  
+    
+    
+      
+      <link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/highlight.js@10/styles/github-gist.min.css" />
+    
+  
+
+  
+    <link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fancyapps/fancybox@3/dist/jquery.fancybox.min.css" />
+  
+
+
+<!-- 主题依赖的图标库，不要自行修改 -->
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1749284_ba1fz6golrf.css">
+
+
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1736178_kmeydafke9r.css">
+
+
+<link  rel="stylesheet" href="/css/main.css" />
+
+<!-- 自定义样式保持在最底部 -->
+
+
+  <script id="fluid-configs">
+    var Fluid = window.Fluid || {};
+    var CONFIG = {"hostname":"hksanduo.github.io","root":"/","version":"1.8.12","typing":{"enable":true,"typeSpeed":70,"cursorChar":"_","loop":false},"anchorjs":{"enable":true,"element":"h1,h2,h3,h4,h5,h6","placement":"right","visible":"hover","icon":""},"progressbar":{"enable":true,"height_px":3,"color":"#29d","options":{"showSpinner":false,"trickleSpeed":100}},"copy_btn":true,"image_zoom":{"enable":true,"img_url_replace":["",""]},"toc":{"enable":true,"headingSelector":"h1,h2,h3,h4,h5,h6","collapseDepth":0},"lazyload":{"enable":true,"loading_img":"/img/loading.gif","onlypost":false,"offset_factor":2},"web_analytics":{"enable":true,"baidu":null,"google":"UA-167858469-1","gtag":null,"tencent":{"sid":null,"cid":null},"woyaola":null,"cnzz":null,"leancloud":{"app_id":null,"app_key":null,"server_url":null,"path":"window.location.pathname"}},"search_path":"/local-search.xml"};
+  </script>
+  <script  src="/js/utils.js" ></script>
+  <script  src="/js/color-schema.js" ></script>
+<meta name="generator" content="Hexo 5.4.2"></head>
+
+
+<body>
+  <header style="height: 70vh;">
+    <nav id="navbar" class="navbar fixed-top  navbar-expand-lg navbar-dark scrolling-navbar">
+  <div class="container">
+    <a class="navbar-brand" href="/">
+      <strong>Welcome To Sanduo&#39;s Blog</strong>
+    </a>
+
+    <button id="navbar-toggler-btn" class="navbar-toggler" type="button" data-toggle="collapse"
+            data-target="#navbarSupportedContent"
+            aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+      <div class="animated-icon"><span></span><span></span><span></span></div>
+    </button>
+
+    <!-- Collapsible content -->
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+      <ul class="navbar-nav ml-auto text-center">
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/">
+                <i class="iconfont icon-home-fill"></i>
+                首页
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/archives/">
+                <i class="iconfont icon-archive-fill"></i>
+                归档
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/categories/">
+                <i class="iconfont icon-category-fill"></i>
+                分类
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/tags/">
+                <i class="iconfont icon-tags-fill"></i>
+                标签
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/about/">
+                <i class="iconfont icon-user-fill"></i>
+                关于
+              </a>
+            </li>
+          
+        
+        
+          <li class="nav-item" id="search-btn">
+            <a class="nav-link" target="_self" href="javascript:;" data-toggle="modal" data-target="#modalSearch" aria-label="Search">
+              &nbsp;<i class="iconfont icon-search"></i>&nbsp;
+            </a>
+          </li>
+        
+        
+          <li class="nav-item" id="color-toggle-btn">
+            <a class="nav-link" target="_self" href="javascript:;" aria-label="Color Toggle">&nbsp;<i
+                class="iconfont icon-dark" id="color-toggle-icon"></i>&nbsp;</a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+</nav>
+
+    <div class="banner" id="banner" parallax=true
+         style="background: url('/img/default.png') no-repeat center center;
+           background-size: cover;">
+      <div class="full-bg-img">
+        <div class="mask flex-center" style="background-color: rgba(0, 0, 0, 0.3)">
+          <div class="page-header text-center fade-in-up">
+            <span class="h2" id="subtitle" title="init进程">
+              
+            </span>
+
+            
+              <div class="mt-3">
+  
+  
+    <span class="post-meta">
+      <i class="iconfont icon-date-fill" aria-hidden="true"></i>
+      <time datetime="2018-05-15 04:00" pubdate>
+        2018年5月15日 凌晨
+      </time>
+    </span>
+  
+</div>
+
+<div class="mt-1">
+  
+    <span class="post-meta mr-2">
+      <i class="iconfont icon-chart"></i>
+      3.9k 字
+    </span>
+  
+
+  
+    <span class="post-meta mr-2">
+      <i class="iconfont icon-clock-fill"></i>
+      
+      
+      12 分钟
+    </span>
+  
+
+  
+  
+</div>
+
+            
+          </div>
+
+          
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <main>
+    
+      
+
+<div class="container-fluid nopadding-x">
+  <div class="row nomargin-x">
+    <div class="d-none d-lg-block col-lg-2"></div>
+    <div class="col-lg-8 nopadding-x-md">
+      <div class="container nopadding-x-md" id="board-ctn">
+        <div class="py-5" id="board">
+          <article class="post-content mx-auto">
+            <!-- SEO header -->
+            <h1 style="display: none">init进程</h1>
+            
+            <div class="markdown-body">
+              <h1 id="init进程"><a href="#init进程" class="headerlink" title="init进程"></a>init进程</h1><p>init的进程号为1,是所有进程的父进程，内核初始化完毕之后，init程序开始运行。其他软件也同时开始运行。init程序通过&#x2F;etc&#x2F;inittab文件进行配置。inittab文件的内容如下：<br>引用内容：</p>
+<pre><code># inittab       This file describes how the INIT process should set up
+#               the system in a certain run-level.
+#
+# Author:       Miquel van Smoorenburg, &lt;miquels@drinkel.nl.mugnet.org&gt;
+#               Modified for RHS Linux by Marc Ewing and Donnie Barnes
+#
+                                                                                                                         
+# Default runlevel. The runlevels used by RHS are:
+#   0 - halt (Do NOT set initdefault to this)
+#   1 - Single user mode
+#   2 - Multiuser, without NFS (The same as 3, if you do not have networking)
+#   3 - Full multiuser mode
+#   4 - unused
+#   5 - X11
+#   6 - reboot (Do NOT set initdefault to this)
+#    
+id:3:initdefault:
+                                                                                                                         
+# System initialization.
+si::sysinit:/etc/rc.d/rc.sysinit
+                                                                                                                         
+l0:0:wait:/etc/rc.d/rc 0
+l1:1:wait:/etc/rc.d/rc 1
+l2:2:wait:/etc/rc.d/rc 2
+l3:3:wait:/etc/rc.d/rc 3
+l4:4:wait:/etc/rc.d/rc 4
+l5:5:wait:/etc/rc.d/rc 5
+l6:6:wait:/etc/rc.d/rc 6
+
+# Things to run in every runlevel
+ud::once:/sbin/update
+                                                                                                                         
+# Trap CTRL-ALT-DELETE
+ca::ctrlaltdel:/sbin/shutdown -t3 -r now
+                                                                                                                         
+# When our UPS tells us power has failed, assume we have a few minutes
+# of power left.  Schedule a shutdown for 2 minutes from now.
+# This does, of course, assume you have powerd installed and your
+# UPS connected and working correctly.
+pf::powerfail:/sbin/shutdown -f -h +2 &quot;Power Failure; System Shutting Down&quot;
+                                                                                                                         
+# If power was restored before the shutdown kicked in, cancel it.
+pr:12345:powerokwait:/sbin/shutdown -c &quot;Power Restored; Shutdown Cancelled&quot;
+
+
+# If power was restored before the shutdown kicked in, cancel it.
+pr:12345:powerokwait:/sbin/shutdown -c &quot;Power Restored; Shutdown Cancelled&quot;
+                                                                                                                         
+                                                                                                                         
+# Run gettys in standard runlevels
+1:2345:respawn:/sbin/mingetty tty1
+2:2345:respawn:/sbin/mingetty tty2
+3:2345:respawn:/sbin/mingetty tty3
+4:2345:respawn:/sbin/mingetty tty4
+5:2345:respawn:/sbin/mingetty tty5
+6:2345:respawn:/sbin/mingetty tty6                                                                                                                             
+# Run xdm in runlevel 5
+x:5:respawn:/etc/X11/prefdm -nodaemon
+</code></pre>
+<p>Runlevel 0是让init关闭所有进程并终止系统。</p>
+<p>Runlevel 1是用来将系统转到单用户模式，单用户模式只能有系统管理员进入，在该模式下处理那些在有登录用户的情况下不能进行更改的文件，改runlevel的编号1也可以用S代替。</p>
+<p>Runlevel 2是允许系统进入多用户的模式，但并不支持文件共享，这种模式很少应用。</p>
+<p>Runlevel 3是最常用的运行模式，主要用来提供真正的多用户模式，也是多数服务器的缺省模式。</p>
+<p>Runlevel 4一般不被系统使用，用户可以设计自己的系统状态并将其应用到runlevel 4阶段，尽管很少使用，但使用该系统可以实现一些特定的登录请求。</p>
+<p>Runlevel 5是将系统初始化为专用的X Window终端。对功能强大的Linux系统来说，这并不是好的选择，但用户如果需要这样，也可以通过在runlevel启动来实现该方案。</p>
+<p>Runlevel 6是关闭所有运行的进程并重新启动系统。</p>
+<p>在inittab文件中以#开头的所有行都是注释行。注释行有助于用户理解inittab文件，inittab文件中的值都是如下格式：</p>
+<pre><code>label:runlevel:action:process
+</code></pre>
+<p>label是1~4个字符的标签，用来标示输入的值。一些系统只支持2个字符的标签。鉴于此原因，多数人都将标签字符的个数限制在2个以内。该标签可以是任意字符构成的字符串，但实际上，某些特定的标签是常用的，在Red Hat Linux中使用的标签是：<br>代码:</p>
+<pre><code>id 用来定义缺省的init运行的级别
+si 是系统初始化的进程
+ln 其中的n从1~6,指明该进程可以使用的runlevel的级别
+ud 是升级进程
+ca 指明当按下Ctrl+Alt+Del是运行的进程
+pf 指当UPS表明断电时运行的进程
+pr 是在系统真正关闭之前，UPS发出电源恢复的信号时需要运行的进程
+x  是将系统转入X终端时需要运行的进程
+</code></pre>
+<p>runlevel字段指定runlevel的级别。可以指定多个runlevel级别，也可以不为runlevel字段指定特定的值。</p>
+<p>action字段定义了该进程应该运行在何种状态下：<br>代码:</p>
+<pre><code>boot        在系统启动时运行，忽略runlevel
+bootwait    在系统启动时运行，init等待进程完成。忽略runlevel
+ctrlaltdel    当Ctrl+Alt+Del三个键同时按下时运行，把SIGINT信号发送给init。忽略    runlevel
+initdefault    不要执行这个进程，它用于设置默认runlevel
+kbrequest    当init从键盘中收到信号时运行。这里要求键盘组合符合KeyBoardSigral(参见/usr/share/doc/kbd-*关于键盘组合的文档)
+off        禁止进入，因此该进程不运行
+once        每一个runlevel级别运行一次
+ondemand    当系统指定特定的运行级别A、B、C时运行
+powerfail    当init收到SIGPWR信号时运行
+powerokwait    当收到SIGPWD信号且/etc/文件中的电源状态包含OK时运行
+powerwait    当收到SIGPWD信号，并且init等待进程结束时运行
+respawn        不管何时终止都重新启动进程
+sysinit        在运行boot或bootwait进程之前运行
+wait        运行进程等待输入运行模式
+process 字段包含init执行的进程，该进程采用的格式与在命令行下运行该进程的格式一样，因此process字段都以该进程的名字开头，紧跟着是运行时，紧跟着是运行时要传递给该进程的参数。比如/sbin/shutdown -t3 -r now，该进程在按下Ctrl+Alt+Del时执行，在命令行下也可以直接输入来重新启动系统。
+</code></pre>
+<p>特殊目的的记录<br>    仔细学习例子文件，学习应用其中关于inittab的语法格式。该文件的大多数内容都可以忽略，因为超过一半的内容都是注释，剩余的一些文件内容主要是用来实现某些特殊的功能：</p>
+<pre><code>id 的值表明缺省的runlevel是3。
+ud 的值可以唤醒/sbin/update进程，该进程为保持磁盘的完整性，将在对磁盘进行I/O操作之前清空整个I/O缓冲区。
+pf、pr和ca的值只被特定的中断所调用。
+</code></pre>
+<p>如果系统是专用的X终端，则只需x的输入值。<br>getty进程来提供虚拟终端设备的服务，例如：</p>
+<pre><code>3:2345:respawn:/sbin/mingetty tty3
+</code></pre>
+<p>标签字段的值是3,3是设备tty3的数字后缀,tty3与相应的进程相关联，该getty进程可以启动的runlevel是2、3、4和5,当该进程终止时，init马上就重新启动它。启动进程的路径名是&#x2F;sbin&#x2F;mingetty，该进程是实现虚拟终端支持的最小版本的getty，为tty3提供启动虚拟设备的进程。</p>
+<pre><code>si::sysinit:/etc/rc.d/rc.sysinit
+</code></pre>
+<p>该值告诉init程序运行&#x2F;etc &#x2F;rc.d&#x2F;rc.sysinit脚本文件来初始化系统，该脚本文件与所有启动的脚本类似，它只是一个包含Linux的 shell命令的可执行文件，注意输入的字符串必须包括该脚本的完整路径。不同版本的Linux存放该脚本的位置也不相同，但不用刻意去记忆这些位置，只需查看&#x2F;etc&#x2F;inittab 文件即可，该文件中包含启动脚本文件的确切位置。</p>
+
+            </div>
+            <hr>
+            <div>
+              <div class="post-metas mb-3">
+                
+                  <div class="post-meta mr-3">
+                    <i class="iconfont icon-category"></i>
+                    
+                      <a class="hover-with-bg" href="/categories/Linux/">Linux</a>
+                    
+                  </div>
+                
+                
+                  <div class="post-meta">
+                    <i class="iconfont icon-tags"></i>
+                    
+                      <a class="hover-with-bg" href="/tags/Kernel/">Kernel</a>
+                    
+                  </div>
+                
+              </div>
+              
+                <p class="note note-warning">
+                  
+                    本博客所有文章除特别声明外，均采用 <a target="_blank" href="https://creativecommons.org/licenses/by-sa/4.0/deed.zh" rel="nofollow noopener noopener">CC BY-SA 4.0 协议</a> ，转载请注明出处！
+                  
+                </p>
+              
+              
+                <div class="post-prevnext">
+                  <article class="post-prev col-6">
+                    
+                    
+                      <a href="/2018/05/15/2018-05-15-grub-guide-os/">
+                        <i class="iconfont icon-arrowleft"></i>
+                        <span class="hidden-mobile">grub多系统引导</span>
+                        <span class="visible-mobile">上一篇</span>
+                      </a>
+                    
+                  </article>
+                  <article class="post-next col-6">
+                    
+                    
+                      <a href="/2018/05/14/2018-05-14-judge-root-in-shell/">
+                        <span class="hidden-mobile">shell编程技巧之判断用户权限</span>
+                        <span class="visible-mobile">下一篇</span>
+                        <i class="iconfont icon-arrowright"></i>
+                      </a>
+                    
+                  </article>
+                </div>
+              
+            </div>
+
+            
+              <!-- Comments -->
+              <article class="comments" id="comments" lazyload>
+                
+                  
+                
+                
+  <script type="text/javascript">
+    Fluid.utils.loadComments('#comments', function() {
+      var light = 'github-light';
+      var dark = 'github-dark';
+      var schema = document.documentElement.getAttribute('data-user-color-scheme');
+      if (schema === 'dark') {
+        schema = dark;
+      } else {
+        schema = light;
+      }
+      window.UtterancesThemeLight = light;
+      window.UtterancesThemeDark = dark;
+      var s = document.createElement('script');
+      s.setAttribute('src', 'https://utteranc.es/client.js');
+      s.setAttribute('repo', 'hksanduo/commit-utterances');
+      s.setAttribute('issue-term', 'title');
+      
+      s.setAttribute('label', 'utterances');
+      
+      s.setAttribute('theme', schema);
+      s.setAttribute('crossorigin', 'anonymous');
+      document.getElementById('comments').appendChild(s);
+    })
+  </script>
+  <noscript>Please enable JavaScript to view the comments</noscript>
+
+
+              </article>
+            
+          </article>
+        </div>
+      </div>
+    </div>
+    
+      <div class="d-none d-lg-block col-lg-2 toc-container" id="toc-ctn">
+        <div id="toc">
+  <p class="toc-header"><i class="iconfont icon-list"></i>&nbsp;目录</p>
+  <div class="toc-body" id="toc-body"></div>
+</div>
+
+      </div>
+    
+  </div>
+</div>
+
+<!-- Custom -->
+
+
+    
+
+    
+      <a id="scroll-top-button" aria-label="TOP" href="#" role="button">
+        <i class="iconfont icon-arrowup" aria-hidden="true"></i>
+      </a>
+    
+
+    
+      <div class="modal fade" id="modalSearch" tabindex="-1" role="dialog" aria-labelledby="ModalLabel"
+     aria-hidden="true">
+  <div class="modal-dialog modal-dialog-scrollable modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header text-center">
+        <h4 class="modal-title w-100 font-weight-bold">搜索</h4>
+        <button type="button" id="local-search-close" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body mx-3">
+        <div class="md-form mb-5">
+          <input type="text" id="local-search-input" class="form-control validate">
+          <label data-error="x" data-success="v"
+                 for="local-search-input">关键词</label>
+        </div>
+        <div class="list-group" id="local-search-result"></div>
+      </div>
+    </div>
+  </div>
+</div>
+    
+
+    
+  </main>
+
+  <footer class="text-center mt-5 py-3">
+  <div class="footer-content">
+     <a href="https://hexo.io" target="_blank" rel="nofollow noopener"><span>Hexo</span></a> <i class="iconfont icon-love"></i> <a href="https://github.com/fluid-dev/hexo-theme-fluid" target="_blank" rel="nofollow noopener"><span>Fluid</span></a> 
+  </div>
+  
+  <div class="statistics">
+    
+    
+
+    
+      
+        <!-- 不蒜子统计PV -->
+        <span id="busuanzi_container_site_pv" style="display: none">
+            总访问量 
+            <span id="busuanzi_value_site_pv"></span>
+             次
+          </span>
+      
+      
+        <!-- 不蒜子统计UV -->
+        <span id="busuanzi_container_site_uv" style="display: none">
+            总访客数 
+            <span id="busuanzi_value_site_uv"></span>
+             人
+          </span>
+      
+    
+  </div>
+
+
+  
+
+  
+</footer>
+
+
+  <!-- SCRIPTS -->
+  
+  <script  src="https://cdn.jsdelivr.net/npm/nprogress@0/nprogress.min.js" ></script>
+  <link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/nprogress@0/nprogress.min.css" />
+
+  <script>
+    NProgress.configure({"showSpinner":false,"trickleSpeed":100})
+    NProgress.start()
+    window.addEventListener('load', function() {
+      NProgress.done();
+    })
+  </script>
+
+
+<script  src="https://cdn.jsdelivr.net/npm/jquery@3/dist/jquery.min.js" ></script>
+<script  src="https://cdn.jsdelivr.net/npm/bootstrap@4/dist/js/bootstrap.min.js" ></script>
+<script  src="/js/events.js" ></script>
+<script  src="/js/plugins.js" ></script>
+
+<!-- Plugins -->
+
+
+  <script  src="/js/local-search.js" ></script>
+
+
+
+  
+    <script  src="/js/img-lazyload.js" ></script>
+  
+
+
+
+  
+
+
+
+  
+    <script  src="https://cdn.jsdelivr.net/npm/tocbot@4/dist/tocbot.min.js" ></script>
+  
+  
+    <script  src="https://cdn.jsdelivr.net/npm/@fancyapps/fancybox@3/dist/jquery.fancybox.min.js" ></script>
+  
+  
+    <script  src="https://cdn.jsdelivr.net/npm/anchor-js@4/anchor.min.js" ></script>
+  
+  
+    <script defer src="https://cdn.jsdelivr.net/npm/clipboard@2/dist/clipboard.min.js" ></script>
+  
+
+
+
+  <script defer src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js" ></script>
+
+
+
+
+  <script  src="https://cdn.jsdelivr.net/npm/typed.js@2/lib/typed.min.js" ></script>
+  <script>
+    (function (window, document) {
+      var typing = Fluid.plugins.typing;
+      var title = document.getElementById('subtitle').title;
+      
+      typing(title)
+      
+    })(window, document);
+  </script>
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+    <!-- Google Analytics -->
+    <script defer>
+      window.ga = window.ga || function () { (ga.q = ga.q || []).push(arguments) };
+      ga.l = +new Date;
+      ga('create', 'UA-167858469-1', 'auto');
+      ga('send', 'pageview');
+    </script>
+    <script async src='https://www.google-analytics.com/analytics.js'></script>
+  
+
+  
+
+  
+
+  
+
+  
+
+
+
+
+
+<!-- 主题的启动项 保持在最底部 -->
+<script  src="/js/boot.js" ></script>
+
+
+</body>
+</html>

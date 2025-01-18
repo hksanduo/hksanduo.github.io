@@ -1,0 +1,615 @@
+
+
+<!DOCTYPE html>
+<html lang="zh-CN" data-default-color-scheme=auto>
+
+
+
+<head>
+  <meta charset="UTF-8">
+  <link rel="apple-touch-icon" sizes="76x76" href="/img/favicon.png">
+  <link rel="icon" href="/img/favicon.png">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, shrink-to-fit=no">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  
+  <meta name="theme-color" content="#2f4154">
+  <meta name="description" content="">
+  <meta name="author" content="sanduo">
+  <meta name="keywords" content="">
+  <meta name="description" content="SALT API安全最佳实践  在多数情况下，专门部署的API安全工具可以更容易、更自动化解决API安全问题。此类平台在整个API生命周期中支持一系列功能，并为组织的API业务逻辑提供必要的上下文以阻止攻击和数据暴露。 这份API安全最佳实践将帮助企业弥补API安全策略中的差距，以下是关于如何确定问题范围和活动优先顺序的一些建议：  测试API安全性同时，还需要API运行时捕获未经过标准构建更改的">
+<meta property="og:type" content="article">
+<meta property="og:title" content="SALT API安全最佳实践">
+<meta property="og:url" content="https://hksanduo.github.io/2022/09/08/2022-09-08-salt-api-security-best-practices/index.html">
+<meta property="og:site_name" content="sanduo blog">
+<meta property="og:description" content="SALT API安全最佳实践  在多数情况下，专门部署的API安全工具可以更容易、更自动化解决API安全问题。此类平台在整个API生命周期中支持一系列功能，并为组织的API业务逻辑提供必要的上下文以阻止攻击和数据暴露。 这份API安全最佳实践将帮助企业弥补API安全策略中的差距，以下是关于如何确定问题范围和活动优先顺序的一些建议：  测试API安全性同时，还需要API运行时捕获未经过标准构建更改的">
+<meta property="og:locale" content="zh_CN">
+<meta property="article:published_time" content="2022-09-08T08:57:00.000Z">
+<meta property="article:modified_time" content="2025-01-18T14:54:10.081Z">
+<meta property="article:author" content="sanduo">
+<meta property="article:tag" content="Api">
+<meta name="twitter:card" content="summary_large_image">
+  
+  <title>SALT API安全最佳实践 - sanduo blog</title>
+
+  <link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4/dist/css/bootstrap.min.css" />
+
+
+  <link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/github-markdown-css@4/github-markdown.min.css" />
+  <link  rel="stylesheet" href="/lib/hint/hint.min.css" />
+
+  
+    
+    
+      
+      <link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/highlight.js@10/styles/github-gist.min.css" />
+    
+  
+
+  
+    <link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fancyapps/fancybox@3/dist/jquery.fancybox.min.css" />
+  
+
+
+<!-- 主题依赖的图标库，不要自行修改 -->
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1749284_ba1fz6golrf.css">
+
+
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1736178_kmeydafke9r.css">
+
+
+<link  rel="stylesheet" href="/css/main.css" />
+
+<!-- 自定义样式保持在最底部 -->
+
+
+  <script id="fluid-configs">
+    var Fluid = window.Fluid || {};
+    var CONFIG = {"hostname":"hksanduo.github.io","root":"/","version":"1.8.12","typing":{"enable":true,"typeSpeed":70,"cursorChar":"_","loop":false},"anchorjs":{"enable":true,"element":"h1,h2,h3,h4,h5,h6","placement":"right","visible":"hover","icon":""},"progressbar":{"enable":true,"height_px":3,"color":"#29d","options":{"showSpinner":false,"trickleSpeed":100}},"copy_btn":true,"image_zoom":{"enable":true,"img_url_replace":["",""]},"toc":{"enable":true,"headingSelector":"h1,h2,h3,h4,h5,h6","collapseDepth":0},"lazyload":{"enable":true,"loading_img":"/img/loading.gif","onlypost":false,"offset_factor":2},"web_analytics":{"enable":true,"baidu":null,"google":"UA-167858469-1","gtag":null,"tencent":{"sid":null,"cid":null},"woyaola":null,"cnzz":null,"leancloud":{"app_id":null,"app_key":null,"server_url":null,"path":"window.location.pathname"}},"search_path":"/local-search.xml"};
+  </script>
+  <script  src="/js/utils.js" ></script>
+  <script  src="/js/color-schema.js" ></script>
+<meta name="generator" content="Hexo 5.4.2"></head>
+
+
+<body>
+  <header style="height: 70vh;">
+    <nav id="navbar" class="navbar fixed-top  navbar-expand-lg navbar-dark scrolling-navbar">
+  <div class="container">
+    <a class="navbar-brand" href="/">
+      <strong>Welcome To Sanduo&#39;s Blog</strong>
+    </a>
+
+    <button id="navbar-toggler-btn" class="navbar-toggler" type="button" data-toggle="collapse"
+            data-target="#navbarSupportedContent"
+            aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+      <div class="animated-icon"><span></span><span></span><span></span></div>
+    </button>
+
+    <!-- Collapsible content -->
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+      <ul class="navbar-nav ml-auto text-center">
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/">
+                <i class="iconfont icon-home-fill"></i>
+                首页
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/archives/">
+                <i class="iconfont icon-archive-fill"></i>
+                归档
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/categories/">
+                <i class="iconfont icon-category-fill"></i>
+                分类
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/tags/">
+                <i class="iconfont icon-tags-fill"></i>
+                标签
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/about/">
+                <i class="iconfont icon-user-fill"></i>
+                关于
+              </a>
+            </li>
+          
+        
+        
+          <li class="nav-item" id="search-btn">
+            <a class="nav-link" target="_self" href="javascript:;" data-toggle="modal" data-target="#modalSearch" aria-label="Search">
+              &nbsp;<i class="iconfont icon-search"></i>&nbsp;
+            </a>
+          </li>
+        
+        
+          <li class="nav-item" id="color-toggle-btn">
+            <a class="nav-link" target="_self" href="javascript:;" aria-label="Color Toggle">&nbsp;<i
+                class="iconfont icon-dark" id="color-toggle-icon"></i>&nbsp;</a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+</nav>
+
+    <div class="banner" id="banner" parallax=true
+         style="background: url('/img/default.png') no-repeat center center;
+           background-size: cover;">
+      <div class="full-bg-img">
+        <div class="mask flex-center" style="background-color: rgba(0, 0, 0, 0.3)">
+          <div class="page-header text-center fade-in-up">
+            <span class="h2" id="subtitle" title="SALT API安全最佳实践">
+              
+            </span>
+
+            
+              <div class="mt-3">
+  
+  
+    <span class="post-meta">
+      <i class="iconfont icon-date-fill" aria-hidden="true"></i>
+      <time datetime="2022-09-08 08:57" pubdate>
+        2022年9月8日 早上
+      </time>
+    </span>
+  
+</div>
+
+<div class="mt-1">
+  
+    <span class="post-meta mr-2">
+      <i class="iconfont icon-chart"></i>
+      2.5k 字
+    </span>
+  
+
+  
+    <span class="post-meta mr-2">
+      <i class="iconfont icon-clock-fill"></i>
+      
+      
+      8 分钟
+    </span>
+  
+
+  
+  
+</div>
+
+            
+          </div>
+
+          
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <main>
+    
+      
+
+<div class="container-fluid nopadding-x">
+  <div class="row nomargin-x">
+    <div class="d-none d-lg-block col-lg-2"></div>
+    <div class="col-lg-8 nopadding-x-md">
+      <div class="container nopadding-x-md" id="board-ctn">
+        <div class="py-5" id="board">
+          <article class="post-content mx-auto">
+            <!-- SEO header -->
+            <h1 style="display: none">SALT API安全最佳实践</h1>
+            
+            <div class="markdown-body">
+              <p>SALT API安全最佳实践</p>
+<hr>
+<p>在多数情况下，专门部署的API安全工具可以更容易、更自动化解决API安全问题。此类平台在整个API生命周期中支持一系列功能，并为组织的API业务逻辑提供必要的上下文以阻止攻击和数据暴露。</p>
+<p>这份API安全最佳实践将帮助企业弥补API安全策略中的差距，以下是关于如何确定问题范围和活动优先顺序的一些建议：</p>
+<ul>
+<li>测试API安全性同时，还需要API运行时捕获未经过标准构建更改的API和测试工具不能发现的API。</li>
+<li>确保覆盖所有环境和软件供应链，而不仅仅是由API网关或API管理平台管理的API。</li>
+<li>如果您不采取API防护措施，可以将重点放在API运行时防护上，将其作为“止血”措施、减缓攻击者的速度并为应用程序和API团队争取时间的一种方式。</li>
+</ul>
+<p>以下内容翻译来至：SaltSecurity Checklist-API_Security_Best_Practices，部分内容掺杂博主本人的观点和看法，如果有问题或者建议，请及时联系本人，鄙人将不胜感激。</p>
+<h2 id="1、API安全设计与开发"><a href="#1、API安全设计与开发" class="headerlink" title="1、API安全设计与开发"></a>1、API安全设计与开发</h2><p>不需要在安全需求上重新创造轮子，可以参考OWASP应用程序安全验证标准(ASVS)，也可以参考安全开发厂商的安全需求自动化推导相关系统，对所有类型的应用程序设计都有用，确保可以进行API集成，并简化API的威胁建模。</p>
+<ul>
+<li>制定开发和集成API安全方案</li>
+<li>在设计评审时增加业务逻辑审查</li>
+<li>制定符合当前开发现状的API编码指南和配置基线</li>
+</ul>
+<h2 id="2、API文档"><a href="#2、API文档" class="headerlink" title="2、API文档"></a>2、API文档</h2><p>不需要在安全需求上重新创造轮子，可以参考OWASP应用程序安全验证标准(ASVS)，也可以参考安全开发厂商的安全需求自动化推导相关系统。充分的文档还为一系列活动提供了好处，包括设计审查、安全测试、安全运维和保护。</p>
+<ul>
+<li>严格遵循API规范，比如owasp OpenAPI(OAS)</li>
+<li>将API架构重新用于基本测试方法和保护方法</li>
+<li>为API文档差异和API变化制定应急方案</li>
+</ul>
+<h2 id="3、API-发现和管理"><a href="#3、API-发现和管理" class="headerlink" title="3、API 发现和管理"></a>3、API 发现和管理</h2><p>尽管API文档本身是一种最佳实践，可能不会始终如一地完成。API地址、参数和数据类型的自动发现对所有组织都至关重要。如何创建准确的API清单，以满足公司内部的众多IT需求。</p>
+<ul>
+<li>尽可能发现API，而不仅仅在生产环境下</li>
+<li>包括依赖的API和第三方API</li>
+<li>标记并标识API和微服务</li>
+</ul>
+<h2 id="4、API安全测试"><a href="#4、API安全测试" class="headerlink" title="4、API安全测试"></a>4、API安全测试</h2><p>使用传统的安全测试工具来验证API安全风险，例如众所周知的错误配置或漏洞，但安全人员要意识到这些工具有局限性。没有一个扫描器擅长解析业务逻辑。API地址、参数和数据类型的自动发现对所有组织都至关重要。这一部分重点介绍如何创建准确的API清单，以满足公司内部的众多IT需求。</p>
+<ul>
+<li>静态分析 API 代码，作为版本控制和 CI&#x2F;CD 的一部分</li>
+<li>检查 API 代码中已知的易受攻击的依赖组件</li>
+<li>动态分析和模糊测试部署的API</li>
+</ul>
+<h2 id="5、前端安全"><a href="#5、前端安全" class="headerlink" title="5、前端安全"></a>5、前端安全</h2><p>保护前端应用程序或API客户端(它们依赖于后端API来提供功能和数据)可以作为分层安全方法的一部分。这部分包括一些用于保护前端的关键元素，但是要注意客户端设计的缺陷。如客户端行为分析和设备标识不经意间造成隐私问题。</p>
+<ul>
+<li>制定前端安全要求，包括JavaScript,Android,iOS</li>
+<li>由于客户端容易被攻击和逆向分析，在客户端尽可能存储少量数据或者不存储数据</li>
+<li>如果后端API已经加固，可以尝试客户端加固</li>
+<li>由于监管要求，对于敏感数据需要进行处理和脱敏</li>
+</ul>
+<h2 id="6、日志和监控"><a href="#6、日志和监控" class="headerlink" title="6、日志和监控"></a>6、日志和监控</h2><p>日志记录和监控数据对于构建构成“正常”的基线也很有用，这样就可以快速识别和解决异常事件。</p>
+<ul>
+<li>必须记录所有架构、应用和API的日志信息</li>
+<li>考虑非安全的场景，比如API的性能，上线时间</li>
+<li>为API分配足够的资源，可以考虑增加云资源</li>
+</ul>
+<h2 id="7、API的适配和架构"><a href="#7、API的适配和架构" class="headerlink" title="7、API的适配和架构"></a>7、API的适配和架构</h2><p>API中间件将帮助企业加速交付、灵活运维、改进实施能力，特别是在涉及到 API 访问控制时。</p>
+<ul>
+<li>采用API中间件提高观察和监控能力</li>
+<li>采用中间件机制(如：API网关)实施访问控制</li>
+<li>采用能够提供深入上下文的API安全工具来增强中间件机制</li>
+</ul>
+<h2 id="8、网络安全"><a href="#8、网络安全" class="headerlink" title="8、网络安全"></a>8、网络安全</h2><p>零信任体系架构的一个主要目标是实施最小特权并动态限制网络访问。但是，API必须具有连接性才能正常工作，而且许多API攻击仍然发生在可信通道和经过身份验证的会话中。</p>
+<ul>
+<li>启用加密传输来保护API传输的数据 </li>
+<li>如果API使用者数量较少，请使用IP地址白名单和黑名单列表</li>
+<li>寻求动态速率限制，并将静态速率限制作为最后的手段</li>
+</ul>
+<h2 id="9、数据安全"><a href="#9、数据安全" class="headerlink" title="9、数据安全"></a>9、数据安全</h2><p>数据安全方案旨在提供数据的机密性、完整性和可用性，但85%的组织缺乏信心，他们不知道哪些API会暴露敏感数据。参考这部分可以减少敏感数据的暴露，敏感数据泄露会导致重大的监管处罚、大规模的隐私影响和公司品牌损害。</p>
+<ul>
+<li>启用加密传输以保护API传输的数据 </li>
+<li>如果API使用者数量较少，请使用IP地址白名单和黑名单列表</li>
+<li>寻求动态速率限制，并将静态速率限制作为最后的手段</li>
+</ul>
+<h2 id="10、认证和授权"><a href="#10、认证和授权" class="headerlink" title="10、认证和授权"></a>10、认证和授权</h2><p>在考虑用于身份验证和授权的API安全最佳实践时，需要同时考虑用户和计算机基础设施，尽可能将API访问控制和身份存储外部化，包括API网关、用户和计算机凭证存储、IAM解决方案、密钥管理服务、公钥基础设施和机密管理等安全机制。</p>
+<ul>
+<li>持续认证和授权API使用者</li>
+<li>避免使用API密钥作为身份验证手段</li>
+<li>使用带有安全扩展的现代授权协议，如OAuth2</li>
+</ul>
+<h2 id="11、运行时保护"><a href="#11、运行时保护" class="headerlink" title="11、运行时保护"></a>11、运行时保护</h2><p>任何运行时保护都应该是动态的，并不断学习。识别API基础架构中的错误配置以及诸如凭据填充、暴力破解或恶意爬虫等行为异常。</p>
+<ul>
+<li>如果可以，启用API网关和APIM的威胁防护功能</li>
+<li>增加API系统 DoS 和 DDoS 防护</li>
+<li>超越传统依赖规则的运行时控制，利用AI&#x2F;ML和行为分析引擎来检测API攻击</li>
+</ul>
+<h2 id="12、安全运营"><a href="#12、安全运营" class="headerlink" title="12、安全运营"></a>12、安全运营</h2><p>SoC安全人员必须经常依赖最了解应用程序体系结构和API逻辑的应用程序开发人员和API项目团队。详细的应用程序和业务逻辑在数字取证和事件响应中至关重要。安全管理人员需要更多地强调SecOps的人员和流程方面，而不是技术方面。</p>
+<ul>
+<li>明确API运营体系中涉及的非安全和安全角色</li>
+<li>创建以API为中心的事件响应手册</li>
+<li>显示可操作的API事件和不转储数据，避免SOC资源耗尽</li>
+</ul>
+<h2 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h2><ul>
+<li><a target="_blank" rel="noopener" href="https://content.salt.security/rs/352-UXR-417/images/SaltSecurity-Checklist-API_Security_Best_Practices.xlsx">https://content.salt.security/rs/352-UXR-417/images/SaltSecurity-Checklist-API_Security_Best_Practices.xlsx</a></li>
+</ul>
+
+            </div>
+            <hr>
+            <div>
+              <div class="post-metas mb-3">
+                
+                  <div class="post-meta mr-3">
+                    <i class="iconfont icon-category"></i>
+                    
+                      <a class="hover-with-bg" href="/categories/Security/">Security</a>
+                    
+                  </div>
+                
+                
+                  <div class="post-meta">
+                    <i class="iconfont icon-tags"></i>
+                    
+                      <a class="hover-with-bg" href="/tags/Api/">Api</a>
+                    
+                  </div>
+                
+              </div>
+              
+                <p class="note note-warning">
+                  
+                    本博客所有文章除特别声明外，均采用 <a target="_blank" href="https://creativecommons.org/licenses/by-sa/4.0/deed.zh" rel="nofollow noopener noopener">CC BY-SA 4.0 协议</a> ，转载请注明出处！
+                  
+                </p>
+              
+              
+                <div class="post-prevnext">
+                  <article class="post-prev col-6">
+                    
+                    
+                      <a href="/2022/09/09/2022-09-09-harder-coding-scan/">
+                        <i class="iconfont icon-arrowleft"></i>
+                        <span class="hidden-mobile">敏捷代码审计之代码硬编码</span>
+                        <span class="visible-mobile">上一篇</span>
+                      </a>
+                    
+                  </article>
+                  <article class="post-next col-6">
+                    
+                    
+                      <a href="/2022/05/25/2022-05-25-resolve-create-directory-no-space-left-on-device/">
+                        <span class="hidden-mobile">创建空文件显示No space left on device</span>
+                        <span class="visible-mobile">下一篇</span>
+                        <i class="iconfont icon-arrowright"></i>
+                      </a>
+                    
+                  </article>
+                </div>
+              
+            </div>
+
+            
+              <!-- Comments -->
+              <article class="comments" id="comments" lazyload>
+                
+                  
+                
+                
+  <script type="text/javascript">
+    Fluid.utils.loadComments('#comments', function() {
+      var light = 'github-light';
+      var dark = 'github-dark';
+      var schema = document.documentElement.getAttribute('data-user-color-scheme');
+      if (schema === 'dark') {
+        schema = dark;
+      } else {
+        schema = light;
+      }
+      window.UtterancesThemeLight = light;
+      window.UtterancesThemeDark = dark;
+      var s = document.createElement('script');
+      s.setAttribute('src', 'https://utteranc.es/client.js');
+      s.setAttribute('repo', 'hksanduo/commit-utterances');
+      s.setAttribute('issue-term', 'title');
+      
+      s.setAttribute('label', 'utterances');
+      
+      s.setAttribute('theme', schema);
+      s.setAttribute('crossorigin', 'anonymous');
+      document.getElementById('comments').appendChild(s);
+    })
+  </script>
+  <noscript>Please enable JavaScript to view the comments</noscript>
+
+
+              </article>
+            
+          </article>
+        </div>
+      </div>
+    </div>
+    
+      <div class="d-none d-lg-block col-lg-2 toc-container" id="toc-ctn">
+        <div id="toc">
+  <p class="toc-header"><i class="iconfont icon-list"></i>&nbsp;目录</p>
+  <div class="toc-body" id="toc-body"></div>
+</div>
+
+      </div>
+    
+  </div>
+</div>
+
+<!-- Custom -->
+
+
+    
+
+    
+      <a id="scroll-top-button" aria-label="TOP" href="#" role="button">
+        <i class="iconfont icon-arrowup" aria-hidden="true"></i>
+      </a>
+    
+
+    
+      <div class="modal fade" id="modalSearch" tabindex="-1" role="dialog" aria-labelledby="ModalLabel"
+     aria-hidden="true">
+  <div class="modal-dialog modal-dialog-scrollable modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header text-center">
+        <h4 class="modal-title w-100 font-weight-bold">搜索</h4>
+        <button type="button" id="local-search-close" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body mx-3">
+        <div class="md-form mb-5">
+          <input type="text" id="local-search-input" class="form-control validate">
+          <label data-error="x" data-success="v"
+                 for="local-search-input">关键词</label>
+        </div>
+        <div class="list-group" id="local-search-result"></div>
+      </div>
+    </div>
+  </div>
+</div>
+    
+
+    
+  </main>
+
+  <footer class="text-center mt-5 py-3">
+  <div class="footer-content">
+     <a href="https://hexo.io" target="_blank" rel="nofollow noopener"><span>Hexo</span></a> <i class="iconfont icon-love"></i> <a href="https://github.com/fluid-dev/hexo-theme-fluid" target="_blank" rel="nofollow noopener"><span>Fluid</span></a> 
+  </div>
+  
+  <div class="statistics">
+    
+    
+
+    
+      
+        <!-- 不蒜子统计PV -->
+        <span id="busuanzi_container_site_pv" style="display: none">
+            总访问量 
+            <span id="busuanzi_value_site_pv"></span>
+             次
+          </span>
+      
+      
+        <!-- 不蒜子统计UV -->
+        <span id="busuanzi_container_site_uv" style="display: none">
+            总访客数 
+            <span id="busuanzi_value_site_uv"></span>
+             人
+          </span>
+      
+    
+  </div>
+
+
+  
+
+  
+</footer>
+
+
+  <!-- SCRIPTS -->
+  
+  <script  src="https://cdn.jsdelivr.net/npm/nprogress@0/nprogress.min.js" ></script>
+  <link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/nprogress@0/nprogress.min.css" />
+
+  <script>
+    NProgress.configure({"showSpinner":false,"trickleSpeed":100})
+    NProgress.start()
+    window.addEventListener('load', function() {
+      NProgress.done();
+    })
+  </script>
+
+
+<script  src="https://cdn.jsdelivr.net/npm/jquery@3/dist/jquery.min.js" ></script>
+<script  src="https://cdn.jsdelivr.net/npm/bootstrap@4/dist/js/bootstrap.min.js" ></script>
+<script  src="/js/events.js" ></script>
+<script  src="/js/plugins.js" ></script>
+
+<!-- Plugins -->
+
+
+  <script  src="/js/local-search.js" ></script>
+
+
+
+  
+    <script  src="/js/img-lazyload.js" ></script>
+  
+
+
+
+  
+
+
+
+  
+    <script  src="https://cdn.jsdelivr.net/npm/tocbot@4/dist/tocbot.min.js" ></script>
+  
+  
+    <script  src="https://cdn.jsdelivr.net/npm/@fancyapps/fancybox@3/dist/jquery.fancybox.min.js" ></script>
+  
+  
+    <script  src="https://cdn.jsdelivr.net/npm/anchor-js@4/anchor.min.js" ></script>
+  
+  
+    <script defer src="https://cdn.jsdelivr.net/npm/clipboard@2/dist/clipboard.min.js" ></script>
+  
+
+
+
+  <script defer src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js" ></script>
+
+
+
+
+  <script  src="https://cdn.jsdelivr.net/npm/typed.js@2/lib/typed.min.js" ></script>
+  <script>
+    (function (window, document) {
+      var typing = Fluid.plugins.typing;
+      var title = document.getElementById('subtitle').title;
+      
+      typing(title)
+      
+    })(window, document);
+  </script>
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+    <!-- Google Analytics -->
+    <script defer>
+      window.ga = window.ga || function () { (ga.q = ga.q || []).push(arguments) };
+      ga.l = +new Date;
+      ga('create', 'UA-167858469-1', 'auto');
+      ga('send', 'pageview');
+    </script>
+    <script async src='https://www.google-analytics.com/analytics.js'></script>
+  
+
+  
+
+  
+
+  
+
+  
+
+
+
+
+
+<!-- 主题的启动项 保持在最底部 -->
+<script  src="/js/boot.js" ></script>
+
+
+</body>
+</html>

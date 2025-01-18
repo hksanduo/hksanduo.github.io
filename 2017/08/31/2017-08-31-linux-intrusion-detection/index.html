@@ -1,0 +1,572 @@
+
+
+<!DOCTYPE html>
+<html lang="zh-CN" data-default-color-scheme=auto>
+
+
+
+<head>
+  <meta charset="UTF-8">
+  <link rel="apple-touch-icon" sizes="76x76" href="/img/favicon.png">
+  <link rel="icon" href="/img/favicon.png">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, shrink-to-fit=no">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  
+  <meta name="theme-color" content="#2f4154">
+  <meta name="description" content="">
+  <meta name="author" content="sanduo">
+  <meta name="keywords" content="">
+  <meta name="description" content="检查系统日志检查系统错误登陆日志，统计IP重试次数这里使用了lastb命令，该命令需要root权限，可以显示所有登陆信息。这里仅仅显示的root用户的，读者可以更具实际情况自行确定，或者直接全部都显示，你会有不一样的收获，每个人的脚本都不一样，更具实际情况自行编写。 1# lastb root | awk &amp;#x27;&amp;#123;print $3&amp;#125;&amp;#x27; | sort | uniq">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Linux 入侵检测">
+<meta property="og:url" content="https://hksanduo.github.io/2017/08/31/2017-08-31-linux-intrusion-detection/index.html">
+<meta property="og:site_name" content="sanduo blog">
+<meta property="og:description" content="检查系统日志检查系统错误登陆日志，统计IP重试次数这里使用了lastb命令，该命令需要root权限，可以显示所有登陆信息。这里仅仅显示的root用户的，读者可以更具实际情况自行确定，或者直接全部都显示，你会有不一样的收获，每个人的脚本都不一样，更具实际情况自行编写。 1# lastb root | awk &amp;#x27;&amp;#123;print $3&amp;#125;&amp;#x27; | sort | uniq">
+<meta property="og:locale" content="zh_CN">
+<meta property="article:published_time" content="2017-08-31T07:36:00.000Z">
+<meta property="article:modified_time" content="2025-01-18T14:54:10.076Z">
+<meta property="article:author" content="sanduo">
+<meta property="article:tag" content="Operations">
+<meta name="twitter:card" content="summary_large_image">
+  
+  <title>Linux 入侵检测 - sanduo blog</title>
+
+  <link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4/dist/css/bootstrap.min.css" />
+
+
+  <link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/github-markdown-css@4/github-markdown.min.css" />
+  <link  rel="stylesheet" href="/lib/hint/hint.min.css" />
+
+  
+    
+    
+      
+      <link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/highlight.js@10/styles/github-gist.min.css" />
+    
+  
+
+  
+    <link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fancyapps/fancybox@3/dist/jquery.fancybox.min.css" />
+  
+
+
+<!-- 主题依赖的图标库，不要自行修改 -->
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1749284_ba1fz6golrf.css">
+
+
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1736178_kmeydafke9r.css">
+
+
+<link  rel="stylesheet" href="/css/main.css" />
+
+<!-- 自定义样式保持在最底部 -->
+
+
+  <script id="fluid-configs">
+    var Fluid = window.Fluid || {};
+    var CONFIG = {"hostname":"hksanduo.github.io","root":"/","version":"1.8.12","typing":{"enable":true,"typeSpeed":70,"cursorChar":"_","loop":false},"anchorjs":{"enable":true,"element":"h1,h2,h3,h4,h5,h6","placement":"right","visible":"hover","icon":""},"progressbar":{"enable":true,"height_px":3,"color":"#29d","options":{"showSpinner":false,"trickleSpeed":100}},"copy_btn":true,"image_zoom":{"enable":true,"img_url_replace":["",""]},"toc":{"enable":true,"headingSelector":"h1,h2,h3,h4,h5,h6","collapseDepth":0},"lazyload":{"enable":true,"loading_img":"/img/loading.gif","onlypost":false,"offset_factor":2},"web_analytics":{"enable":true,"baidu":null,"google":"UA-167858469-1","gtag":null,"tencent":{"sid":null,"cid":null},"woyaola":null,"cnzz":null,"leancloud":{"app_id":null,"app_key":null,"server_url":null,"path":"window.location.pathname"}},"search_path":"/local-search.xml"};
+  </script>
+  <script  src="/js/utils.js" ></script>
+  <script  src="/js/color-schema.js" ></script>
+<meta name="generator" content="Hexo 5.4.2"></head>
+
+
+<body>
+  <header style="height: 70vh;">
+    <nav id="navbar" class="navbar fixed-top  navbar-expand-lg navbar-dark scrolling-navbar">
+  <div class="container">
+    <a class="navbar-brand" href="/">
+      <strong>Welcome To Sanduo&#39;s Blog</strong>
+    </a>
+
+    <button id="navbar-toggler-btn" class="navbar-toggler" type="button" data-toggle="collapse"
+            data-target="#navbarSupportedContent"
+            aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+      <div class="animated-icon"><span></span><span></span><span></span></div>
+    </button>
+
+    <!-- Collapsible content -->
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+      <ul class="navbar-nav ml-auto text-center">
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/">
+                <i class="iconfont icon-home-fill"></i>
+                首页
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/archives/">
+                <i class="iconfont icon-archive-fill"></i>
+                归档
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/categories/">
+                <i class="iconfont icon-category-fill"></i>
+                分类
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/tags/">
+                <i class="iconfont icon-tags-fill"></i>
+                标签
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/about/">
+                <i class="iconfont icon-user-fill"></i>
+                关于
+              </a>
+            </li>
+          
+        
+        
+          <li class="nav-item" id="search-btn">
+            <a class="nav-link" target="_self" href="javascript:;" data-toggle="modal" data-target="#modalSearch" aria-label="Search">
+              &nbsp;<i class="iconfont icon-search"></i>&nbsp;
+            </a>
+          </li>
+        
+        
+          <li class="nav-item" id="color-toggle-btn">
+            <a class="nav-link" target="_self" href="javascript:;" aria-label="Color Toggle">&nbsp;<i
+                class="iconfont icon-dark" id="color-toggle-icon"></i>&nbsp;</a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+</nav>
+
+    <div class="banner" id="banner" parallax=true
+         style="background: url('/img/default.png') no-repeat center center;
+           background-size: cover;">
+      <div class="full-bg-img">
+        <div class="mask flex-center" style="background-color: rgba(0, 0, 0, 0.3)">
+          <div class="page-header text-center fade-in-up">
+            <span class="h2" id="subtitle" title="Linux 入侵检测">
+              
+            </span>
+
+            
+              <div class="mt-3">
+  
+  
+    <span class="post-meta">
+      <i class="iconfont icon-date-fill" aria-hidden="true"></i>
+      <time datetime="2017-08-31 07:36" pubdate>
+        2017年8月31日 早上
+      </time>
+    </span>
+  
+</div>
+
+<div class="mt-1">
+  
+    <span class="post-meta mr-2">
+      <i class="iconfont icon-chart"></i>
+      3.5k 字
+    </span>
+  
+
+  
+    <span class="post-meta mr-2">
+      <i class="iconfont icon-clock-fill"></i>
+      
+      
+      11 分钟
+    </span>
+  
+
+  
+  
+</div>
+
+            
+          </div>
+
+          
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <main>
+    
+      
+
+<div class="container-fluid nopadding-x">
+  <div class="row nomargin-x">
+    <div class="d-none d-lg-block col-lg-2"></div>
+    <div class="col-lg-8 nopadding-x-md">
+      <div class="container nopadding-x-md" id="board-ctn">
+        <div class="py-5" id="board">
+          <article class="post-content mx-auto">
+            <!-- SEO header -->
+            <h1 style="display: none">Linux 入侵检测</h1>
+            
+            <div class="markdown-body">
+              <h2 id="检查系统日志"><a href="#检查系统日志" class="headerlink" title="检查系统日志"></a>检查系统日志</h2><h3 id="检查系统错误登陆日志，统计IP重试次数"><a href="#检查系统错误登陆日志，统计IP重试次数" class="headerlink" title="检查系统错误登陆日志，统计IP重试次数"></a>检查系统错误登陆日志，统计IP重试次数</h3><p>这里使用了lastb命令，该命令需要root权限，可以显示所有登陆信息。这里仅仅显示的root用户的，读者可以更具实际情况自行确定，或者直接全部都显示，你会有不一样的收获，每个人的脚本都不一样，更具实际情况自行编写。</p>
+<figure class="highlight coq"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs coq"># lastb root | <span class="hljs-type">awk</span> &#x27;&#123;print $<span class="hljs-number">3</span>&#125;&#x27; | <span class="hljs-type">sort</span> | <span class="hljs-type">uniq</span> -c | <span class="hljs-type">sort</span> -nr| <span class="hljs-type">more</span><br></code></pre></td></tr></table></figure>
+<p>以下是我部署在阿里云上主机被多次扫描的日志</p>
+<blockquote>
+<p>isadmin  ssh:notty    121.42.165.44    Mon Aug  7 23:56 - 23:56  (00:00)<br>deploy   ssh:notty    121.42.165.44    Mon Aug  7 23:54 - 23:54  (00:00)<br>deploy   ssh:notty    121.42.165.44    Mon Aug  7 23:54 - 23:54  (00:00)<br>vagrant  ssh:notty    121.42.165.44    Mon Aug  7 23:51 - 23:51  (00:00)<br>vagrant  ssh:notty    121.42.165.44    Mon Aug  7 23:51 - 23:51  (00:00)<br>Iqadmin  ssh:notty    121.42.165.44    Mon Aug  7 23:47 - 23:47  (00:00)<br>Iqadmin  ssh:notty    121.42.165.44    Mon Aug  7 23:47 - 23:47  (00:00)<br>debian   ssh:notty    121.42.165.44    Mon Aug  7 23:45 - 23:45  (00:00)<br>debian   ssh:notty    121.42.165.44    Mon Aug  7 23:45 - 23:45  (00:00)<br>gpadmin  ssh:notty    121.42.165.44    Mon Aug  7 23:43 - 23:43  (00:00)<br>gpadmin  ssh:notty    121.42.165.44    Mon Aug  7 23:43 - 23:43  (00:00)<br>oracle   ssh:notty    121.42.165.44    Mon Aug  7 23:40 - 23:40  (00:00)<br>oracle   ssh:notty    121.42.165.44    Mon Aug  7 23:40 - 23:40  (00:00)<br>tomovic  ssh:notty    121.42.165.44    Mon Aug  7 23:38 - 23:38  (00:00)<br>tomovic  ssh:notty    121.42.165.44    Mon Aug  7 23:38 - 23:38  (00:00)<br>nginx    ssh:notty    185.56.146.16    Mon Aug  7 23:37 - 23:37  (00:00)<br>nginx    ssh:notty    185.56.146.16    Mon Aug  7 23:36 - 23:36  (00:00)<br>root     ssh:notty    121.42.165.44    Mon Aug  7 23:36 - 23:36  (00:00)<br>root     ssh:notty    121.42.165.44    Mon Aug  7 23:34 - 23:34  (00:00)<br>aaa      ssh:notty    121.42.165.44    Mon Aug  7 23:12 - 23:12  (00:00)<br>aaa      ssh:notty    121.42.165.44    Mon Aug  7 23:12 - 23:12  (00:00) ‘</p>
+</blockquote>
+<p>通过检测，我们可以发现可以得到该恶意ip，然后添加到过滤名单中</p>
+<blockquote>
+<p>[root@sanduo ~]#  lastb root | awk ‘{print $3}’ | sort | uniq -c | sort -nr| more<br>     78 218.244.128.200<br>     32 140.205.225.199<br>     32 140.205.201.37<br>     24 140.205.201.32<br>     22 140.205.225.188<br>     22 140.205.201.42<br>     16 140.205.225.204<br>     16 140.205.225.201<br>     16 140.205.225.200<br>     16 140.205.225.193<br>     16 140.205.225.186<br>     16 140.205.225.183<br>     16 140.205.201.30<br>     12 129.144.188.171</p>
+</blockquote>
+<h2 id="检查系统用户"><a href="#检查系统用户" class="headerlink" title="检查系统用户"></a>检查系统用户</h2><figure class="highlight swift"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><code class="hljs swift"><span class="hljs-number">1</span><span class="hljs-operator">、</span>cat <span class="hljs-regexp">/etc/</span>passwd 查看是否有异常的系统用户<br><br><span class="hljs-number">2</span><span class="hljs-operator">、</span>grep “<span class="hljs-number">0</span>” <span class="hljs-regexp">/etc/</span>passwd 查看是否产生了新用户，<span class="hljs-type">UID和GID为0的用户</span><br><br><span class="hljs-number">3</span><span class="hljs-operator">、</span>ls <span class="hljs-operator">-</span>l <span class="hljs-regexp">/etc/</span>passwd 查看passwd的修改时间，判断是否在不知的情况下添加用户<br><br><span class="hljs-number">4</span><span class="hljs-operator">、</span>查看是否存在特权用户 awk <span class="hljs-operator">-</span><span class="hljs-type">F</span><span class="hljs-string">&quot;:&quot;</span> &#x27;&#123;<span class="hljs-keyword">if</span>(<span class="hljs-variable">$3</span> <span class="hljs-operator">==</span> <span class="hljs-number">0</span>)&#123;print <span class="hljs-variable">$1</span>&#125;&#125;&#x27; <span class="hljs-regexp">/etc/</span>passwd<br><br><span class="hljs-number">5</span><span class="hljs-operator">、</span>查看是否存在空口令帐户 awk <span class="hljs-operator">-</span><span class="hljs-type">F</span>: &#x27;&#123;<span class="hljs-keyword">if</span>(length(<span class="hljs-variable">$2</span>)<span class="hljs-operator">==</span><span class="hljs-number">0</span>) &#123;print <span class="hljs-variable">$1</span>&#125;&#125;&#x27; <span class="hljs-regexp">/etc/</span>passwd<br></code></pre></td></tr></table></figure>
+<h2 id="检查系统异常进程"><a href="#检查系统异常进程" class="headerlink" title="检查系统异常进程"></a>检查系统异常进程</h2><blockquote>
+<p>1、注意UID为0的进程 使用ps -ef命令查看进程<br>2、察看该进程所打开的端口和文件 lsof -p pid命令查看<br>3、检查隐藏进程<br>“linux即文件，所有的进程在&#x2F;proc均有记录，需要注意，这里的信息是最详细的，一些系统指令可能会出现被替换的的问题。”</p>
+</blockquote>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs shell"><span class="hljs-meta prompt_"># </span><span class="language-bash">ps -ef | awk <span class="hljs-string">&#x27;&#123;print $2&#125;&#x27;</span>| <span class="hljs-built_in">sort</span> -n | <span class="hljs-built_in">uniq</span> &gt;1 <span class="hljs-built_in">ls</span> /proc |<span class="hljs-built_in">sort</span> -n|<span class="hljs-built_in">uniq</span> &gt;2 diff 1 2</span><br></code></pre></td></tr></table></figure>
+<h2 id="检查系统异常文件"><a href="#检查系统异常文件" class="headerlink" title="检查系统异常文件"></a>检查系统异常文件</h2><figure class="highlight gradle"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><code class="hljs gradle"># <span class="hljs-keyword">find</span> / -uid <span class="hljs-number">0</span> -perm <span class="hljs-number">4000</span> -<span class="hljs-keyword">print</span><br># <span class="hljs-keyword">find</span> / -<span class="hljs-keyword">size</span> +<span class="hljs-number">10000</span>k –<span class="hljs-keyword">print</span><br># <span class="hljs-keyword">find</span> / -name “…” –<span class="hljs-keyword">print</span><br># <span class="hljs-keyword">find</span> / -name “.. ” –<span class="hljs-keyword">print</span><br># <span class="hljs-keyword">find</span> / -name “. ” –<span class="hljs-keyword">print</span><br># <span class="hljs-keyword">find</span> / -name ” ” –<span class="hljs-keyword">print</span><br></code></pre></td></tr></table></figure>
+<blockquote>
+<ul>
+<li>注意SUID文件，可疑大于10M和空格文件</li>
+</ul>
+</blockquote>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs shell"><span class="hljs-meta prompt_"># </span><span class="language-bash">find / -name core -<span class="hljs-built_in">exec</span> <span class="hljs-built_in">ls</span> -l &#123;&#125; \ （检查系统中的core文件）</span><br></code></pre></td></tr></table></figure>
+
+<blockquote>
+<p>find -perm 高级用法</p>
+</blockquote>
+<pre><code>-perm mode:文件许可正好符合mode
+-perm +mode:文件许可部分符合mode
+-perm -mode: 文件许可完全符合mode
+</code></pre>
+<h2 id="检查系统文件的完整性"><a href="#检查系统文件的完整性" class="headerlink" title="检查系统文件的完整性"></a>检查系统文件的完整性</h2><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><code class="hljs shell"><span class="hljs-meta prompt_"># </span><span class="language-bash">rpm –qf /bin/ls</span><br><span class="hljs-meta prompt_"># </span><span class="language-bash">rpm -qf /bin/login</span><br><span class="hljs-meta prompt_"># </span><span class="language-bash"><span class="hljs-built_in">md5sum</span> –b 文件名</span><br><span class="hljs-meta prompt_"># </span><span class="language-bash"><span class="hljs-built_in">md5sum</span> –t 文件名</span><br></code></pre></td></tr></table></figure>
+<h2 id="检查系统安装包的完整性（这里主要检验的rpm包）"><a href="#检查系统安装包的完整性（这里主要检验的rpm包）" class="headerlink" title="检查系统安装包的完整性（这里主要检验的rpm包）"></a>检查系统安装包的完整性（这里主要检验的rpm包）</h2><figure class="highlight crmsh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><code class="hljs crmsh"><span class="hljs-comment"># rpm –Va 输出格式：</span><br>S – File size differs<br>M – Mode differs (permissions)<br><span class="hljs-number">5</span> – MD5 sum differs<br>D – Device <span class="hljs-keyword">number</span> mismatch<br>L – readLink path mismatch<br>U – <span class="hljs-keyword">user</span> <span class="hljs-title">ownership</span> differs<br>G – <span class="hljs-keyword">group</span> <span class="hljs-title">ownership</span> differs<br>T – modification time differs<br>注意相关的 /sbin, /bin, /usr/sbin, <span class="hljs-keyword">and</span> /usr/bin<br></code></pre></td></tr></table></figure>
+<blockquote>
+<p>对于不同的linux系统，你需要根据实际情况进行检查。</p>
+</blockquote>
+<h2 id="检查网络"><a href="#检查网络" class="headerlink" title="检查网络"></a>检查网络</h2><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><code class="hljs shell"><span class="hljs-meta prompt_"># </span><span class="language-bash">ip <span class="hljs-built_in">link</span> | grep PROMISC（正常网卡不该在promisc混杂模式，可能存在sniffer）</span><br><br>网卡处于混杂模式，这样通过网卡的流量都会被监听<br><span class="hljs-meta prompt_"></span><br><span class="hljs-meta prompt_"># </span><span class="language-bash">lsof –i 如查看所有打开80端口的进程： lsof –i :80</span><br><br>查看恶意程序开放的端口<br><span class="hljs-meta prompt_"></span><br><span class="hljs-meta prompt_"># </span><span class="language-bash">netstat –nap（察看不正常打开的TCP/UDP端口)</span><br><span class="hljs-meta prompt_"></span><br><span class="hljs-meta prompt_"># </span><span class="language-bash">arp –a 查看流量在内网是否被劫持</span><br></code></pre></td></tr></table></figure>
+<h2 id="检查系统计划任务"><a href="#检查系统计划任务" class="headerlink" title="检查系统计划任务"></a>检查系统计划任务</h2><blockquote>
+<ul>
+<li>注意root和UID是0的schedule</li>
+</ul>
+</blockquote>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><code class="hljs shell"><span class="hljs-meta prompt_"># </span><span class="language-bash">crontab –u root –l</span><br><span class="hljs-meta prompt_"></span><br><span class="hljs-meta prompt_"># </span><span class="language-bash"><span class="hljs-built_in">cat</span> /etc/crontab</span><br><span class="hljs-meta prompt_"></span><br><span class="hljs-meta prompt_"># </span><span class="language-bash"><span class="hljs-built_in">ls</span> /etc/cron.*</span><br></code></pre></td></tr></table></figure>
+<h2 id="检查系统后门"><a href="#检查系统后门" class="headerlink" title="检查系统后门"></a>检查系统后门</h2><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><code class="hljs shell"><span class="hljs-meta prompt_"># </span><span class="language-bash"><span class="hljs-built_in">cat</span> /etc/crontab</span><br><span class="hljs-meta prompt_"></span><br><span class="hljs-meta prompt_"># </span><span class="language-bash"><span class="hljs-built_in">ls</span> /var/spool/cron/</span><br><span class="hljs-meta prompt_"></span><br><span class="hljs-meta prompt_"># </span><span class="language-bash"><span class="hljs-built_in">cat</span> /etc/rc.d/rc.local</span><br><span class="hljs-meta prompt_"></span><br><span class="hljs-meta prompt_"># </span><span class="language-bash"><span class="hljs-built_in">ls</span> /etc/rc.d <span class="hljs-comment"># ls /etc/rc3.d</span></span><br><span class="hljs-meta prompt_"></span><br><span class="hljs-meta prompt_"># </span><span class="language-bash">find / -<span class="hljs-built_in">type</span> f -perm 4000</span><br></code></pre></td></tr></table></figure>
+<h2 id="检查系统服务"><a href="#检查系统服务" class="headerlink" title="检查系统服务"></a>检查系统服务</h2><figure class="highlight 1c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><code class="hljs 1c"><span class="hljs-meta"># chkconfig —list</span><br><br><span class="hljs-meta"># rpcinfo -p（查看RPC服务）</span><br></code></pre></td></tr></table></figure>
+<p>这个主要检测的是启动服务，目前在centos7以上都采用systemd 来管理相应的服务。Systemd是一个系统管理守护进程、工具和库的集合，用于取代System V初始进程。Systemd的功能是用于集中管理和配置类UNIX系统。</p>
+<figure class="highlight 1c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><code class="hljs 1c">查看所有的可用单元<br><br><span class="hljs-meta"># systemctl list-unit-files</span><br></code></pre></td></tr></table></figure>
+<h2 id="检查rootkit"><a href="#检查rootkit" class="headerlink" title="检查rootkit"></a>检查rootkit</h2><figure class="highlight 1c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><code class="hljs 1c"><span class="hljs-meta"># rkhunter -c</span><br><br><span class="hljs-meta"># chkrootkit -q</span><br></code></pre></td></tr></table></figure>
+
+            </div>
+            <hr>
+            <div>
+              <div class="post-metas mb-3">
+                
+                  <div class="post-meta mr-3">
+                    <i class="iconfont icon-category"></i>
+                    
+                      <a class="hover-with-bg" href="/categories/Security/">Security</a>
+                    
+                      <a class="hover-with-bg" href="/categories/Security/Linux/">Linux</a>
+                    
+                  </div>
+                
+                
+                  <div class="post-meta">
+                    <i class="iconfont icon-tags"></i>
+                    
+                      <a class="hover-with-bg" href="/tags/Operations/">Operations</a>
+                    
+                  </div>
+                
+              </div>
+              
+                <p class="note note-warning">
+                  
+                    本博客所有文章除特别声明外，均采用 <a target="_blank" href="https://creativecommons.org/licenses/by-sa/4.0/deed.zh" rel="nofollow noopener noopener">CC BY-SA 4.0 协议</a> ，转载请注明出处！
+                  
+                </p>
+              
+              
+                <div class="post-prevnext">
+                  <article class="post-prev col-6">
+                    
+                    
+                      <a href="/2018/01/09/2018-01-10-kali-install-nvidia-driver/">
+                        <i class="iconfont icon-arrowleft"></i>
+                        <span class="hidden-mobile">KaliLinux 安装Nvidia闭源驱动</span>
+                        <span class="visible-mobile">上一篇</span>
+                      </a>
+                    
+                  </article>
+                  <article class="post-next col-6">
+                    
+                    
+                  </article>
+                </div>
+              
+            </div>
+
+            
+              <!-- Comments -->
+              <article class="comments" id="comments" lazyload>
+                
+                  
+                
+                
+  <script type="text/javascript">
+    Fluid.utils.loadComments('#comments', function() {
+      var light = 'github-light';
+      var dark = 'github-dark';
+      var schema = document.documentElement.getAttribute('data-user-color-scheme');
+      if (schema === 'dark') {
+        schema = dark;
+      } else {
+        schema = light;
+      }
+      window.UtterancesThemeLight = light;
+      window.UtterancesThemeDark = dark;
+      var s = document.createElement('script');
+      s.setAttribute('src', 'https://utteranc.es/client.js');
+      s.setAttribute('repo', 'hksanduo/commit-utterances');
+      s.setAttribute('issue-term', 'title');
+      
+      s.setAttribute('label', 'utterances');
+      
+      s.setAttribute('theme', schema);
+      s.setAttribute('crossorigin', 'anonymous');
+      document.getElementById('comments').appendChild(s);
+    })
+  </script>
+  <noscript>Please enable JavaScript to view the comments</noscript>
+
+
+              </article>
+            
+          </article>
+        </div>
+      </div>
+    </div>
+    
+      <div class="d-none d-lg-block col-lg-2 toc-container" id="toc-ctn">
+        <div id="toc">
+  <p class="toc-header"><i class="iconfont icon-list"></i>&nbsp;目录</p>
+  <div class="toc-body" id="toc-body"></div>
+</div>
+
+      </div>
+    
+  </div>
+</div>
+
+<!-- Custom -->
+
+
+    
+
+    
+      <a id="scroll-top-button" aria-label="TOP" href="#" role="button">
+        <i class="iconfont icon-arrowup" aria-hidden="true"></i>
+      </a>
+    
+
+    
+      <div class="modal fade" id="modalSearch" tabindex="-1" role="dialog" aria-labelledby="ModalLabel"
+     aria-hidden="true">
+  <div class="modal-dialog modal-dialog-scrollable modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header text-center">
+        <h4 class="modal-title w-100 font-weight-bold">搜索</h4>
+        <button type="button" id="local-search-close" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body mx-3">
+        <div class="md-form mb-5">
+          <input type="text" id="local-search-input" class="form-control validate">
+          <label data-error="x" data-success="v"
+                 for="local-search-input">关键词</label>
+        </div>
+        <div class="list-group" id="local-search-result"></div>
+      </div>
+    </div>
+  </div>
+</div>
+    
+
+    
+  </main>
+
+  <footer class="text-center mt-5 py-3">
+  <div class="footer-content">
+     <a href="https://hexo.io" target="_blank" rel="nofollow noopener"><span>Hexo</span></a> <i class="iconfont icon-love"></i> <a href="https://github.com/fluid-dev/hexo-theme-fluid" target="_blank" rel="nofollow noopener"><span>Fluid</span></a> 
+  </div>
+  
+  <div class="statistics">
+    
+    
+
+    
+      
+        <!-- 不蒜子统计PV -->
+        <span id="busuanzi_container_site_pv" style="display: none">
+            总访问量 
+            <span id="busuanzi_value_site_pv"></span>
+             次
+          </span>
+      
+      
+        <!-- 不蒜子统计UV -->
+        <span id="busuanzi_container_site_uv" style="display: none">
+            总访客数 
+            <span id="busuanzi_value_site_uv"></span>
+             人
+          </span>
+      
+    
+  </div>
+
+
+  
+
+  
+</footer>
+
+
+  <!-- SCRIPTS -->
+  
+  <script  src="https://cdn.jsdelivr.net/npm/nprogress@0/nprogress.min.js" ></script>
+  <link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/nprogress@0/nprogress.min.css" />
+
+  <script>
+    NProgress.configure({"showSpinner":false,"trickleSpeed":100})
+    NProgress.start()
+    window.addEventListener('load', function() {
+      NProgress.done();
+    })
+  </script>
+
+
+<script  src="https://cdn.jsdelivr.net/npm/jquery@3/dist/jquery.min.js" ></script>
+<script  src="https://cdn.jsdelivr.net/npm/bootstrap@4/dist/js/bootstrap.min.js" ></script>
+<script  src="/js/events.js" ></script>
+<script  src="/js/plugins.js" ></script>
+
+<!-- Plugins -->
+
+
+  <script  src="/js/local-search.js" ></script>
+
+
+
+  
+    <script  src="/js/img-lazyload.js" ></script>
+  
+
+
+
+  
+
+
+
+  
+    <script  src="https://cdn.jsdelivr.net/npm/tocbot@4/dist/tocbot.min.js" ></script>
+  
+  
+    <script  src="https://cdn.jsdelivr.net/npm/@fancyapps/fancybox@3/dist/jquery.fancybox.min.js" ></script>
+  
+  
+    <script  src="https://cdn.jsdelivr.net/npm/anchor-js@4/anchor.min.js" ></script>
+  
+  
+    <script defer src="https://cdn.jsdelivr.net/npm/clipboard@2/dist/clipboard.min.js" ></script>
+  
+
+
+
+  <script defer src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js" ></script>
+
+
+
+
+  <script  src="https://cdn.jsdelivr.net/npm/typed.js@2/lib/typed.min.js" ></script>
+  <script>
+    (function (window, document) {
+      var typing = Fluid.plugins.typing;
+      var title = document.getElementById('subtitle').title;
+      
+      typing(title)
+      
+    })(window, document);
+  </script>
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+    <!-- Google Analytics -->
+    <script defer>
+      window.ga = window.ga || function () { (ga.q = ga.q || []).push(arguments) };
+      ga.l = +new Date;
+      ga('create', 'UA-167858469-1', 'auto');
+      ga('send', 'pageview');
+    </script>
+    <script async src='https://www.google-analytics.com/analytics.js'></script>
+  
+
+  
+
+  
+
+  
+
+  
+
+
+
+
+
+<!-- 主题的启动项 保持在最底部 -->
+<script  src="/js/boot.js" ></script>
+
+
+</body>
+</html>

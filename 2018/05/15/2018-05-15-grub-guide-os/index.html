@@ -1,0 +1,792 @@
+
+
+<!DOCTYPE html>
+<html lang="zh-CN" data-default-color-scheme=auto>
+
+
+
+<head>
+  <meta charset="UTF-8">
+  <link rel="apple-touch-icon" sizes="76x76" href="/img/favicon.png">
+  <link rel="icon" href="/img/favicon.png">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, shrink-to-fit=no">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  
+  <meta name="theme-color" content="#2f4154">
+  <meta name="description" content="">
+  <meta name="author" content="sanduo">
+  <meta name="keywords" content="">
+  <meta name="description" content="grub多系统引导 摘要： GRUB是多系统引导管理器，简单的说既能引导Linux，同时也能引导Windows；从讨论区近四年的观察来看，大多初学者并不能在短时间内掌握GRUB的用法，为了解决初学者在最短时间内掌握GRUB，重写GRUB入门文档还是有必要的；本文重点介绍了GRUB的menu.lst的写法，另外通过GRUB命令行引导系统也做了详述；这些无论是对Windows版本的WINGRUB还是L">
+<meta property="og:type" content="article">
+<meta property="og:title" content="grub多系统引导">
+<meta property="og:url" content="https://hksanduo.github.io/2018/05/15/2018-05-15-grub-guide-os/index.html">
+<meta property="og:site_name" content="sanduo blog">
+<meta property="og:description" content="grub多系统引导 摘要： GRUB是多系统引导管理器，简单的说既能引导Linux，同时也能引导Windows；从讨论区近四年的观察来看，大多初学者并不能在短时间内掌握GRUB的用法，为了解决初学者在最短时间内掌握GRUB，重写GRUB入门文档还是有必要的；本文重点介绍了GRUB的menu.lst的写法，另外通过GRUB命令行引导系统也做了详述；这些无论是对Windows版本的WINGRUB还是L">
+<meta property="og:locale" content="zh_CN">
+<meta property="article:published_time" content="2018-05-15T04:00:00.000Z">
+<meta property="article:modified_time" content="2025-01-18T14:54:10.077Z">
+<meta property="article:author" content="sanduo">
+<meta property="article:tag" content="Grub">
+<meta name="twitter:card" content="summary_large_image">
+  
+  <title>grub多系统引导 - sanduo blog</title>
+
+  <link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4/dist/css/bootstrap.min.css" />
+
+
+  <link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/github-markdown-css@4/github-markdown.min.css" />
+  <link  rel="stylesheet" href="/lib/hint/hint.min.css" />
+
+  
+    
+    
+      
+      <link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/highlight.js@10/styles/github-gist.min.css" />
+    
+  
+
+  
+    <link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fancyapps/fancybox@3/dist/jquery.fancybox.min.css" />
+  
+
+
+<!-- 主题依赖的图标库，不要自行修改 -->
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1749284_ba1fz6golrf.css">
+
+
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1736178_kmeydafke9r.css">
+
+
+<link  rel="stylesheet" href="/css/main.css" />
+
+<!-- 自定义样式保持在最底部 -->
+
+
+  <script id="fluid-configs">
+    var Fluid = window.Fluid || {};
+    var CONFIG = {"hostname":"hksanduo.github.io","root":"/","version":"1.8.12","typing":{"enable":true,"typeSpeed":70,"cursorChar":"_","loop":false},"anchorjs":{"enable":true,"element":"h1,h2,h3,h4,h5,h6","placement":"right","visible":"hover","icon":""},"progressbar":{"enable":true,"height_px":3,"color":"#29d","options":{"showSpinner":false,"trickleSpeed":100}},"copy_btn":true,"image_zoom":{"enable":true,"img_url_replace":["",""]},"toc":{"enable":true,"headingSelector":"h1,h2,h3,h4,h5,h6","collapseDepth":0},"lazyload":{"enable":true,"loading_img":"/img/loading.gif","onlypost":false,"offset_factor":2},"web_analytics":{"enable":true,"baidu":null,"google":"UA-167858469-1","gtag":null,"tencent":{"sid":null,"cid":null},"woyaola":null,"cnzz":null,"leancloud":{"app_id":null,"app_key":null,"server_url":null,"path":"window.location.pathname"}},"search_path":"/local-search.xml"};
+  </script>
+  <script  src="/js/utils.js" ></script>
+  <script  src="/js/color-schema.js" ></script>
+<meta name="generator" content="Hexo 5.4.2"></head>
+
+
+<body>
+  <header style="height: 70vh;">
+    <nav id="navbar" class="navbar fixed-top  navbar-expand-lg navbar-dark scrolling-navbar">
+  <div class="container">
+    <a class="navbar-brand" href="/">
+      <strong>Welcome To Sanduo&#39;s Blog</strong>
+    </a>
+
+    <button id="navbar-toggler-btn" class="navbar-toggler" type="button" data-toggle="collapse"
+            data-target="#navbarSupportedContent"
+            aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+      <div class="animated-icon"><span></span><span></span><span></span></div>
+    </button>
+
+    <!-- Collapsible content -->
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+      <ul class="navbar-nav ml-auto text-center">
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/">
+                <i class="iconfont icon-home-fill"></i>
+                首页
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/archives/">
+                <i class="iconfont icon-archive-fill"></i>
+                归档
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/categories/">
+                <i class="iconfont icon-category-fill"></i>
+                分类
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/tags/">
+                <i class="iconfont icon-tags-fill"></i>
+                标签
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/about/">
+                <i class="iconfont icon-user-fill"></i>
+                关于
+              </a>
+            </li>
+          
+        
+        
+          <li class="nav-item" id="search-btn">
+            <a class="nav-link" target="_self" href="javascript:;" data-toggle="modal" data-target="#modalSearch" aria-label="Search">
+              &nbsp;<i class="iconfont icon-search"></i>&nbsp;
+            </a>
+          </li>
+        
+        
+          <li class="nav-item" id="color-toggle-btn">
+            <a class="nav-link" target="_self" href="javascript:;" aria-label="Color Toggle">&nbsp;<i
+                class="iconfont icon-dark" id="color-toggle-icon"></i>&nbsp;</a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+</nav>
+
+    <div class="banner" id="banner" parallax=true
+         style="background: url('/img/default.png') no-repeat center center;
+           background-size: cover;">
+      <div class="full-bg-img">
+        <div class="mask flex-center" style="background-color: rgba(0, 0, 0, 0.3)">
+          <div class="page-header text-center fade-in-up">
+            <span class="h2" id="subtitle" title="grub多系统引导">
+              
+            </span>
+
+            
+              <div class="mt-3">
+  
+  
+    <span class="post-meta">
+      <i class="iconfont icon-date-fill" aria-hidden="true"></i>
+      <time datetime="2018-05-15 04:00" pubdate>
+        2018年5月15日 凌晨
+      </time>
+    </span>
+  
+</div>
+
+<div class="mt-1">
+  
+    <span class="post-meta mr-2">
+      <i class="iconfont icon-chart"></i>
+      23k 字
+    </span>
+  
+
+  
+    <span class="post-meta mr-2">
+      <i class="iconfont icon-clock-fill"></i>
+      
+      
+      71 分钟
+    </span>
+  
+
+  
+  
+</div>
+
+            
+          </div>
+
+          
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <main>
+    
+      
+
+<div class="container-fluid nopadding-x">
+  <div class="row nomargin-x">
+    <div class="d-none d-lg-block col-lg-2"></div>
+    <div class="col-lg-8 nopadding-x-md">
+      <div class="container nopadding-x-md" id="board-ctn">
+        <div class="py-5" id="board">
+          <article class="post-content mx-auto">
+            <!-- SEO header -->
+            <h1 style="display: none">grub多系统引导</h1>
+            
+            <div class="markdown-body">
+              <p>grub多系统引导</p>
+<h2 id="摘要：-GRUB是多系统引导管理器，简单的说既能引导Linux，同时也能引导Windows；从讨论区近四年的观察来看，大多初学者并不能在短时间内掌握GRUB的用法，为了解决初学者在最短时间内掌握GRUB，重写GRUB入门文档还是有必要的；本文重点介绍了GRUB的menu-lst的写法，另外通过GRUB命令行引导系统也做了详述；这些无论是对Windows版本的WINGRUB还是Linux版本的GRUB都是适用的；"><a href="#摘要：-GRUB是多系统引导管理器，简单的说既能引导Linux，同时也能引导Windows；从讨论区近四年的观察来看，大多初学者并不能在短时间内掌握GRUB的用法，为了解决初学者在最短时间内掌握GRUB，重写GRUB入门文档还是有必要的；本文重点介绍了GRUB的menu-lst的写法，另外通过GRUB命令行引导系统也做了详述；这些无论是对Windows版本的WINGRUB还是Linux版本的GRUB都是适用的；" class="headerlink" title="摘要： GRUB是多系统引导管理器，简单的说既能引导Linux，同时也能引导Windows；从讨论区近四年的观察来看，大多初学者并不能在短时间内掌握GRUB的用法，为了解决初学者在最短时间内掌握GRUB，重写GRUB入门文档还是有必要的；本文重点介绍了GRUB的menu.lst的写法，另外通过GRUB命令行引导系统也做了详述；这些无论是对Windows版本的WINGRUB还是Linux版本的GRUB都是适用的；"></a>摘要： GRUB是多系统引导管理器，简单的说既能引导Linux，同时也能引导Windows；从讨论区近四年的观察来看，大多初学者并不能在短时间内掌握GRUB的用法，为了解决初学者在最短时间内掌握GRUB，重写GRUB入门文档还是有必要的；<br>本文重点介绍了GRUB的menu.lst的写法，另外通过GRUB命令行引导系统也做了详述；这些无论是对Windows版本的WINGRUB还是Linux版本的GRUB都是适用的；</h2><h1 id="一、什么是多重操作系统引导管理器，什么是GRUB；"><a href="#一、什么是多重操作系统引导管理器，什么是GRUB；" class="headerlink" title="一、什么是多重操作系统引导管理器，什么是GRUB；"></a>一、什么是多重操作系统引导管理器，什么是GRUB；</h1><h2 id="1、什么是多重操作系统引导管理器及工作原理；"><a href="#1、什么是多重操作系统引导管理器及工作原理；" class="headerlink" title="1、什么是多重操作系统引导管理器及工作原理；"></a>1、什么是多重操作系统引导管理器及工作原理；</h2><p>系统启动引导管理器，是在计算机启动后运行的第一个程序，他是用来负责加载、传输控制到操作系统的内核，一旦把内核挂载，系统引导管理器的任务就算完成退出，系统引导的其它部份，比如系统的初始化及启动过程则完全由内核来控制完成；<br /></p>
+<p>Briefly, boot loader is the first software program that runs when a computer starts. It is responsible for loading and transferring control to the operating system kernel software (such as the Hurd or the Linux). The kernel, in turn, initializes the rest of the operating system (e.g. GNU). <br /></p>
+<p>在X86 架构的机器中，Linux、BSD 或其它Unix类的操作系统中GRUB、LILO 是大家最为常用，应该说是主流；</p>
+<p>Windows也有类似的工具NTLOADER；比如我们在机器中安装了Windows 98后，我们再安装一个Windows XP ，在机器启动的会有一个菜单让我们选择进入是进入Windows 98 还是进入Windows XP。NTLOADER就是一个多系统启动引导管理器，NTLOADER 同样也能引导Linux，只是极为麻烦罢了；</p>
+<p>在Powerpc 架构的机器中，如果安装了Linux的Powerpc 版本，大多是用yaboot 多重引导管理器，比如Apple机目前用的是IBM Powerpc处理器，所以在如果想在Apple机上，安装Macos 和Linux Powerpc 版本，大多是用yaboot来引导多个操作系统；</p>
+<p>因为目前X86架构的机器仍是主流， 所以目前GRUB和LILO 仍然是我们最常用的多重操作系统引导管理器；</p>
+<h2 id="2、什么是GRUB；为什么我要选择GRUB；"><a href="#2、什么是GRUB；为什么我要选择GRUB；" class="headerlink" title="2、什么是GRUB；为什么我要选择GRUB；"></a>2、什么是GRUB；为什么我要选择GRUB；</h2><h3 id="1）什么是GRUB；"><a href="#1）什么是GRUB；" class="headerlink" title="1）什么是GRUB；"></a>1）什么是GRUB；</h3><p>GNU GRUB 是一个多重操作系统启动管理器。GNU GRUB 是由GRUB（GRand Unified Bootloader） 派生而来。GRUB 最初由Erich Stefan Boleyn 设计和应用；</p>
+<p>GNU GRUB is a Multiboot boot loader. It was derived from GRUB, GRand Unified Bootloader, which was originally designed and implemented by Erich Stefan Boleyn.</p>
+<h3 id="2）“GRUB太不好用”──对GRUB的认识的误区；"><a href="#2）“GRUB太不好用”──对GRUB的认识的误区；" class="headerlink" title="2）“GRUB太不好用”──对GRUB的认识的误区；"></a>2）“GRUB太不好用”──对GRUB的认识的误区；</h3><p>GRUB真的不好用吗？不是的，通过LinuxSir.Org 社区近四年来的运行，我发现了大多新手弟兄还是不太了解GRUB；当然这也有中文Linux社区的责任，虽然也有GRUB的中文译本，初学Linux的弟兄可能有点看不懂；</p>
+<p>我们欣喜的看到LinuxSir.Org 社区的好多弟兄都曾经或正在写GRUB实践文档，也有的弟兄也总结了GRUB的一些基础知识，比如 probing兄弟的 《GRUB 学习笔记》；由于每个人的写文档时风格不同，可能同一份文档不同的人来写就有不同的风格；所以今天也抖胆也一篇入门级的教程，由于北南不会写高级教程，所以还得请高手弟兄指教，先谢过；</p>
+<h3 id="3）为什么要选择GRUB；"><a href="#3）为什么要选择GRUB；" class="headerlink" title="3）为什么要选择GRUB；"></a>3）为什么要选择GRUB；</h3><p>基于在X86架构的CPU而开发操作系统，系统引导管理器不仅仅有GRUB ，而且也有LILO，但对于多重系统引导管理器，你只能选择其一而用；不能两个同时使用；</p>
+<p>目前这两个多重系统引导管理器是大家最常用的，也是主流Linux发行版而采用的；有的弟兄喜欢GRUB，比如我个人，有的弟兄喜欢LILO ，比如etony兄（谁是etony，请参见 <a target="_blank" rel="noopener" href="http://debian.linuxsir.org/">http://debian.linuxsir.org</a> ）；</p>
+<p>主流发行版 Fedora、Redhat、Centos等基于RPM包的系统，在最新版本中都默认GRUB引导；Slackware 目前仍采用LILO；而Debian发行版目前最新的版本也是采用GRUB；</p>
+<p>从目前看来，GRUB有逐渐取代LILO之势，GRUB 2.0正在开发之中；所以我们有理由用GRUB，我也有理由写GRUB使用教程；</p>
+<h1 id="二、GRUB软件包版本选择和安装；"><a href="#二、GRUB软件包版本选择和安装；" class="headerlink" title="二、GRUB软件包版本选择和安装；"></a>二、GRUB软件包版本选择和安装；</h1><h2 id="1、GRUB的版本选择，Linux版本的GRUB及Windows版本的GRUB的说明；"><a href="#1、GRUB的版本选择，Linux版本的GRUB及Windows版本的GRUB的说明；" class="headerlink" title="1、GRUB的版本选择，Linux版本的GRUB及Windows版本的GRUB的说明；"></a>1、GRUB的版本选择，Linux版本的GRUB及Windows版本的GRUB的说明；</h2><p>GRUB不但有Linux版本，也有Windows版本；现我们一一介绍；</p>
+<p>如前面所说，目前在在Unix类的操作系统中，大多是都有GRUB；GRUB几乎能引导所有X86架构的操作系统；功能之强，使用简单是GRUB最大的卖点；由于Windows 操作系统的先入为主的优势，使得大家对Windows的NTLOADER了解的比较多，而对开源社区的GRUB显得有点寞生，由此而带来使用上的“心理恐惧”；究其初学者对GRUB“恐惧”的主要原因还是对GRUB没有太多的了解和深入；无论是WINGRUB还是Linux版本的GRUB，最方便的还是对 GRUB命令行的操作；一谈到命令行（Command）的操作，可能初学者对此恐惧；其实没有什么难的，象北南这样低级的写手，还能操作得起来，您也应该能行；</p>
+<h2 id="2、GRUB的Windows版本WINGRUB；"><a href="#2、GRUB的Windows版本WINGRUB；" class="headerlink" title="2、GRUB的Windows版本WINGRUB；"></a>2、GRUB的Windows版本WINGRUB；</h2><p>请参考：《以WINGRUB 引导安装Fedora 4.0 为例，详述用WINGRUB来引导Linux的安装》</p>
+<h2 id="3、GRUB的Linux版本软件包的安装；"><a href="#3、GRUB的Linux版本软件包的安装；" class="headerlink" title="3、GRUB的Linux版本软件包的安装；"></a>3、GRUB的Linux版本软件包的安装；</h2><p>其实对于Linux的GRUB，几乎所有的Linux主流发行版都有打包，如果您安装了Linux，并且在开机后出现GRUB字样的，证明您已经安装了GRUB；而无需再次安装；Linux的GRUB软件包安装部份并不是本文的重点；</p>
+<p>如果您的Linux系统没有安装GRUB，或者采用的是LILO，而您想用GRUB，可以用系统安装盘自带GRUB软件包来安装，或者到相关发行版本的软件仓库下载后安装；</p>
+<p>GRUB 的Linux版本目前在各大发行版中都有打包；比如Fedora&#x2F;Redhat&#x2F;Centos&#x2F;Mandrive&#x2F;Mandriva&#x2F;SuSE等以RPM包管理机制的系统，可以通过如下的命令来安装；</p>
+<p>请参考《Fedora &#x2F; Redhat 软件包管理指南》</p>
+<pre><code>[root@localhost ~]# rpm -ivh grub*.rpm
+</code></pre>
+<p>如果是Slackware 您可以用如下的办法来安装；</p>
+<pre><code>[root@localhost ~]# installpkg grub*.tgz
+</code></pre>
+<p>其它的发行版本请用其自己特色的软件包管理工具来安装；</p>
+<p>当然您也可以通过源码包，在任何Linux的发行版上安装；至于源码包的安装方法；</p>
+<p>请参考：《如何编译安装源码包软件》</p>
+<figure class="highlight autoit"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><code class="hljs autoit">[root<span class="hljs-symbol">@localhost</span> ~]<span class="hljs-meta">#tar zxvf grub*.tar.gz</span><br>[root<span class="hljs-symbol">@localhost</span> ~]<span class="hljs-meta">#cd grub-xxx</span><br>[root<span class="hljs-symbol">@localhost</span> ~]<span class="hljs-meta">#./configure<span class="hljs-comment">;make;make install</span></span><br></code></pre></td></tr></table></figure>
+<p>确认您是否成功安装了GRUB，您可以测试是否有如下两个命令；</p>
+<figure class="highlight autoit"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><code class="hljs autoit">[root<span class="hljs-symbol">@localhost</span> ~]<span class="hljs-meta"># grub</span><br>[root<span class="hljs-symbol">@localhost</span> ~]<span class="hljs-meta"># grub-install</span><br></code></pre></td></tr></table></figure>
+<p>如果您不能找到这两个命令，可能您的可执行程序的路径没有设置；</p>
+<p>请参考：《设置可执行程序路径》，当然您可以用绝对路径；比如下面的；</p>
+<figure class="highlight autoit"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><code class="hljs autoit">[root<span class="hljs-symbol">@localhost</span> ~]<span class="hljs-meta"># /usr/sbin/grub</span><br>[root<span class="hljs-symbol">@localhost</span> ~]<span class="hljs-meta"># /usr/sbin/grub-install</span><br></code></pre></td></tr></table></figure>
+<p>如果您还是找不到GRUB软件包安装在哪了；您可以用下面的命令来解决和查找；</p>
+<figure class="highlight autoit"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><code class="hljs autoit">[root<span class="hljs-symbol">@localhost</span> ~]<span class="hljs-meta"># updatedb  注：这个要花很长时间；是索引slocate 的库，然后再通过locate来查找；</span><br>[root<span class="hljs-symbol">@localhost</span> ~]<span class="hljs-meta"># locate grub</span><br></code></pre></td></tr></table></figure>
+<p>比如找到的是有类似如下的；</p>
+<figure class="highlight crystal"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><code class="hljs crystal">[root<span class="hljs-variable">@localhost</span> ~]<span class="hljs-comment"># locate grub</span><br><span class="hljs-regexp">/sbin/grub</span>-md5-crypt<br><span class="hljs-regexp">/sbin/grub</span><br><span class="hljs-regexp">/sbin/grub</span>-install<br><span class="hljs-regexp">/sbin/grub</span>-terminfo<br></code></pre></td></tr></table></figure>
+<p>在一般情况下，在路径中带有bin或sbin中字样的，这些路径下都是可执行程序；sbin 是超级权限用户才能使用的管理命令；要使用这些命令一般的情况下得切换到root用户下才能使用；比如</p>
+<figure class="highlight crystal"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><code class="hljs crystal">[beinan<span class="hljs-variable">@localhost</span> ~]<span class="hljs-variable">$ </span>su -  注：切换到root用户，并且切换到其家目录；<br><span class="hljs-symbol">Password:</span><br>[root<span class="hljs-variable">@localhost</span> ~]<span class="hljs-comment">#/sbin/grub  注：用绝对路径来运行grub命令；</span><br></code></pre></td></tr></table></figure>
+
+<h1 id="三、在Linux中，GRUB的配置中的安装和写入硬盘的MBR；"><a href="#三、在Linux中，GRUB的配置中的安装和写入硬盘的MBR；" class="headerlink" title="三、在Linux中，GRUB的配置中的安装和写入硬盘的MBR；"></a>三、在Linux中，GRUB的配置中的安装和写入硬盘的MBR；</h1><h2 id="1、在Linux中，GRUB配置过程中的安装grub-install；"><a href="#1、在Linux中，GRUB配置过程中的安装grub-install；" class="headerlink" title="1、在Linux中，GRUB配置过程中的安装grub-install；"></a>1、在Linux中，GRUB配置过程中的安装grub-install；</h2><p>grub-install 命令有何用呢？其实就是把我们前面已经安装的软件包中的一些文件复制到 &#x2F;boot&#x2F;grub中；对于新安装GRUB软件包后，也是一个必经的过程；我们前面所说的GRUB软件包的安装；而现在我们说的是GRUB配置的过程中的安装；虽然在洋文中都是install ，但表达的意思是不一样的；</p>
+<p>我们首先要运行 fdisk -l 来确认到底是硬盘的标识；</p>
+<p>这个过程主要是确认硬盘的标识是哪个调备，到底是&#x2F;dev&#x2F;hda还是&#x2F;dev&#x2F;hdb 还是其它的；</p>
+<figure class="highlight tap"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><code class="hljs tap">[root@localhost ~]<span class="hljs-comment"># fdisk -l</span><br>Disk /dev/hda: 80.0 GB,<span class="hljs-number"> 80026361856 </span>bytes<br>255 heads,<span class="hljs-number"> 63 </span>sectors/track,<span class="hljs-number"> 9729 </span>cylinders<br>Units = cylinders of<span class="hljs-number"> 16065 </span>*<span class="hljs-number"> 512 </span>=<span class="hljs-number"> 8225280 </span>bytes<br><br>   Device Boot      Start         End      Blocks   Id  System<br>/dev/hda1   *          <span class="hljs-number"> 1 </span>       <span class="hljs-number"> 970 </span>    7791493+  <span class="hljs-number"> 7 </span> HPFS/NTFS<br>/dev/hda2            <span class="hljs-number"> 971 </span>      <span class="hljs-number"> 9729 </span>   70356667+  <span class="hljs-number"> 5 </span> Extended<br>/dev/hda5            <span class="hljs-number"> 971 </span>      <span class="hljs-number"> 2915 </span>  <span class="hljs-number"> 15623181 </span>   b  W95 FAT32<br>/dev/hda6           <span class="hljs-number"> 2916 </span>      <span class="hljs-number"> 4131 </span>    9767488+ <span class="hljs-number"> 83 </span> Linux<br>/dev/hda7           <span class="hljs-number"> 4132 </span>      <span class="hljs-number"> 5590 </span>  <span class="hljs-number"> 11719386 </span> <span class="hljs-number"> 83 </span> Linux<br>/dev/hda8           <span class="hljs-number"> 5591 </span>      <span class="hljs-number"> 6806 </span>    9767488+ <span class="hljs-number"> 83 </span> Linux<br>/dev/hda9           <span class="hljs-number"> 6807 </span>      <span class="hljs-number"> 9657 </span>  <span class="hljs-number"> 22900626 </span> <span class="hljs-number"> 83 </span> Linux<br>/dev/hda10          <span class="hljs-number"> 9658 </span>      <span class="hljs-number"> 9729 </span>     578308+ <span class="hljs-number"> 82 </span> Linux swap / Solaris<br></code></pre></td></tr></table></figure>
+<p>如果通过fdisk -l 出现有&#x2F;dev&#x2F;hda字样的，我们就要用下面的命令来安装；</p>
+<figure class="highlight applescript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><code class="hljs applescript">[root@localhost ~]<span class="hljs-comment"># grub-install /dev/hda</span><br>Installation finished. No <span class="hljs-keyword">error</span> reported.<br>This <span class="hljs-keyword">is</span> <span class="hljs-keyword">the</span> <span class="hljs-built_in">contents</span> <span class="hljs-keyword">of</span> <span class="hljs-keyword">the</span> device map /boot/grub/device.map.<br>Check <span class="hljs-keyword">if</span> this <span class="hljs-keyword">is</span> correct <span class="hljs-keyword">or</span> <span class="hljs-keyword">not</span>. If any <span class="hljs-keyword">of</span> <span class="hljs-keyword">the</span> lines <span class="hljs-keyword">is</span> incorrect,<br>fix <span class="hljs-keyword">it</span> <span class="hljs-keyword">and</span> re-<span class="hljs-built_in">run</span> <span class="hljs-keyword">the</span> <span class="hljs-keyword">script</span> `grub-install&#x27;.<br><br>(fd0)   /dev/fd0<br>(hd0)   /dev/hda<br></code></pre></td></tr></table></figure>
+<p>如果是您fdisk -l 出现的有&#x2F;dev&#x2F;hdb呢，那就如下运行；</p>
+<pre><code>[root@localhost ~]# grub-install /dev/hdb
+</code></pre>
+<p>如果既有&#x2F;dev&#x2F;hda和&#x2F;dev&#x2F;hdb 就安装到&#x2F;dev&#x2F;hda中；</p>
+<pre><code>[root@localhost ~]# grub-install /dev/hda
+</code></pre>
+<p>值得注意的是如果您有一个&#x2F;boot分区，应该用如下的办法来安装；</p>
+<pre><code>[root@localhost ~]#grub-install --root-directory=/boot /dev/hda
+
+[root@localhost ~]#grub-install --root-directory=/boot /dev/hdb
+</code></pre>
+<p>注解：具体是&#x2F;dev&#x2F;hda还是&#x2F;dev&#x2F;hdb，请以fdisk -l 为准；如果两个都有，就看您把&#x2F;boot分区是放在第一块硬盘还是第二块硬盘上了，以实际情况为准；</p>
+<h2 id="2、设定GRUB的-x2F-boot分区并写入MBR；；"><a href="#2、设定GRUB的-x2F-boot分区并写入MBR；；" class="headerlink" title="2、设定GRUB的&#x2F;boot分区并写入MBR；；"></a>2、设定GRUB的&#x2F;boot分区并写入MBR；；</h2><p>在Linux中，GRUB软件包的安装，及在配置过程中安装grub到 &#x2F;boot中还是不够的， 还要把GRUB，写入MBR才行；有时我们重新安装了Windows，Windows会把MBR 重写，这样GRUB就消失了；如果您出现这样的情况，就要进行这个过程；</p>
+<pre><code>[root@localhost ~]# grub
+</code></pre>
+<p>会出现grub&gt;提示符，这是grub命令行模式 ，如果能在开机中出现提示符，没有引导不起来的系统，除非您的系统破坏的极为严重。如果仅仅是GRUB被破坏了，GRUB命令行是能让操作系统引导起来的；</p>
+<p>接着看例子，我们要找到 &#x2F;boot&#x2F;grub&#x2F;stage1的，在grub&gt;后面输入；</p>
+<figure class="highlight gradle"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><code class="hljs gradle">grub&gt; <span class="hljs-keyword">find</span>  <span class="hljs-regexp">/boot/g</span>rub/stage1<br>(hd0,<span class="hljs-number">6</span>) <br>(fd0)   注：这个是软驱；现在很少用软驱了，如果您有这方面的需要，自己看GRUB的DOC吧；<br></code></pre></td></tr></table></figure>
+<p>注解：</p>
+<p>(hd0,6) 这是&#x2F;boot所在的分区；不要误解为是Linux 的&#x2F;所在的分区，这是值得注意的；<br>(fd0) 注：这个是软驱；现在很少用软驱了，如果您有这方面的需要，自己看GRUB的DOC吧；</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><code class="hljs shell"><span class="hljs-meta prompt_">grub&gt;</span><span class="language-bash">root (hd0,6)    注：这是/boot所在的分区；</span><br><span class="hljs-meta prompt_">grub&gt;</span><span class="language-bash">setup (hd0)   注：把GRUB写到MBR上；</span><br></code></pre></td></tr></table></figure>
+<p>注解：</p>
+<p>上面这步骤是根据 find &#x2F;boot&#x2F;stage1而来的，仔细看一下就明白了；现在我们一般安装很少会把&#x2F;boot分区列为一个单独的分区；不过有的弟兄可能也喜欢这么做；所以还是有必要说一下为好；</p>
+<h1 id="四、GRUB的配置文件的menu-lst的写法；"><a href="#四、GRUB的配置文件的menu-lst的写法；" class="headerlink" title="四、GRUB的配置文件的menu.lst的写法；"></a>四、GRUB的配置文件的menu.lst的写法；</h1><p>对于GRUB来说，如果没有配置menu.lst，无论是Linux版本的GRUB，还是WINGRUB，都会有命令行可用，通过命令行是一样能把操作系统引导起来的；有些弟兄总以为menu.lst 配置错了， 或者在机器启动后出现grub&gt;命令行模式就要重新安装系统，其实根本没有这个必要；只要学会GRUB的命令行的用法，根本没有必要重装系统；</p>
+<p>menu.lst 位于&#x2F;boot&#x2F;grub目录中，也就是&#x2F;boot&#x2F;grub&#x2F;menu.lst 文件；您可以用vi或您喜欢的编辑器来编辑他；如果您不会用vi，还是去学习一下吧；简单的用法怎么也得会，对不对？毕竟这个文档不是讲vi的用法的；</p>
+<p>有的弟兄会说，我没有menu.lst怎么办？那就创建一个；用下面的命令；</p>
+<pre><code>[root@localhost ~]# touch  /boot/grub/menu.lst
+</code></pre>
+<p>然后我们再做一个&#x2F;boot&#x2F;grub&#x2F;menu.lst 的链接 &#x2F;boot&#x2F;grub&#x2F;grub.conf</p>
+<pre><code>[root@localhost ~]# cd /boot/grub
+[root@localhost ~]# ln -s menu.lst grub.conf
+</code></pre>
+<p>现在我们来写GRUB的menu.lst了，因为&#x2F;boot&#x2F;grub&#x2F;grub.conf是 &#x2F;boot&#x2F;grub&#x2F;menu.lst的链接文件，改哪个都行。链接文件相当于Windows的快捷方式，这样可能能更好的理解；</p>
+<h2 id="1、menu-lst的写法之一；"><a href="#1、menu-lst的写法之一；" class="headerlink" title="1、menu.lst的写法之一；"></a>1、menu.lst的写法之一；</h2><p>首先我们看一下我的Fedora 4.0 中的&#x2F;boot&#x2F;grub&#x2F;menu.lst 的内容；</p>
+<figure class="highlight apache"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><code class="hljs apache"><span class="hljs-attribute">default</span>=<span class="hljs-number">0</span><br><span class="hljs-attribute">timeout</span>=<span class="hljs-number">5</span><br><span class="hljs-comment">#splashimage=(hd0,6)/boot/grub/splash.xpm.gz</span><br><span class="hljs-attribute">hiddenmenu</span><br><span class="hljs-attribute">title</span> Fedora Core (<span class="hljs-number">2</span>.<span class="hljs-number">6</span>.<span class="hljs-number">11</span>-<span class="hljs-number">1</span>.<span class="hljs-number">1369</span>_FC4)<br>        <span class="hljs-attribute">root</span> (hd0,<span class="hljs-number">6</span>)<br>        <span class="hljs-attribute">kernel</span> /boot/vmlinuz-<span class="hljs-number">2</span>.<span class="hljs-number">6</span>.<span class="hljs-number">11</span>-<span class="hljs-number">1</span>.<span class="hljs-number">1369</span>_FC4 ro root=LABEL=/<br>        <span class="hljs-attribute">initrd</span> /boot/initrd-<span class="hljs-number">2</span>.<span class="hljs-number">6</span>.<span class="hljs-number">11</span>-<span class="hljs-number">1</span>.<span class="hljs-number">1369</span>_FC4.img<br><span class="hljs-attribute">title</span> WinXp<br>        <span class="hljs-attribute">rootnoverify</span> (hd0,<span class="hljs-number">0</span>)<br>        <span class="hljs-attribute">chainloader</span> +<span class="hljs-number">1</span><br></code></pre></td></tr></table></figure>
+<p>注解：<br>default&#x3D;0</p>
+<p>default&#x3D;0 是默认启动哪个系统，从0开始；每个操作系统的启动的定义都从title开始的，第一个title 在GRUB的启动菜单上显示为0,第二个启动为1，以此类推；<br>timeout&#x3D;5</p>
+<p>注：表示在开机后，GRUB画面出现几秒后开始以默认启动；如果在启动时，移动上下键，则解除这一规则；<br>    #splashimage&#x3D;(hd0,6)&#x2F;boot&#x2F;grub&#x2F;splash.xpm.gz 注：GRUB的背景画面，这个是可选项；我不喜欢GRUB的背景画面，所以加#号注掉，也可以删除；<br>hiddenmenu</p>
+<p>注解：隐藏GRUB的启动菜单，这项也是可选的，也可以用#号注掉；</p>
+<p>一般的情况下对Linux操作系统的启动，一般要包括四行；title 行；root行；kernel 行；initrd 行；</p>
+<h3 id="1）在menu-lst中-，通过-root-hd-0-n-y-来指定-x2F-boot-所在的分区；"><a href="#1）在menu-lst中-，通过-root-hd-0-n-y-来指定-x2F-boot-所在的分区；" class="headerlink" title="1）在menu.lst中 ，通过 root (hd[0-n],y)来指定&#x2F;boot 所在的分区；"></a>1）在menu.lst中 ，通过 root (hd[0-n],y)来指定&#x2F;boot 所在的分区；</h3><p>title XXXXX 注：title 后面加一个空格，title 是小写的，后面可以自己定义；比如FC4，自己定义一个名字就行；<br>root (hd[0-n],y) ，在本例中，我们看到的是root (hd0,6) ,root (hd[0-n],y)表示的是&#x2F;boot所在的分区；有时我们安装Linux的时候，大多是不设置&#x2F;boot的，这时&#x2F;boot和&#x2F;所在的同一个分区； 这个root (hd[0-n],y)很重要，因为&#x2F;boot目录中虽然有grub目录，最为重要的是还有kernel 和initrd文件，这是Linux能启动起来最为重要东西；</p>
+<p>有的弟兄会问，root (hd[0-n],y)是怎么来的？</p>
+<p>请参考：《在Linux系统中存储设备的两种表示方法》</p>
+<h3 id="2）在menu-lst中，kernel-命令行的写法；"><a href="#2）在menu-lst中，kernel-命令行的写法；" class="headerlink" title="2）在menu.lst中，kernel 命令行的写法；"></a>2）在menu.lst中，kernel 命令行的写法；</h3><p>kernel 一行，是通指定内核及Linux的&#x2F;分区所在位置；</p>
+<p>比如例子中是；</p>
+<pre><code>kernel /boot/vmlinuz-2.6.11-1.1369_FC4 ro root=LABEL=/
+</code></pre>
+<p>在这里以kernel 起始，指定Linux的内核的文件所处的绝对路径；因为内核是处在&#x2F;boot目录中的， 如果&#x2F;boot是独立的一个分区，则需要把boot省略；如果&#x2F;boot是独立的分区，这行要写成:</p>
+<pre><code>kernel /vmlinuz-2.6.11-1.1369_FC4 ro root=LABEL=/ 
+</code></pre>
+<p>因为&#x2F;boot所处的分区已经在title 下一行root (hd[0-n],y)中指定了，所以就无需要再指明内核处在哪个分区了；另外Linux系统的硬盘分区的挂载配置文件在&#x2F;etc&#x2F;fstab ，原理是通过 mount &#x2F;dev&#x2F;hd[a-z]X &#x2F;boot 来进行的；您可以对照着来理解；</p>
+<p>ro 表示只读； root&#x3D;LABEL&#x3D;&#x2F; 来表示Linux的根所处的分区。LABEL&#x3D;&#x2F; 这是硬盘分区格式化为相应文件系统后所加的标签；如果您不了解什么是标签，也可以直接以&#x2F;dev&#x2F;hd[a-z]X 或者&#x2F;dev&#x2F;sd[a-z]X来表示；就看您的Linux是根分区是在哪个分区了。比如我的是在&#x2F;dev&#x2F;hda7 ， 那这里就可以写成root&#x3D;&#x2F;dev&#x2F;hda7；</p>
+<p>如果查看系统运行所挂载的分区，请用 df -lh 来查看，就能明白是不是&#x2F;boot是独立的分区，或者查看&#x2F;etc&#x2F;fstab也能知道；</p>
+<figure class="highlight crystal"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><code class="hljs crystal">[root<span class="hljs-variable">@localhost</span> ~]<span class="hljs-comment"># df -lh</span><br>Filesystem            容量  已用 可用 已用% 挂载点<br><span class="hljs-regexp">/dev/hda</span>7              <span class="hljs-number">11</span>G  <span class="hljs-number">9.2</span>G  <span class="hljs-number">1.2</span>G  <span class="hljs-number">90</span>% <span class="hljs-regexp">/</span><br><span class="hljs-regexp">/dev</span><span class="hljs-regexp">/shm              236M     0  236M   0% /dev</span><span class="hljs-regexp">/shm</span><br></code></pre></td></tr></table></figure>
+<p>在这个例子中，我们可以发现 &#x2F;boot并没有出现只有&#x2F;dev&#x2F;hda7，这表示&#x2F;boot并不是独立的一个分区；所有的东西都包含在&#x2F;中；于是我们在&#x2F;boot中查看内核版本；</p>
+<pre><code>[root@localhost ~]# ls /boot/vmlinuz*/boot/vmlinuz-2.6.11-1.1369_FC4   注：看到内核vmlinuz所处的目录；
+</code></pre>
+<p>于是我们就可以这样kernel 这行了；</p>
+<pre><code>kernel /boot/vmlinuz-2.6.11-1.1369_FC4  ro root=/dev/hda7
+</code></pre>
+<h3 id="3）initrd-命令行的写法；"><a href="#3）initrd-命令行的写法；" class="headerlink" title="3）initrd 命令行的写法；"></a>3）initrd 命令行的写法；</h3><p>如果是&#x2F;boot独立一个分区，initrd 一行要把&#x2F;boot中省略；如果&#x2F;boot不是处于一个分区，而是和Linux的&#x2F;分区处于同一分区，不应该省略；</p>
+<p>比如我们在2）中用的例子；现在拿到这里，我们应该首先查看 &#x2F;boot中的initrd的文件名到底是什么；</p>
+<pre><code>[root@localhost ~]# ls /boot/initrd*/boot/initrd-2.6.11-1.1369_FC4.img
+</code></pre>
+<p>如果是通过df -lh 得知或查看&#x2F;etc&#x2F;fstab 也行， 得知&#x2F;boot是独立的分区；这时initrd 应该写成；</p>
+<pre><code>initrd  /initrd-2.6.11-1.1369_FC4.img
+</code></pre>
+<p>如果是 &#x2F;boot不是独处一个分区，而是在&#x2F;同一处一个分区， 则要写成；</p>
+<pre><code>initrd  /boot/initrd-2.6.11-1.1369_FC4.img
+</code></pre>
+<h3 id="4）menu-lst第一种写法的总结和实践；"><a href="#4）menu-lst第一种写法的总结和实践；" class="headerlink" title="4）menu.lst第一种写法的总结和实践；"></a>4）menu.lst第一种写法的总结和实践；</h3><p>在这里，我们只说重要的，不重要的就一带而过了；</p>
+<h4 id="1］用fdisk-l-；df-lh-；more-x2F-etc-x2F-fstab来确认分区情况；"><a href="#1］用fdisk-l-；df-lh-；more-x2F-etc-x2F-fstab来确认分区情况；" class="headerlink" title="1］用fdisk -l ；df -lh ；more &#x2F;etc&#x2F;fstab来确认分区情况；"></a>1］用fdisk -l ；df -lh ；more &#x2F;etc&#x2F;fstab来确认分区情况；</h4><p>我们过fdisk -l ；df -lh ; more &#x2F;etc&#x2F;fstab 来确认&#x2F;boot所在的分区，及Linux的根分区所在位置；</p>
+<p>比如我们确认&#x2F;boot和Linux的&#x2F;分区同处一个分区；</p>
+<figure class="highlight crystal"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><code class="hljs crystal">[root<span class="hljs-variable">@localhost</span> ~]<span class="hljs-comment"># df -lh</span><br>Filesystem            容量  已用 可用 已用% 挂载点<br><span class="hljs-regexp">/dev/hda</span>7              <span class="hljs-number">11</span>G  <span class="hljs-number">9.2</span>G  <span class="hljs-number">1.2</span>G  <span class="hljs-number">90</span>% <span class="hljs-regexp">/</span><br><span class="hljs-regexp">/dev</span><span class="hljs-regexp">/shm              236M     0  236M   0% /dev</span><span class="hljs-regexp">/shm</span><br></code></pre></td></tr></table></figure>
+<p>然后我们&#x2F;etc&#x2F;fstab 中,查看&#x2F;分所在的分区或分区标签是什么；</p>
+<figure class="highlight nix"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><code class="hljs nix">[root@localhost ~]<span class="hljs-comment"># more /etc/fstab</span><br><span class="hljs-comment"># This file is edited by fstab-sync - see &#x27;man fstab-sync&#x27; for details</span><br>L<span class="hljs-attr">ABEL</span><span class="hljs-operator">=</span><span class="hljs-symbol">/</span>                 <span class="hljs-symbol">/</span>                       ext3    defaults        <span class="hljs-number">1</span> <span class="hljs-number">1</span><br><span class="hljs-symbol">/dev/devpts</span>             <span class="hljs-symbol">/dev/pts</span>                devpts  gid<span class="hljs-operator">=</span><span class="hljs-number">5</span>,mode<span class="hljs-operator">=</span><span class="hljs-number">620</span>  <span class="hljs-number">0</span> <span class="hljs-number">0</span><br><span class="hljs-symbol">/dev/shm</span>                <span class="hljs-symbol">/dev/shm</span>                tmpfs   defaults        <span class="hljs-number">0</span> <span class="hljs-number">0</span><br><span class="hljs-symbol">/dev/proc</span>               <span class="hljs-symbol">/proc</span>                   proc    defaults        <span class="hljs-number">0</span> <span class="hljs-number">0</span><br><span class="hljs-symbol">/dev/sys</span>                <span class="hljs-symbol">/sys</span>                    sysfs   defaults        <span class="hljs-number">0</span> <span class="hljs-number">0</span><br>L<span class="hljs-attr">ABEL</span><span class="hljs-operator">=</span>SWAP-hda1         swap                    swap    defaults        <span class="hljs-number">0</span> <span class="hljs-number">0</span><br><span class="hljs-symbol">/dev/hdc</span>                <span class="hljs-symbol">/media/cdrecorder</span>       auto    pamconsole,exec,noauto,managed <span class="hljs-number">0</span> <span class="hljs-number">0</span><br></code></pre></td></tr></table></figure>
+<p>经过上面的df -lh 和more &#x2F;etc&#x2F;fstab 的对照中得知，&#x2F;boot并是独处一个分区，而是和&#x2F;在同一个分区；这个Linux系统安装在&#x2F;dev&#x2F;hda7上，文件系统（此分区）的标签为 LABEL&#x3D;&#x2F; ，&#x2F;boot也是处于&#x2F;dev&#x2F;hda7 ，&#x2F;dev&#x2F;hda7也可以说是 root (hd0,6)；</p>
+<h4 id="2-查看内核vmlinuz的和initrd文件名的全称；"><a href="#2-查看内核vmlinuz的和initrd文件名的全称；" class="headerlink" title="2]查看内核vmlinuz的和initrd文件名的全称；"></a>2]查看内核vmlinuz的和initrd文件名的全称；</h4><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><code class="hljs bash">[root@localhost ~]# <span class="hljs-built_in">ls</span> -lh /boot/vmlinuz*<br>-rw-r--r--  1 root root 1.6M 2005-06-03  /boot/vmlinuz-2.6.11-1.1369_FC4<br>[root@localhost ~]# <span class="hljs-built_in">ls</span> -lh /boot/initrd*<br>-rw-r--r--  1 root root 1.1M 11月 26 22:30 /boot/initrd-2.6.11-1.1369_FC4.img<br></code></pre></td></tr></table></figure>
+
+<p>3]开始写menu.lst ；</p>
+<p>我们根据上面所提到的，可以写成如下的样子；</p>
+<figure class="highlight apache"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><code class="hljs apache"><span class="hljs-attribute">default</span>=<span class="hljs-number">0</span> <br><span class="hljs-attribute">timeout</span>=<span class="hljs-number">5</span><br><span class="hljs-attribute">title</span> FC4<br>        <span class="hljs-attribute">root</span> (hd0,<span class="hljs-number">6</span>)<br>        <span class="hljs-attribute">kernel</span> /boot/vmlinuz-<span class="hljs-number">2</span>.<span class="hljs-number">6</span>.<span class="hljs-number">11</span>-<span class="hljs-number">1</span>.<span class="hljs-number">1369</span>_FC4 ro root=LABEL=/<br>        <span class="hljs-attribute">initrd</span> /boot/initrd-<span class="hljs-number">2</span>.<span class="hljs-number">6</span>.<span class="hljs-number">11</span>-<span class="hljs-number">1</span>.<span class="hljs-number">1369</span>_FC4.img<br></code></pre></td></tr></table></figure>
+<p>也可以写成；</p>
+<figure class="highlight apache"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><code class="hljs apache"><span class="hljs-attribute">default</span>=<span class="hljs-number">0</span> <br><span class="hljs-attribute">timeout</span>=<span class="hljs-number">5</span><br><span class="hljs-attribute">title</span> FC4<br>        <span class="hljs-attribute">root</span> (hd0,<span class="hljs-number">6</span>)<br>        <span class="hljs-attribute">kernel</span> /boot/vmlinuz-<span class="hljs-number">2</span>.<span class="hljs-number">6</span>.<span class="hljs-number">11</span>-<span class="hljs-number">1</span>.<span class="hljs-number">1369</span>_FC4 ro root=/dev/hda7<br>        <span class="hljs-attribute">initrd</span> /boot/initrd-<span class="hljs-number">2</span>.<span class="hljs-number">6</span>.<span class="hljs-number">11</span>-<span class="hljs-number">1</span>.<span class="hljs-number">1369</span>_FC4.img<br></code></pre></td></tr></table></figure>
+<p>注解：上面两个不同之处在于一指定Linux的根&#x2F;所在的分区时，一个是用了文件系统的标签，另一个没有用标签；</p>
+<h2 id="2、menu-lst的写法之二，精简型；"><a href="#2、menu-lst的写法之二，精简型；" class="headerlink" title="2、menu.lst的写法之二，精简型；"></a>2、menu.lst的写法之二，精简型；</h2><p>本写法主要是把指定&#x2F;boot所位于的所分区直接写入kernel 指令行；这样就省略了通过root (hd[0-n],y)来指定&#x2F;boot所位于的分区；</p>
+<h3 id="1-第一种情况：-x2F-boot和Linux的-x2F-根分区在同一个分区；"><a href="#1-第一种情况：-x2F-boot和Linux的-x2F-根分区在同一个分区；" class="headerlink" title="1)第一种情况：&#x2F;boot和Linux的&#x2F;根分区在同一个分区；"></a>1)第一种情况：&#x2F;boot和Linux的&#x2F;根分区在同一个分区；</h3><p>有前面的那么多的讲解，menu.lst写法之二就好理解多了；也得分两种情况，咱们先把&#x2F;boot并不是独处一个分区，而是和Linux的根分区处于同一个分区；我们以 4）menu.lst第一种方法的写法总结 的实例为例子；</p>
+<figure class="highlight apache"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><code class="hljs apache"><span class="hljs-attribute">default</span>=<span class="hljs-number">0</span> <br><span class="hljs-attribute">timeout</span>=<span class="hljs-number">5</span><br><span class="hljs-attribute">title</span> FC4x<br>        <span class="hljs-attribute">kernel</span> (hd0,<span class="hljs-number">6</span>)/boot/vmlinuz-<span class="hljs-number">2</span>.<span class="hljs-number">6</span>.<span class="hljs-number">11</span>-<span class="hljs-number">1</span>.<span class="hljs-number">1369</span>_FC4 ro root=/dev/hda7<br>        <span class="hljs-attribute">initrd</span> (hd0,<span class="hljs-number">6</span>)/boot/initrd-<span class="hljs-number">2</span>.<span class="hljs-number">6</span>.<span class="hljs-number">11</span>-<span class="hljs-number">1</span>.<span class="hljs-number">1369</span>_FC4.img<br></code></pre></td></tr></table></figure>
+<p>注解：</p>
+<p>title FC4x 注：自己为这个Linux 起个简单的名，以title开头，然后一个空格，后面就自己发挥吧，FC4或FC4x都行；</p>
+<p>kernel 空格 (hd0,6)&#x2F;boot&#x2F;vmlinuz-2.6.11-1.1369_FC4 空格 ro 空格 root&#x3D;&#x2F;dev&#x2F;hda7</p>
+<p>kernel 这行这样理解 kernel (boot所在的分区)&#x2F;boot&#x2F;内核文件件全称 ro root&#x3D;Linux根所位于的分区或标签</p>
+<p>initrd 空格 (hd0,6)&#x2F;boot&#x2F;initrd-2.6.11-1.1369_FC4.img<br>initrd 这行可以这样理解 initrd (&#x2F;boot所在的分区)&#x2F;boot&#x2F;内核文件名全称</p>
+<h3 id="2）第二种情况：-x2F-boot独立一个分区，和Linux的根分区不是同一个分区；"><a href="#2）第二种情况：-x2F-boot独立一个分区，和Linux的根分区不是同一个分区；" class="headerlink" title="2）第二种情况：&#x2F;boot独立一个分区，和Linux的根分区不是同一个分区；"></a>2）第二种情况：&#x2F;boot独立一个分区，和Linux的根分区不是同一个分区；</h3><p>比如我们查看到df -lh 得到的是</p>
+<figure class="highlight crystal"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><code class="hljs crystal">[root<span class="hljs-variable">@localhost</span> ~]<span class="hljs-comment"># df -lh</span><br>Filesystem            容量  已用 可用 已用% 挂载点<br><span class="hljs-regexp">/dev/hda</span>6              <span class="hljs-number">200</span>M  <span class="hljs-number">120</span>M  <span class="hljs-number">80</span>M  <span class="hljs-number">60</span>% <span class="hljs-regexp">/boot</span><br><span class="hljs-regexp">/dev</span><span class="hljs-regexp">/hda7              11G  9.2G  1.2G  90% /</span><br></code></pre></td></tr></table></figure>
+<p>我们再进一行查看&#x2F;etc&#x2F;fstab 得知；</p>
+<figure class="highlight nix"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><code class="hljs nix">L<span class="hljs-attr">ABEL</span><span class="hljs-operator">=</span><span class="hljs-symbol">/</span>                 <span class="hljs-symbol">/</span>                       ext3    defaults        <span class="hljs-number">1</span> <span class="hljs-number">1</span><br>L<span class="hljs-attr">ABEL</span><span class="hljs-operator">=</span><span class="hljs-symbol">/boot</span>             <span class="hljs-symbol">/boot</span>                   ext3    defaults        <span class="hljs-number">1</span> <span class="hljs-number">2</span><br></code></pre></td></tr></table></figure>
+<p>所以我们应该写成如下的；</p>
+<figure class="highlight apache"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><code class="hljs apache"><span class="hljs-attribute">title</span> FC4x<br>        <span class="hljs-attribute">kernel</span> (hd0,<span class="hljs-number">5</span>)/vmlinuz-<span class="hljs-number">2</span>.<span class="hljs-number">6</span>.<span class="hljs-number">11</span>-<span class="hljs-number">1</span>.<span class="hljs-number">1369</span>_FC4 ro root=LABEL=/<br>        <span class="hljs-attribute">initrd</span> (hd0,<span class="hljs-number">5</span>)/initrd-<span class="hljs-number">2</span>.<span class="hljs-number">6</span>.<span class="hljs-number">11</span>-<span class="hljs-number">1</span>.<span class="hljs-number">1369</span>_FC4.img<br></code></pre></td></tr></table></figure>
+<p>因为Linux的根分区是&#x2F;dev&#x2F;hda7，通过&#x2F;etc&#x2F;fstab和df -h的内容得知标签为 LABEL&#x3D;&#x2F;的分区就是&#x2F;dev&#x2F;hda7 ，所以有；</p>
+<figure class="highlight apache"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><code class="hljs apache"><span class="hljs-attribute">title</span> FC4x<br>        <span class="hljs-attribute">kernel</span> (hd0,<span class="hljs-number">5</span>)/vmlinuz-<span class="hljs-number">2</span>.<span class="hljs-number">6</span>.<span class="hljs-number">11</span>-<span class="hljs-number">1</span>.<span class="hljs-number">1369</span>_FC4 ro root=/dev/hda7<br>        <span class="hljs-attribute">initrd</span> (hd0,<span class="hljs-number">5</span>)/initrd-<span class="hljs-number">2</span>.<span class="hljs-number">6</span>.<span class="hljs-number">11</span>-<span class="hljs-number">1</span>.<span class="hljs-number">1369</span>_FC4.img<br></code></pre></td></tr></table></figure>
+
+<h1 id="五、通过GRUB命令行来启动Linux操作系统；"><a href="#五、通过GRUB命令行来启动Linux操作系统；" class="headerlink" title="五、通过GRUB命令行来启动Linux操作系统；"></a>五、通过GRUB命令行来启动Linux操作系统；</h1><p>GRUB的命令行才是王道，如果知道怎么用命令行来启动操作系统，那理解menu.lst的写法也不难；也就是说在开机的时候，不用GRUB的菜单，通过GRUB的命令也是一样能把操作系统引导起来。</p>
+<p>因为menu.lst的内容就是GRUB的一个一个的指令集合；是不是Linux这玩意很神奇？</p>
+<h2 id="1、为什么需要学习GRUB的命令行；"><a href="#1、为什么需要学习GRUB的命令行；" class="headerlink" title="1、为什么需要学习GRUB的命令行；"></a>1、为什么需要学习GRUB的命令行；</h2><p>当我们把GRUB的menu.lst写错的时候，或者丢掉了menu.lst的时，比如在开机的时候，GRUB会出现grub&gt;类似的命令提示符，这时需要我们用命令行启动系统；当然您可以不用定义GRUB的菜单 ，直接用命令行来启动系统，比如我现在就是，为了写GRUB的文档，就把menu.lst 删除了，直接用命令来启动系统；</p>
+<h2 id="2、用命令行来引导Linux操作系统的步骤；"><a href="#2、用命令行来引导Linux操作系统的步骤；" class="headerlink" title="2、用命令行来引导Linux操作系统的步骤；"></a>2、用命令行来引导Linux操作系统的步骤；</h2><p>通过命令行来引导操作系统的流程，也没有什么难的；无非是把指令手工输入到grub&gt;提示符的后面；在这个过程中，tab键的命令补齐功能就显得很重要了。如果您不知道有哪些命令，可以输入help；</p>
+<h3 id="1）进入GRUB的命令行模式-grub-gt"><a href="#1）进入GRUB的命令行模式-grub-gt" class="headerlink" title="1）进入GRUB的命令行模式 grub&gt;"></a>1）进入GRUB的命令行模式 grub&gt;</h3><p>如果开机时，GRUB出现的是grub&gt;，说明你没有&#x2F;etc&#x2F;grub&#x2F;menu.lst ，您需要自己写一个才会GRUB的菜单，让我们来选择进入哪个系统。如果有GRUB的菜单，您可以按Ctrl+c组合键进入GRUB的命令行模式，会出现grub&gt; 提示符；</p>
+<pre><code>grub&gt;
+</code></pre>
+<h3 id="2）获取帮助GRUB的-help"><a href="#2）获取帮助GRUB的-help" class="headerlink" title="2）获取帮助GRUB的 help"></a>2）获取帮助GRUB的 help</h3><p>只要您在grub&gt;提示符的后面输入help 就能得到GRUB所有的命令提示；</p>
+<figure class="highlight inform7"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><code class="hljs inform7">grub&gt; help<br>blocklist FILE                         boot<br>cat FILE                               chainloader <span class="hljs-comment">[--force]</span> FILE<br>clear                                  color NORMAL <span class="hljs-comment">[HIGHLIGHT]</span><br>configfile FILE                        device DRIVE DEVICE<br>displayapm                             displaymem<br>find FILENAME                          geometry DRIVE <span class="hljs-comment">[CYLINDER HEAD SECTOR <span class="hljs-comment">[</span></span><br><span class="hljs-comment"><span class="hljs-comment">halt <span class="hljs-comment">[--no-apm]</span>                        help <span class="hljs-comment">[--all]</span> <span class="hljs-comment">[PATTERN ...]</span></span></span><br><span class="hljs-comment"><span class="hljs-comment">hide PARTITION                         initrd FILE <span class="hljs-comment">[ARG ...]</span></span></span><br><span class="hljs-comment"><span class="hljs-comment">kernel <span class="hljs-comment">[--no-mem-option]</span> <span class="hljs-comment">[--type=TYPE]</span> makeactive</span></span><br><span class="hljs-comment"><span class="hljs-comment">map TO_DRIVE FROM_DRIVE                md5crypt</span></span><br><span class="hljs-comment"><span class="hljs-comment">module FILE <span class="hljs-comment">[ARG ...]</span>                  modulenounzip FILE <span class="hljs-comment">[ARG ...]</span></span></span><br><span class="hljs-comment"><span class="hljs-comment">pager <span class="hljs-comment">[FLAG]</span>                           partnew PART TYPE START LEN</span></span><br><span class="hljs-comment"><span class="hljs-comment">parttype PART TYPE                     quit</span></span><br><span class="hljs-comment"><span class="hljs-comment">reboot                                 root <span class="hljs-comment">[DEVICE <span class="hljs-comment">[HDBIAS]</span>]</span></span></span><br><span class="hljs-comment"><span class="hljs-comment">rootnoverify <span class="hljs-comment">[DEVICE <span class="hljs-comment">[HDBIAS]</span>]</span>         serial <span class="hljs-comment">[--unit=UNIT]</span> <span class="hljs-comment">[--port=PORT]</span> <span class="hljs-comment">[--</span></span></span><br><span class="hljs-comment"><span class="hljs-comment"><span class="hljs-comment">setkey <span class="hljs-comment">[TO_KEY FROM_KEY]</span>               setup <span class="hljs-comment">[--prefix=DIR]</span> <span class="hljs-comment">[--stage2=STAGE2_</span></span></span></span><br><span class="hljs-comment"><span class="hljs-comment"><span class="hljs-comment"><span class="hljs-comment">terminal <span class="hljs-comment">[--dumb]</span> <span class="hljs-comment">[--no-echo]</span> <span class="hljs-comment">[--no-ed terminfo <span class="hljs-comment">[--name=NAME --cursor-address</span></span></span></span></span></span><br><span class="hljs-comment"><span class="hljs-comment"><span class="hljs-comment"><span class="hljs-comment"><span class="hljs-comment"><span class="hljs-comment">testvbe MODE                           unhide PARTITION</span></span></span></span></span></span><br><span class="hljs-comment"><span class="hljs-comment"><span class="hljs-comment"><span class="hljs-comment"><span class="hljs-comment"><span class="hljs-comment">uppermem KBYTES                        vbeprobe <span class="hljs-comment">[MODE]</span></span></span></span></span></span></span><br></code></pre></td></tr></table></figure>
+<p>如果需要得到某个指令的帮助，就在 help 后面空一格，然后输入指令，比如；</p>
+<pre><code>grub&gt;help kernel 
+</code></pre>
+<h3 id="3）cat的用法；"><a href="#3）cat的用法；" class="headerlink" title="3）cat的用法；"></a>3）cat的用法；</h3><p>cat指令是用来查看文件内容的，有时我们不知道Linux的&#x2F;boot分区，以及&#x2F;根分区所在的位置，要查看&#x2F;etc&#x2F;fstab的内容来得知，这时，我们就要用到cat (hd[0-n],y)&#x2F;etc&#x2F;fstab 来获得这些内容；注意要学会用tab键命令补齐的功能；</p>
+<figure class="highlight maxima"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><code class="hljs maxima">grub&gt; cat (     按<span class="hljs-built_in">tab</span> 键会出来hd0或hd1之类的；<br>grub&gt; cat (hd0, 注：输入hd0,然后再按<span class="hljs-built_in">tab</span>键；会出来分区之类的；<br>grub&gt; cat (hd0,<span class="hljs-number">6</span>)<br>Possible partitions are:<br>   Partition <span class="hljs-built_in">num</span>: <span class="hljs-number">0</span>,  Filesystem type <span class="hljs-literal">unknown</span>, <span class="hljs-built_in">partition</span> type <span class="hljs-number">0x7</span><br>   Partition <span class="hljs-built_in">num</span>: <span class="hljs-number">4</span>,  Filesystem type <span class="hljs-built_in">is</span> fat, <span class="hljs-built_in">partition</span> type <span class="hljs-number">0xb</span><br>   Partition <span class="hljs-built_in">num</span>: <span class="hljs-number">5</span>,  Filesystem type <span class="hljs-built_in">is</span> reiserfs, <span class="hljs-built_in">partition</span> type <span class="hljs-number">0x83</span><br>   Partition <span class="hljs-built_in">num</span>: <span class="hljs-number">6</span>,  Filesystem type <span class="hljs-built_in">is</span> ext2fs, <span class="hljs-built_in">partition</span> type <span class="hljs-number">0x83</span><br>   Partition <span class="hljs-built_in">num</span>: <span class="hljs-number">7</span>,  Filesystem type <span class="hljs-literal">unknown</span>, <span class="hljs-built_in">partition</span> type <span class="hljs-number">0x83</span><br>   Partition <span class="hljs-built_in">num</span>: <span class="hljs-number">8</span>,  Filesystem type <span class="hljs-built_in">is</span> reiserfs, <span class="hljs-built_in">partition</span> type <span class="hljs-number">0x83</span><br>   Partition <span class="hljs-built_in">num</span>: <span class="hljs-number">9</span>,  Filesystem type <span class="hljs-literal">unknown</span>, <span class="hljs-built_in">partition</span> type <span class="hljs-number">0x82</span><br></code></pre></td></tr></table></figure>
+
+<pre><code>grub&gt; cat (hd0,6)/etc/fstab 注：比如我想查看一下 (hd0,6)/etc/fstab的内容就这样输入；
+</code></pre>
+<figure class="highlight nix"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><code class="hljs nix">L<span class="hljs-attr">ABEL</span><span class="hljs-operator">=</span><span class="hljs-symbol">/</span>                 <span class="hljs-symbol">/</span>                       ext3    defaults        <span class="hljs-number">1</span> <span class="hljs-number">1</span><br><span class="hljs-symbol">/dev/devpts</span>             <span class="hljs-symbol">/dev/pts</span>                devpts  gid<span class="hljs-operator">=</span><span class="hljs-number">5</span>,mode<span class="hljs-operator">=</span><span class="hljs-number">620</span>  <span class="hljs-number">0</span> <span class="hljs-number">0</span><br><span class="hljs-symbol">/dev/shm</span>                <span class="hljs-symbol">/dev/shm</span>                tmpfs   defaults        <span class="hljs-number">0</span> <span class="hljs-number">0</span><br><span class="hljs-symbol">/dev/proc</span>               <span class="hljs-symbol">/proc</span>                   proc    defaults        <span class="hljs-number">0</span> <span class="hljs-number">0</span><br><span class="hljs-symbol">/dev/sys</span>                <span class="hljs-symbol">/sys</span>                    sysfs   defaults        <span class="hljs-number">0</span> <span class="hljs-number">0</span><br>L<span class="hljs-attr">ABEL</span><span class="hljs-operator">=</span>SWAP-hda1         swap                    swap    defaults        <span class="hljs-number">0</span> <span class="hljs-number">0</span><br><span class="hljs-symbol">/dev/hdc</span>                <span class="hljs-symbol">/media/cdrecorder</span>       auto    pamconsole,exec,noauto,<br>managed <span class="hljs-number">0</span> <span class="hljs-number">0</span><br></code></pre></td></tr></table></figure>
+<p>有的弟兄可能会说，我不知道Linux安装在了哪个分区。那根据文件系统来判断一个一个的尝试总可以吧我；只要能cat出&#x2F;etc&#x2F;fstab就能为以后引导带来方便；</p>
+<p>主要查看&#x2F;etc&#x2F;fstab中的内容，主要是Linux的&#x2F;分区及&#x2F;boot是否是独立的分区；如果没有&#x2F;boot类似的行，证明&#x2F;boot和 Linux的&#x2F;处于同一个硬盘分区；比如上面的例子中LABEL&#x3D;&#x2F; 这行是极为重要的；说明Linux系统就安在标签为LABEL&#x3D;&#x2F;的分区中；</p>
+<p>如果您的Linux系统&#x2F;boot和&#x2F;没有位于同一个分区，可能cat (hd[a-n],y) 查到的是类似下面的；</p>
+<figure class="highlight nix"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><code class="hljs nix">L<span class="hljs-attr">ABEL</span><span class="hljs-operator">=</span><span class="hljs-symbol">/</span>                 <span class="hljs-symbol">/</span>                       ext3    defaults        <span class="hljs-number">1</span> <span class="hljs-number">1</span><br>L<span class="hljs-attr">ABEL</span><span class="hljs-operator">=</span><span class="hljs-symbol">/boot</span>             <span class="hljs-symbol">/boot</span>                   ext3    defaults        <span class="hljs-number">1</span> <span class="hljs-number">2</span><br></code></pre></td></tr></table></figure>
+
+<h3 id="4）-root-hd-0-n-y-指令来指定-x2F-boot所在的分区；"><a href="#4）-root-hd-0-n-y-指令来指定-x2F-boot所在的分区；" class="headerlink" title="4） root (hd[0-n,y) 指令来指定&#x2F;boot所在的分区；"></a>4） root (hd[0-n,y) 指令来指定&#x2F;boot所在的分区；</h3><p>其实这个root (hd[0,n],y)是可以省略的，如果省略了，我们要在kerenl 命令中指定；我们前面已经说过 (hd[0-n],y) 硬盘分区的表示方法的用途；主要是用来指定 &#x2F;boot所在的分区；</p>
+<p>比如我们确认&#x2F;boot和 (hd0,6)，所以就可以这样来输入root (hd0,6)</p>
+<pre><code>grub&gt; root (hd0,6)
+</code></pre>
+<p>如果发现不对，可以重新来过；没有什么大不了的；</p>
+<h3 id="5）-kernel-指令，用来指定Linux的内核，及所在的分区；"><a href="#5）-kernel-指令，用来指定Linux的内核，及所在的分区；" class="headerlink" title="5） kernel 指令，用来指定Linux的内核，及所在的分区；"></a>5） kernel 指令，用来指定Linux的内核，及所在的分区；</h3><p>kernel 这个指令可能初学者有点怕，不知道内核在哪个分区，及内核文件名的全称是什么。不要忘记tab键的命令补齐的应用；</p>
+<p>如果我们已经通过root (hd[0-n],y) 指定了&#x2F;boot所在的分区，语法有两个：</p>
+<p>如果&#x2F;boot和Linux的&#x2F;位于同一个分区，应该是下面的一种格式；</p>
+<p>kernel &#x2F;boot&#x2F;vmlinuz在这里按tab键来补齐，就看到内核全称了 ro root&#x3D;&#x2F;dev&#x2F;hd[a-z]X</p>
+<p>如果&#x2F;boot有自己独立的分区，应该是；</p>
+<p>kernel &#x2F;vmlinuz在这里按tab键来补齐，就看到内核全称了 ro root&#x3D;&#x2F;dev&#x2F;hd[a-z]X</p>
+<p>在这里 root&#x3D;&#x2F;dev&#x2F;hd[a-z]X 是Linux 的&#x2F;根所位于的分区，如果不知道是哪个分区，就用tab出来的来计算，一个一个的尝试；或用cat (hd[0-n],y)&#x2F;etc&#x2F;fstab 中得到Linux的&#x2F;所在的分区或分区的标签；</p>
+<pre><code>grub&gt; kernel /boot/在这里按tab键；这样就列出/boot中的文件了；
+</code></pre>
+<figure class="highlight subunit"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><code class="hljs subunit">Possible files are: grub initrd<span class="hljs-string">-2</span>.6.11<span class="hljs-string">-1</span>.1369_FC4.img System.map<span class="hljs-string">-2</span>.6.11<span class="hljs-string">-1</span>.1369<br>_FC4 config<span class="hljs-string">-2</span>.6.11<span class="hljs-string">-1</span>.1369_FC4 vmlinuz<span class="hljs-string">-2</span>.6.11<span class="hljs-string">-1</span>.1369_FC4 grubBAK memtest86+<span class="hljs-string">-1</span>.55<br>.1 xen-syms xen.gz<br><br>grub&gt; kernel /boot/vmlinuz<span class="hljs-string">-2</span>.6.11<span class="hljs-string">-1</span>.1369_FC4 ro root=LABEL=/ <br>   [Linux-bzImage, setup=0x1e00, size=0x18e473]<br></code></pre></td></tr></table></figure>
+<p>注解： root&#x3D;LABEL&#x3D;&#x2F; 是Linux的&#x2F;所在的分区的文件系统的标签；如果您知道Linux的&#x2F;在哪个具体的分区，用root&#x3D;&#x2F;dev&#x2F;hd[a-z]X来指定也行。比如下面的一行也是可以的；</p>
+<pre><code>grub&gt; kernel /boot/vmlinuz-2.6.11-1.1369_FC4 ro root=/dev/hda7
+</code></pre>
+<p>也可以把&#x2F;boot所在的分区的指定 root (hd[0-n],y)这行省掉，直接在kernel 中指定&#x2F;boot所在的分区；所以就在下面的语法；</p>
+<p>如果是&#x2F;boot和Linux的根同处一个分区；<br>kernel (hd[0-n],y)&#x2F;boot&#x2F;vmlinuz ro root&#x3D;&#x2F;dev&#x2F;hd[a-z]X</p>
+<p>比如：</p>
+<pre><code>grub&gt;kernel
+</code></pre>
+<p>如果是&#x2F;boot和Linux所在的根不在一个分区；则是；</p>
+<pre><code>kernel (hd[0-n],y)/vmlinuz  ro root=/dev/hd[a-z]X
+
+grub&gt; kernel (hd0,6)/boot/vmlinuz-2.6.11-1.1369_FC4 ro root=/dev/hda7 [Linux-bzImage, setup=0x1e00, size=0x18e473]
+</code></pre>
+<p>或下面的输入，以cat 出&#x2F;etc&#x2F;fstab内容为准；</p>
+<figure class="highlight routeros"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><code class="hljs routeros">grub&gt; kernel (hd0,6)/boot/vmlinuz-2.6.11-1.1369_FC4 ro <span class="hljs-attribute">root</span>=LABEL=/<br>   [Linux-bzImage, <span class="hljs-attribute">setup</span>=0x1e00, <span class="hljs-attribute">size</span>=0x18e473]<br></code></pre></td></tr></table></figure>
+
+<h3 id="6）initrd-命令行来指定initrd文件；"><a href="#6）initrd-命令行来指定initrd文件；" class="headerlink" title="6）initrd 命令行来指定initrd文件；"></a>6）initrd 命令行来指定initrd文件；</h3><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><code class="hljs shell"><span class="hljs-meta prompt_">grub&gt; </span><span class="language-bash">initrd /boot/initrd在这里tab 来补齐；</span><br><span class="hljs-meta prompt_">grub&gt; </span><span class="language-bash">initrd /boot/initrd-2.6.11-1.1369_FC4.img</span><br>   [Linux-initrd @ 0x2e1000, 0x10e685 bytes]<br></code></pre></td></tr></table></figure>
+<p>如果&#x2F;boot是独立的一个分区，应该是如下样子的语法；比如下面的；</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><code class="hljs shell"><span class="hljs-meta prompt_">grub&gt; </span><span class="language-bash">initrd /initrd在这里tab 来补齐；</span><br><span class="hljs-meta prompt_">grub&gt; </span><span class="language-bash">initrd /initrd-2.6.11-1.1369_FC4.img</span><br>   [Linux-initrd @ 0x2e1000, 0x10e685 bytes]<br></code></pre></td></tr></table></figure>
+
+<h3 id="7）boot-引导系统；"><a href="#7）boot-引导系统；" class="headerlink" title="7）boot 引导系统；"></a>7）boot 引导系统；</h3><pre><code>grub&gt;boot
+</code></pre>
+<p>前面的几个步骤都弄好 。就进入引导；尝试一下就知道了。。</p>
+<h3 id="8）引导Linux系统实例全程回放；"><a href="#8）引导Linux系统实例全程回放；" class="headerlink" title="8）引导Linux系统实例全程回放；"></a>8）引导Linux系统实例全程回放；</h3><p>实例：&#x2F;boot和Linux的&#x2F;处于同一个硬盘分区；</p>
+<figure class="highlight tcl"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br></pre></td><td class="code"><pre><code class="hljs tcl">grub&gt; cat (hd0,<span class="hljs-number">6</span>)/etc/fstab<br><span class="hljs-comment"># This file is edited by fstab-sync - see &#x27;man fstab-sync&#x27; for details</span><br>LABEL=/                 /                       ext3    defaults        <span class="hljs-number">1</span> <span class="hljs-number">1</span><br>/dev/devpts             /dev/pts                devpts  gid=<span class="hljs-number">5</span>,mode=<span class="hljs-number">620</span>  <span class="hljs-number">0</span> <span class="hljs-number">0</span><br>/dev/shm                /dev/shm                tmpfs   defaults        <span class="hljs-number">0</span> <span class="hljs-number">0</span><br>/dev/<span class="hljs-keyword">proc</span>               /<span class="hljs-keyword">proc</span><span class="hljs-title">                   proc</span> <span class="hljs-title">   defaults</span>        0 0<br>/dev/sys                /sys<span class="hljs-title">                    sysfs</span> <span class="hljs-title">  defaults</span>        0 0<span class="hljs-title"></span><br><span class="hljs-title">LABEL=SWAP-hda1</span> <span class="hljs-title">        swap</span> <span class="hljs-title">                   swap</span> <span class="hljs-title">   defaults</span>        0 0<br>/dev/hdc                /media/cdrecorder<span class="hljs-title">       auto</span> <span class="hljs-title">   pamconsole,exec,noauto,managed</span> 0 0<span class="hljs-title"></span><br><span class="hljs-title"></span><br><span class="hljs-title">grub&gt;</span> root (hd0,6)<span class="hljs-title"></span><br><span class="hljs-title">Filesystem</span> type<span class="hljs-title"> is</span> ext2fs,<span class="hljs-title"> partition</span> type 0x83<span class="hljs-title"></span><br><span class="hljs-title"></span><br><span class="hljs-title">grub&gt;</span> kernel /boot/在这里按tab补齐，全列出/boot所有的文件；<span class="hljs-title"></span><br><span class="hljs-title">Possible</span> files<span class="hljs-title"> are:</span> grub<span class="hljs-title"> initrd-2.6.11-1.1369_FC4.img</span> System.map-2.6.11-1.1369_FC4<span class="hljs-title"> config-2.6.11-1.1369_FC4</span> vmlinuz-2.6.11-1.1369_FC4<span class="hljs-title"> </span><br><span class="hljs-title">memtest86+-1.55.1</span> xen-syms<span class="hljs-title"> xen.gz</span><br><span class="hljs-title"></span><br><span class="hljs-title">grub&gt;</span> kernel /boot/vmlinuz-2.6.11-1.1369_FC4<span class="hljs-title"> ro</span> root=/dev/hda7  注：输入<br>   [Linux-bzImage,<span class="hljs-title"> setup=0x1e00,</span> size=0x18e473]<span class="hljs-title"></span><br><span class="hljs-title"></span><br><span class="hljs-title">grub&gt;</span> initrd /boot/在这里按tab补齐<span class="hljs-title"></span><br><span class="hljs-title">Possible</span> files<span class="hljs-title"> are:</span> grub<span class="hljs-title"> initrd-2.6.11-1.1369_FC4.img</span> System.map-2.6.11-1.1369_FC4<span class="hljs-title"> config-2.6.11-1.1369_FC4</span> vmlinuz-2.6.11-1.1369_FC4<span class="hljs-title"> </span><br><span class="hljs-title">memtest86+-1.55.1</span> xen-syms<span class="hljs-title"> xen.gz</span><br><span class="hljs-title"></span><br><span class="hljs-title">grub&gt;</span> initrd /boot/initrd-2.6.11-1.1369_FC4.img 注;输入intrd文件名的全名；<br>   [Linux-initrd @ 0x2e1000, 0x10e685<span class="hljs-title"> bytes]</span><br><span class="hljs-title"></span><br><span class="hljs-title">grub&gt;</span> boot<br></code></pre></td></tr></table></figure>
+<p>我们指定Linux的根时，可以用cat出来的fstab的内容中Linux的&#x2F;分区文件系统标签来替代；也就是kernel 那行中 root&#x3D;&#x2F;dev&#x2F;hd[a-z]X；</p>
+<figure class="highlight tcl"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br></pre></td><td class="code"><pre><code class="hljs tcl">grub&gt; cat (hd0,<span class="hljs-number">6</span>)/etc/fstab<br><span class="hljs-comment"># This file is edited by fstab-sync - see &#x27;man fstab-sync&#x27; for details</span><br>LABEL=/                 /                       ext3    defaults        <span class="hljs-number">1</span> <span class="hljs-number">1</span><br>/dev/devpts             /dev/pts                devpts  gid=<span class="hljs-number">5</span>,mode=<span class="hljs-number">620</span>  <span class="hljs-number">0</span> <span class="hljs-number">0</span><br>/dev/shm                /dev/shm                tmpfs   defaults        <span class="hljs-number">0</span> <span class="hljs-number">0</span><br>/dev/<span class="hljs-keyword">proc</span>               /<span class="hljs-keyword">proc</span><span class="hljs-title">                   proc</span> <span class="hljs-title">   defaults</span>        0 0<br>/dev/sys                /sys<span class="hljs-title">                    sysfs</span> <span class="hljs-title">  defaults</span>        0 0<span class="hljs-title"></span><br><span class="hljs-title">LABEL=SWAP-hda1</span> <span class="hljs-title">        swap</span> <span class="hljs-title">                   swap</span> <span class="hljs-title">   defaults</span>        0 0<br><br>/dev/hdc                /media/cdrecorder<span class="hljs-title">       auto</span> <span class="hljs-title">   pamconsole,exec,noauto,managed</span> 0 0<span class="hljs-title"></span><br><span class="hljs-title"></span><br><span class="hljs-title">grub&gt;</span> root (hd0,6)<span class="hljs-title"></span><br><span class="hljs-title">Filesystem</span> type<span class="hljs-title"> is</span> ext2fs,<span class="hljs-title"> partition</span> type 0x83<span class="hljs-title"></span><br><span class="hljs-title"></span><br><span class="hljs-title">grub&gt;</span> kernel /boot/在这里按tab补齐，全列出/boot所有的文件；<span class="hljs-title"></span><br><span class="hljs-title">Possible</span> files<span class="hljs-title"> are:</span> grub<span class="hljs-title"> initrd-2.6.11-1.1369_FC4.img</span> System.map-2.6.11-1.1369_FC4<span class="hljs-title"> config-2.6.11-1.1369_FC4</span> vmlinuz-2.6.11-1.1369_FC4<span class="hljs-title"> </span><br><span class="hljs-title">memtest86+-1.55.1</span> xen-syms<span class="hljs-title"> xen.gz</span><br><span class="hljs-title"></span><br><span class="hljs-title">grub&gt;</span> kernel /boot/vmlinuz-2.6.11-1.1369_FC4<span class="hljs-title"> ro</span> root=LABEL=/ <br>   [Linux-bzImage,<span class="hljs-title"> setup=0x1e00,</span> size=0x18e473]<span class="hljs-title"></span><br><span class="hljs-title"></span><br><span class="hljs-title">grub&gt;</span> initrd /boot/在这里按tab补齐<span class="hljs-title"></span><br><span class="hljs-title">Possible</span> files<span class="hljs-title"> are:</span> grub<span class="hljs-title"> initrd-2.6.11-1.1369_FC4.img</span> System.map-2.6.11-1.1369_FC4<span class="hljs-title"> config-2.6.11-1.1369_FC4</span> vmlinuz-2.6.11-1.1369_FC4<span class="hljs-title"> grubBAK</span><br>memtest86+-1.55.1<span class="hljs-title"> xen-syms</span> xen.gz<span class="hljs-title"></span><br><span class="hljs-title"></span><br><span class="hljs-title">grub&gt;</span> initrd /boot/initrd-2.6.11-1.1369_FC4.img 注;输入intrd文件名的全名；<br>   [Linux-initrd @ 0x2e1000, 0x10e685<span class="hljs-title"> bytes]</span><br><span class="hljs-title"></span><br><span class="hljs-title">grub&gt;</span> boot<br></code></pre></td></tr></table></figure>
+<p>如果是&#x2F;boot和Linux的根分区不在同一个分区，要把kernel和initrd 指令中的&#x2F;boot去掉，也就是&#x2F;vmlinuzMMMMMM 或 &#x2F;initrdNNNN</p>
+<p>也可以不用root (hd[0-n]来指定&#x2F;boot所在分区，要在kernel 和initrd 中指定；比如Linux的&#x2F;根所位于的分区和&#x2F;boot所位于的分区都是(hd0,6)，并且我们cat出来的&#x2F;etc&#x2F;fstab是Linux的&#x2F;根分区的文件系统的标签为LABEL&#x3D;&#x2F;，引导操作系统的例子如下；</p>
+<figure class="highlight apache"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><code class="hljs apache"><span class="hljs-attribute">grub</span>&gt;kernel (hd0,<span class="hljs-number">6</span>)/boot/vmlinuz-<span class="hljs-number">2</span>.<span class="hljs-number">6</span>.<span class="hljs-number">11</span>-<span class="hljs-number">1</span>.<span class="hljs-number">1369</span>_FC4 ro root=LABEL=/<br><span class="hljs-attribute">grub</span>&gt;initrd (hd0,<span class="hljs-number">6</span>)/boot/initrd-<span class="hljs-number">2</span>.<span class="hljs-number">6</span>.<span class="hljs-number">11</span>-<span class="hljs-number">1</span>.<span class="hljs-number">1369</span>_FC4.img<br><span class="hljs-attribute">grub</span>&gt;boot<br></code></pre></td></tr></table></figure>
+<p>或</p>
+<figure class="highlight apache"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><code class="hljs apache"><span class="hljs-attribute">grub</span>&gt;kernel (hd0,<span class="hljs-number">6</span>)/boot/vmlinuz-<span class="hljs-number">2</span>.<span class="hljs-number">6</span>.<span class="hljs-number">11</span>-<span class="hljs-number">1</span>.<span class="hljs-number">1369</span>_FC4 ro root=/dev/hda7<br><span class="hljs-attribute">grub</span>&gt;initrd (hd0,<span class="hljs-number">6</span>)/boot/initrd-<span class="hljs-number">2</span>.<span class="hljs-number">6</span>.<span class="hljs-number">11</span>-<span class="hljs-number">1</span>.<span class="hljs-number">1369</span>_FC4.img<br><span class="hljs-attribute">grub</span>&gt;boot<br></code></pre></td></tr></table></figure>
+<p>如果&#x2F;boot位于 &#x2F;dev&#x2F;hda6，也就是(hd0,5)，Linux的根&#x2F;位于分区&#x2F;dev&#x2F;hda7，并且我们cat 出来的&#x2F;etc&#x2F;fstab 中&#x2F;分区的标签为 LABEL&#x3D;&#x2F;。下面的两种方法都可以引导；</p>
+<figure class="highlight apache"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><code class="hljs apache"><span class="hljs-attribute">grub</span>&gt;kernel (hd0,<span class="hljs-number">5</span>)/vmlinuz-<span class="hljs-number">2</span>.<span class="hljs-number">6</span>.<span class="hljs-number">11</span>-<span class="hljs-number">1</span>.<span class="hljs-number">1369</span>_FC4 ro root=LABEL=/<br><span class="hljs-attribute">grub</span>&gt;initrd (hd0,<span class="hljs-number">5</span>)/initrd-<span class="hljs-number">2</span>.<span class="hljs-number">6</span>.<span class="hljs-number">11</span>-<span class="hljs-number">1</span>.<span class="hljs-number">1369</span>_FC4.img<br><span class="hljs-attribute">grub</span>&gt;boot<br></code></pre></td></tr></table></figure>
+<p>或</p>
+<figure class="highlight apache"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><code class="hljs apache"><span class="hljs-attribute">grub</span>&gt;kernel (hd0,<span class="hljs-number">5</span>)/vmlinuz-<span class="hljs-number">2</span>.<span class="hljs-number">6</span>.<span class="hljs-number">11</span>-<span class="hljs-number">1</span>.<span class="hljs-number">1369</span>_FC4 ro root=/dev/hda7<br><span class="hljs-attribute">grub</span>&gt;initrd (hd0,<span class="hljs-number">5</span>)/initrd-<span class="hljs-number">2</span>.<span class="hljs-number">6</span>.<span class="hljs-number">11</span>-<span class="hljs-number">1</span>.<span class="hljs-number">1369</span>_FC4.img<br><span class="hljs-attribute">grub</span>&gt;boot<br></code></pre></td></tr></table></figure>
+
+<h1 id="六、通过GRUB引导Windows操作系统；"><a href="#六、通过GRUB引导Windows操作系统；" class="headerlink" title="六、通过GRUB引导Windows操作系统；"></a>六、通过GRUB引导Windows操作系统；</h1><h2 id="1、通过编辑-menu-lst-来引导Windows-系统；"><a href="#1、通过编辑-menu-lst-来引导Windows-系统；" class="headerlink" title="1、通过编辑 menu.lst 来引导Windows 系统；"></a>1、通过编辑 menu.lst 来引导Windows 系统；</h2><p>如果您的Windows所处于的分区在(hd0,0)，可以在menu.lst 加如下的一段就能引导起来了；</p>
+<pre><code>title WinXp
+    rootnoverify (hd0,0)
+    chainloader +1
+</code></pre>
+<p>如果您的机器有两块硬盘，而Windows 位于第二个硬盘的第一个分区，也就是(hd1,0)</p>
+<p>您可以用grub的map来指令来操作把两块硬盘的序列对调，这样就不用在BIOS中设置了；在menu.lst中加如下的内容，比如下面的；</p>
+<figure class="highlight lisp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><code class="hljs lisp">title WinXp<br>        map (<span class="hljs-name">hd0</span>) (<span class="hljs-name">hd1</span>)<br>        map (<span class="hljs-name">hd1</span>) (<span class="hljs-name">hd0</span>)<br>        rootnoverify (<span class="hljs-name">hd0</span>,<span class="hljs-number">0</span>)<br>        chainloader <span class="hljs-number">+1</span><br>  makeactive<br></code></pre></td></tr></table></figure>
+<p>如果Windows的分区不位于硬盘的第一个分区怎么办呢？比如在(hd0,2)；</p>
+<p>这个也好办吧，把rootnoverify 这行的(hd0,0)改为 (hd0,2)</p>
+<figure class="highlight apache"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><code class="hljs apache"><span class="hljs-attribute">title</span> WinXp<br>        <span class="hljs-attribute">rootnoverify</span> (hd0,<span class="hljs-number">2</span>)<br>        <span class="hljs-attribute">chainloader</span> +<span class="hljs-number">1</span><br>  <span class="hljs-attribute">makeactive</span><br></code></pre></td></tr></table></figure>
+<p>如果Windows的在第二个硬盘的某个分区，比如说是位于(hd1,2)，则要用到map指令；</p>
+<figure class="highlight lisp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><code class="hljs lisp">title WinXp<br>        map (<span class="hljs-name">hd0</span>) (<span class="hljs-name">hd1</span>)<br>        map (<span class="hljs-name">hd1</span>) (<span class="hljs-name">hd0</span>)<br>        rootnoverify (<span class="hljs-name">hd1</span>,<span class="hljs-number">2</span>)<br>        chainloader <span class="hljs-number">+1</span><br>  makeactive<br></code></pre></td></tr></table></figure>
+<p>如果有多个Windows 系统，怎么才能引导出来呢？应该用hide 和unhide指令操作；比如我们安装了两个Windows ，一个是位于(hd0,0)的windows 98 ，另一个是安装的是位于(hd0,1)的WindowsXP；这时我们就要用到hide指令了；</p>
+<figure class="highlight apache"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><code class="hljs apache"><span class="hljs-attribute">title</span> Win98<br>         <span class="hljs-attribute">unhide</span> (hd0,<span class="hljs-number">0</span>)<br>         <span class="hljs-attribute">hide</span> (hd0,<span class="hljs-number">1</span>)<br>        <span class="hljs-attribute">rootnoverify</span> (hd0,<span class="hljs-number">0</span>)<br>        <span class="hljs-attribute">chainloader</span> +<span class="hljs-number">1</span><br>  <span class="hljs-attribute">makeactive</span><br><br><span class="hljs-attribute">title</span> WinXP<br>        <span class="hljs-attribute">unhide</span> (hd0,<span class="hljs-number">1</span>)<br>        <span class="hljs-attribute">hide</span> (hd0,<span class="hljs-number">0</span>)<br>        <span class="hljs-attribute">rootnoverify</span> (hd0,<span class="hljs-number">1</span>)<br>        <span class="hljs-attribute">chainloader</span> +<span class="hljs-number">1</span><br>  <span class="hljs-attribute">makeactive</span><br></code></pre></td></tr></table></figure>
+
+<h2 id="2、通过GRUB指令来引导Windows-；"><a href="#2、通过GRUB指令来引导Windows-；" class="headerlink" title="2、通过GRUB指令来引导Windows ；"></a>2、通过GRUB指令来引导Windows ；</h2><p>其实我们会写menu.lst了，在menu.lst中的除了title外，都是一条条指令；如果我们启动Windows ，只是输入指令就行了；</p>
+<p>比如 Windows的分区在 (hd0,0)，我们在开机后，按ctrl+c ，进入GRUB的命令模式；就可以用下面的</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><code class="hljs shell"><span class="hljs-meta prompt_">grub&gt; </span><span class="language-bash">rootnoverify (hd0,0)</span><br><span class="hljs-meta prompt_">grub&gt; </span><span class="language-bash">chainloader +1</span><br><span class="hljs-meta prompt_">grub&gt; </span><span class="language-bash">boot</span><br></code></pre></td></tr></table></figure>
+<p>其它同理… …</p>
+<h1 id="七、GRUB丢失或损坏的应对策略；"><a href="#七、GRUB丢失或损坏的应对策略；" class="headerlink" title="七、GRUB丢失或损坏的应对策略；"></a>七、GRUB丢失或损坏的应对策略；</h1><p>如果GRUB是Linux版本才出会这样的问题；WINGRUB可以不写在MBR上；所以不会出现这样的问题。WINGRUB用起来比较简单。menu.lst 和命令行的用法和Linux版本的GRUB是一样的；</p>
+<h2 id="1、由于重新安装Windows或其它未知原因而导致GRUB的丢失；"><a href="#1、由于重新安装Windows或其它未知原因而导致GRUB的丢失；" class="headerlink" title="1、由于重新安装Windows或其它未知原因而导致GRUB的丢失；"></a>1、由于重新安装Windows或其它未知原因而导致GRUB的丢失；</h2><p>您可以通过系统安装盘、livecd进入修复模式；</p>
+<p>请参考：《Linux 系统的单用户模式、修复模式、跨控制台登录在系统修复中的运用》</p>
+<p>首先：您根据前面所说grub-install来安装GRUB到&#x2F;boot所在的分区；要仔细看文档，&#x2F;boot是不是处于一个独立的分区是重要的，执行的命令也不同；</p>
+<p>其次：要执行grub ，然后通过 root (hd[0-n],y)来指定&#x2F;boot所位于的分区，然后接着执行 setup (hd0)，这样就写入MBR了，比如下面的例子；</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><code class="hljs shell"><span class="hljs-meta prompt_">grub&gt;</span><span class="language-bash">root (hd0,6)</span><br><span class="hljs-meta prompt_">grub&gt;</span><span class="language-bash">setup (hd0)</span><br><span class="hljs-meta prompt_">grub&gt;</span><span class="language-bash">quit</span><br></code></pre></td></tr></table></figure>
+<p>重新引导就会再次出现MBR的菜单了或命令行的提示符了；</p>
+<h2 id="2、如果出现GRUB提示符，而不出现GRUB的菜单，如何引导系统；"><a href="#2、如果出现GRUB提示符，而不出现GRUB的菜单，如何引导系统；" class="headerlink" title="2、如果出现GRUB提示符，而不出现GRUB的菜单，如何引导系统；"></a>2、如果出现GRUB提示符，而不出现GRUB的菜单，如何引导系统；</h2><p>存在的问题可能是&#x2F;boot&#x2F;grub&#x2F;menu.lst丢失，要自己写一个才行；您可以用命令行来启动系统，进入系统后写一写menu.lst就OK了。前面已经谈过了；</p>
+<p>写好后还要建一个grub.conf的链接，如下：</p>
+<figure class="highlight autoit"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><code class="hljs autoit">[root<span class="hljs-symbol">@localhost</span> ~]<span class="hljs-meta"># cd /boot/grub</span><br>[root<span class="hljs-symbol">@localhost</span> grub]<span class="hljs-meta"># ln -s menu.lst grub.conf</span><br></code></pre></td></tr></table></figure>
+
+<h1 id="八、关于GRUB的未尽事宜；"><a href="#八、关于GRUB的未尽事宜；" class="headerlink" title="八、关于GRUB的未尽事宜；"></a>八、关于GRUB的未尽事宜；</h1><p>GRUB有很多内容，比如对BSD的引导，还有一些其它指令的用法，我并没有在本文提到；主要我目前还未用到，如果您需要了解更多，请查看 《GNU GRUB 手册和FAQ》</p>
+<h1 id="九、关于本文；"><a href="#九、关于本文；" class="headerlink" title="九、关于本文；"></a>九、关于本文；</h1><p>本文前后写了三四天，中间发现并不能把Linux设备的两种表现形式说的清楚，于是被迫写了《在Linux系统中存储设备的两种表示方法》；由于没有BSD系统，所以没有写关于BSD的引导；如果正在用BSD的弟兄如果有时间不妨写一写；写的时候注意文档的结构，这样方便大家的阅读；</p>
+<p>GRUB有很多内容，需要大家慢慢的学习和研究；有的弟兄抑制GRUB，说不如NTLOADER，其实这是错误的；如果您想学习和使用Linux就得学习和适应Linux的操作；习惯成自然，如果您抵制学习Linux，那可能您永远会说“Linux不如Windows”；</p>
+<h1 id="十、参考文档；"><a href="#十、参考文档；" class="headerlink" title="十、参考文档；"></a>十、参考文档；</h1><p>《GNU GRUB 手册和FAQ》</p>
+<h1 id="注-以上文档为本人整理资料时发现的文章-但是文章的出处已经无从查证-对书写此文章的前辈致敬"><a href="#注-以上文档为本人整理资料时发现的文章-但是文章的出处已经无从查证-对书写此文章的前辈致敬" class="headerlink" title="注:以上文档为本人整理资料时发现的文章,但是文章的出处已经无从查证,对书写此文章的前辈致敬"></a>注:以上文档为本人整理资料时发现的文章,但是文章的出处已经无从查证,对书写此文章的前辈致敬</h1>
+            </div>
+            <hr>
+            <div>
+              <div class="post-metas mb-3">
+                
+                  <div class="post-meta mr-3">
+                    <i class="iconfont icon-category"></i>
+                    
+                      <a class="hover-with-bg" href="/categories/Linux/">Linux</a>
+                    
+                      <a class="hover-with-bg" href="/categories/Linux/OS/">OS</a>
+                    
+                  </div>
+                
+                
+                  <div class="post-meta">
+                    <i class="iconfont icon-tags"></i>
+                    
+                      <a class="hover-with-bg" href="/tags/Grub/">Grub</a>
+                    
+                  </div>
+                
+              </div>
+              
+                <p class="note note-warning">
+                  
+                    本博客所有文章除特别声明外，均采用 <a target="_blank" href="https://creativecommons.org/licenses/by-sa/4.0/deed.zh" rel="nofollow noopener noopener">CC BY-SA 4.0 协议</a> ，转载请注明出处！
+                  
+                </p>
+              
+              
+                <div class="post-prevnext">
+                  <article class="post-prev col-6">
+                    
+                    
+                      <a href="/2018/05/15/2018-05-15-grub-command/">
+                        <i class="iconfont icon-arrowleft"></i>
+                        <span class="hidden-mobile">grub命令</span>
+                        <span class="visible-mobile">上一篇</span>
+                      </a>
+                    
+                  </article>
+                  <article class="post-next col-6">
+                    
+                    
+                      <a href="/2018/05/15/2018-05-15-linux-init/">
+                        <span class="hidden-mobile">init进程</span>
+                        <span class="visible-mobile">下一篇</span>
+                        <i class="iconfont icon-arrowright"></i>
+                      </a>
+                    
+                  </article>
+                </div>
+              
+            </div>
+
+            
+              <!-- Comments -->
+              <article class="comments" id="comments" lazyload>
+                
+                  
+                
+                
+  <script type="text/javascript">
+    Fluid.utils.loadComments('#comments', function() {
+      var light = 'github-light';
+      var dark = 'github-dark';
+      var schema = document.documentElement.getAttribute('data-user-color-scheme');
+      if (schema === 'dark') {
+        schema = dark;
+      } else {
+        schema = light;
+      }
+      window.UtterancesThemeLight = light;
+      window.UtterancesThemeDark = dark;
+      var s = document.createElement('script');
+      s.setAttribute('src', 'https://utteranc.es/client.js');
+      s.setAttribute('repo', 'hksanduo/commit-utterances');
+      s.setAttribute('issue-term', 'title');
+      
+      s.setAttribute('label', 'utterances');
+      
+      s.setAttribute('theme', schema);
+      s.setAttribute('crossorigin', 'anonymous');
+      document.getElementById('comments').appendChild(s);
+    })
+  </script>
+  <noscript>Please enable JavaScript to view the comments</noscript>
+
+
+              </article>
+            
+          </article>
+        </div>
+      </div>
+    </div>
+    
+      <div class="d-none d-lg-block col-lg-2 toc-container" id="toc-ctn">
+        <div id="toc">
+  <p class="toc-header"><i class="iconfont icon-list"></i>&nbsp;目录</p>
+  <div class="toc-body" id="toc-body"></div>
+</div>
+
+      </div>
+    
+  </div>
+</div>
+
+<!-- Custom -->
+
+
+    
+
+    
+      <a id="scroll-top-button" aria-label="TOP" href="#" role="button">
+        <i class="iconfont icon-arrowup" aria-hidden="true"></i>
+      </a>
+    
+
+    
+      <div class="modal fade" id="modalSearch" tabindex="-1" role="dialog" aria-labelledby="ModalLabel"
+     aria-hidden="true">
+  <div class="modal-dialog modal-dialog-scrollable modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header text-center">
+        <h4 class="modal-title w-100 font-weight-bold">搜索</h4>
+        <button type="button" id="local-search-close" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body mx-3">
+        <div class="md-form mb-5">
+          <input type="text" id="local-search-input" class="form-control validate">
+          <label data-error="x" data-success="v"
+                 for="local-search-input">关键词</label>
+        </div>
+        <div class="list-group" id="local-search-result"></div>
+      </div>
+    </div>
+  </div>
+</div>
+    
+
+    
+  </main>
+
+  <footer class="text-center mt-5 py-3">
+  <div class="footer-content">
+     <a href="https://hexo.io" target="_blank" rel="nofollow noopener"><span>Hexo</span></a> <i class="iconfont icon-love"></i> <a href="https://github.com/fluid-dev/hexo-theme-fluid" target="_blank" rel="nofollow noopener"><span>Fluid</span></a> 
+  </div>
+  
+  <div class="statistics">
+    
+    
+
+    
+      
+        <!-- 不蒜子统计PV -->
+        <span id="busuanzi_container_site_pv" style="display: none">
+            总访问量 
+            <span id="busuanzi_value_site_pv"></span>
+             次
+          </span>
+      
+      
+        <!-- 不蒜子统计UV -->
+        <span id="busuanzi_container_site_uv" style="display: none">
+            总访客数 
+            <span id="busuanzi_value_site_uv"></span>
+             人
+          </span>
+      
+    
+  </div>
+
+
+  
+
+  
+</footer>
+
+
+  <!-- SCRIPTS -->
+  
+  <script  src="https://cdn.jsdelivr.net/npm/nprogress@0/nprogress.min.js" ></script>
+  <link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/nprogress@0/nprogress.min.css" />
+
+  <script>
+    NProgress.configure({"showSpinner":false,"trickleSpeed":100})
+    NProgress.start()
+    window.addEventListener('load', function() {
+      NProgress.done();
+    })
+  </script>
+
+
+<script  src="https://cdn.jsdelivr.net/npm/jquery@3/dist/jquery.min.js" ></script>
+<script  src="https://cdn.jsdelivr.net/npm/bootstrap@4/dist/js/bootstrap.min.js" ></script>
+<script  src="/js/events.js" ></script>
+<script  src="/js/plugins.js" ></script>
+
+<!-- Plugins -->
+
+
+  <script  src="/js/local-search.js" ></script>
+
+
+
+  
+    <script  src="/js/img-lazyload.js" ></script>
+  
+
+
+
+  
+
+
+
+  
+    <script  src="https://cdn.jsdelivr.net/npm/tocbot@4/dist/tocbot.min.js" ></script>
+  
+  
+    <script  src="https://cdn.jsdelivr.net/npm/@fancyapps/fancybox@3/dist/jquery.fancybox.min.js" ></script>
+  
+  
+    <script  src="https://cdn.jsdelivr.net/npm/anchor-js@4/anchor.min.js" ></script>
+  
+  
+    <script defer src="https://cdn.jsdelivr.net/npm/clipboard@2/dist/clipboard.min.js" ></script>
+  
+
+
+
+  <script defer src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js" ></script>
+
+
+
+
+  <script  src="https://cdn.jsdelivr.net/npm/typed.js@2/lib/typed.min.js" ></script>
+  <script>
+    (function (window, document) {
+      var typing = Fluid.plugins.typing;
+      var title = document.getElementById('subtitle').title;
+      
+      typing(title)
+      
+    })(window, document);
+  </script>
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+    <!-- Google Analytics -->
+    <script defer>
+      window.ga = window.ga || function () { (ga.q = ga.q || []).push(arguments) };
+      ga.l = +new Date;
+      ga('create', 'UA-167858469-1', 'auto');
+      ga('send', 'pageview');
+    </script>
+    <script async src='https://www.google-analytics.com/analytics.js'></script>
+  
+
+  
+
+  
+
+  
+
+  
+
+
+
+
+
+<!-- 主题的启动项 保持在最底部 -->
+<script  src="/js/boot.js" ></script>
+
+
+</body>
+</html>

@@ -1,0 +1,725 @@
+
+
+<!DOCTYPE html>
+<html lang="zh-CN" data-default-color-scheme=auto>
+
+
+
+<head>
+  <meta charset="UTF-8">
+  <link rel="apple-touch-icon" sizes="76x76" href="/img/favicon.png">
+  <link rel="icon" href="/img/favicon.png">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, shrink-to-fit=no">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  
+  <meta name="theme-color" content="#2f4154">
+  <meta name="description" content="">
+  <meta name="author" content="sanduo">
+  <meta name="keywords" content="">
+  <meta name="description" content="S.M.A.R.T 技术 S.M.A.R.T.（Self-Monitoring, Analysis and Reporting Technology）意思是自我监控，分析和报告技术，也常常写成SMART。SMART是计算机硬盘驱动器（HDDs）和固态驱动器（SSDs）的监控系统，用来对许多驱动器可靠性的许多指标进行检测和报告，以便能够预测硬件故障。 当前多数存储设备内建了S.M.A.R.T.附件来">
+<meta property="og:type" content="article">
+<meta property="og:title" content="S.M.A.R.T">
+<meta property="og:url" content="https://hksanduo.github.io/2018/03/29/2018-03-29-S_M_A_R_T/index.html">
+<meta property="og:site_name" content="sanduo blog">
+<meta property="og:description" content="S.M.A.R.T 技术 S.M.A.R.T.（Self-Monitoring, Analysis and Reporting Technology）意思是自我监控，分析和报告技术，也常常写成SMART。SMART是计算机硬盘驱动器（HDDs）和固态驱动器（SSDs）的监控系统，用来对许多驱动器可靠性的许多指标进行检测和报告，以便能够预测硬件故障。 当前多数存储设备内建了S.M.A.R.T.附件来">
+<meta property="og:locale" content="zh_CN">
+<meta property="article:published_time" content="2018-03-29T04:00:00.000Z">
+<meta property="article:modified_time" content="2025-01-18T14:54:10.076Z">
+<meta property="article:author" content="sanduo">
+<meta property="article:tag" content="i&#x2F;o">
+<meta property="article:tag" content="disk">
+<meta name="twitter:card" content="summary_large_image">
+  
+  <title>S.M.A.R.T - sanduo blog</title>
+
+  <link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4/dist/css/bootstrap.min.css" />
+
+
+  <link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/github-markdown-css@4/github-markdown.min.css" />
+  <link  rel="stylesheet" href="/lib/hint/hint.min.css" />
+
+  
+    
+    
+      
+      <link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/highlight.js@10/styles/github-gist.min.css" />
+    
+  
+
+  
+    <link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fancyapps/fancybox@3/dist/jquery.fancybox.min.css" />
+  
+
+
+<!-- 主题依赖的图标库，不要自行修改 -->
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1749284_ba1fz6golrf.css">
+
+
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1736178_kmeydafke9r.css">
+
+
+<link  rel="stylesheet" href="/css/main.css" />
+
+<!-- 自定义样式保持在最底部 -->
+
+
+  <script id="fluid-configs">
+    var Fluid = window.Fluid || {};
+    var CONFIG = {"hostname":"hksanduo.github.io","root":"/","version":"1.8.12","typing":{"enable":true,"typeSpeed":70,"cursorChar":"_","loop":false},"anchorjs":{"enable":true,"element":"h1,h2,h3,h4,h5,h6","placement":"right","visible":"hover","icon":""},"progressbar":{"enable":true,"height_px":3,"color":"#29d","options":{"showSpinner":false,"trickleSpeed":100}},"copy_btn":true,"image_zoom":{"enable":true,"img_url_replace":["",""]},"toc":{"enable":true,"headingSelector":"h1,h2,h3,h4,h5,h6","collapseDepth":0},"lazyload":{"enable":true,"loading_img":"/img/loading.gif","onlypost":false,"offset_factor":2},"web_analytics":{"enable":true,"baidu":null,"google":"UA-167858469-1","gtag":null,"tencent":{"sid":null,"cid":null},"woyaola":null,"cnzz":null,"leancloud":{"app_id":null,"app_key":null,"server_url":null,"path":"window.location.pathname"}},"search_path":"/local-search.xml"};
+  </script>
+  <script  src="/js/utils.js" ></script>
+  <script  src="/js/color-schema.js" ></script>
+<meta name="generator" content="Hexo 5.4.2"></head>
+
+
+<body>
+  <header style="height: 70vh;">
+    <nav id="navbar" class="navbar fixed-top  navbar-expand-lg navbar-dark scrolling-navbar">
+  <div class="container">
+    <a class="navbar-brand" href="/">
+      <strong>Welcome To Sanduo&#39;s Blog</strong>
+    </a>
+
+    <button id="navbar-toggler-btn" class="navbar-toggler" type="button" data-toggle="collapse"
+            data-target="#navbarSupportedContent"
+            aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+      <div class="animated-icon"><span></span><span></span><span></span></div>
+    </button>
+
+    <!-- Collapsible content -->
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+      <ul class="navbar-nav ml-auto text-center">
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/">
+                <i class="iconfont icon-home-fill"></i>
+                首页
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/archives/">
+                <i class="iconfont icon-archive-fill"></i>
+                归档
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/categories/">
+                <i class="iconfont icon-category-fill"></i>
+                分类
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/tags/">
+                <i class="iconfont icon-tags-fill"></i>
+                标签
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/about/">
+                <i class="iconfont icon-user-fill"></i>
+                关于
+              </a>
+            </li>
+          
+        
+        
+          <li class="nav-item" id="search-btn">
+            <a class="nav-link" target="_self" href="javascript:;" data-toggle="modal" data-target="#modalSearch" aria-label="Search">
+              &nbsp;<i class="iconfont icon-search"></i>&nbsp;
+            </a>
+          </li>
+        
+        
+          <li class="nav-item" id="color-toggle-btn">
+            <a class="nav-link" target="_self" href="javascript:;" aria-label="Color Toggle">&nbsp;<i
+                class="iconfont icon-dark" id="color-toggle-icon"></i>&nbsp;</a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+</nav>
+
+    <div class="banner" id="banner" parallax=true
+         style="background: url('/img/default.png') no-repeat center center;
+           background-size: cover;">
+      <div class="full-bg-img">
+        <div class="mask flex-center" style="background-color: rgba(0, 0, 0, 0.3)">
+          <div class="page-header text-center fade-in-up">
+            <span class="h2" id="subtitle" title="S.M.A.R.T">
+              
+            </span>
+
+            
+              <div class="mt-3">
+  
+  
+    <span class="post-meta">
+      <i class="iconfont icon-date-fill" aria-hidden="true"></i>
+      <time datetime="2018-03-29 04:00" pubdate>
+        2018年3月29日 凌晨
+      </time>
+    </span>
+  
+</div>
+
+<div class="mt-1">
+  
+    <span class="post-meta mr-2">
+      <i class="iconfont icon-chart"></i>
+      6.9k 字
+    </span>
+  
+
+  
+    <span class="post-meta mr-2">
+      <i class="iconfont icon-clock-fill"></i>
+      
+      
+      22 分钟
+    </span>
+  
+
+  
+  
+</div>
+
+            
+          </div>
+
+          
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <main>
+    
+      
+
+<div class="container-fluid nopadding-x">
+  <div class="row nomargin-x">
+    <div class="d-none d-lg-block col-lg-2"></div>
+    <div class="col-lg-8 nopadding-x-md">
+      <div class="container nopadding-x-md" id="board-ctn">
+        <div class="py-5" id="board">
+          <article class="post-content mx-auto">
+            <!-- SEO header -->
+            <h1 style="display: none">S.M.A.R.T</h1>
+            
+            <div class="markdown-body">
+              <h1 id="S-M-A-R-T-技术"><a href="#S-M-A-R-T-技术" class="headerlink" title="S.M.A.R.T 技术"></a>S.M.A.R.T 技术</h1><hr>
+<p>S.M.A.R.T.（Self-Monitoring, Analysis and Reporting Technology）意思是自我监控，分析<br>和报告技术，也常常写成SMART。SMART是计算机硬盘驱动器（HDDs）和固态驱动器（SSDs）的监<br>控系统，用来对许多驱动器可靠性的许多指标进行检测和报告，以便能够预测硬件故障。</p>
+<p>当前多数存储设备内建了S.M.A.R.T.附件来监控、存储和分析其设备操作的健康程度。通过软件<br>搜集温度、重新分配的扇区、寻道错误等状态数据，软件可以用来<br>度量设备等健康状况。当S.M.A.R.T.数据预测到驱动器可能的故障，运行在主机上的软件可能会<br>通知用户复制数据到其他驱动器，避免数据丢失以及可以替换驱动<br>器。</p>
+<h2 id="smartmontools"><a href="#smartmontools" class="headerlink" title="smartmontools"></a>smartmontools</h2><p>smartmontools软件包包含了2个工具程序来分析和监控存储设备：smartctl和smartd。</p>
+<p>设备必须支持SMART功能并且激活每个存储设备的SMART，这样才能有效使用工具。可以使用<br><code>smartctl</code>来检查是否激活了SMART支持，然后运行测试和检查测试结果。<br>另外，可以使用smartd在自动运行测试和进行email通知。</p>
+<h2 id="安装smartmontools"><a href="#安装smartmontools" class="headerlink" title="安装smartmontools"></a>安装smartmontools</h2><ul>
+<li><p>Debian</p>
+<p>  <code>apt-get install smartmontools</code></p>
+</li>
+<li><p>CentOS&#x2F;RHEL</p>
+<p>  <code>yum install smartmontools</code></p>
+</li>
+</ul>
+<h2 id="smartctl"><a href="#smartctl" class="headerlink" title="smartctl"></a>smartctl</h2><p><code>smartctl</code>是一个命令行工具,控制大多数ATA&#x2F;SATA和SCSI&#x2F;SAS硬盘和固态存储内建的SMART”。</p>
+<p><code>--info</code>或<code>-i</code>参数将打印一个设备的信息参数，包括是否支持SMART以及是否激活了该功能。</p>
+<figure class="highlight awk"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs awk">smartctl -i <span class="hljs-regexp">/dev/</span>sda<br></code></pre></td></tr></table></figure>
+
+<p>显示输出（包括了型号、序列号、Firmware版本、容量、扇区、接口等信息，最后两行参数显<br>示支持SMART）</p>
+<pre><code>=== START OF INFORMATION SECTION ===
+Model Family:     Seagate Laptop HDD
+Device Model:     ST500LT012-1DG142
+Serial Number:    W3P13ZF9
+LU WWN Device Id: 5 000c50 06e3a8813
+Firmware Version: 0002LVM1
+User Capacity:    500,107,862,016 bytes [500 GB]
+Sector Sizes:     512 bytes logical, 4096 bytes physical
+Rotation Rate:    5400 rpm
+Form Factor:      2.5 inches
+Device is:        In smartctl database [for details use: -P show]
+ATA Version is:   ATA8-ACS T13/1699-D revision 4
+SATA Version is:  SATA 3.0, 6.0 Gb/s (current: 3.0 Gb/s)
+Local Time is:    Thu Mar 29 16:22:02 2018 CST
+SMART support is: Available - device has SMART capability.
+SMART support is: Enabled
+</code></pre>
+<p>如果设备没有激活SMART，可以使用命令</p>
+<pre><code>smartctl --smart=on /dev/sda
+</code></pre>
+<p>有可能需要指定设备类型，如 <code>--device=ata</code> 以便通知smartctl设备类型，避免使用SCSI命令<br><code>--smart=off</code>可关闭设备的SMART功能</p>
+<h2 id="运行测试"><a href="#运行测试" class="headerlink" title="运行测试"></a>运行测试</h2><p>有3种类型的自我测试（所有的测试都是用户数据安全的）：</p>
+<blockquote>
+<ul>
+<li>short (检查设备的高概率问题)</li>
+<li>extended （或者称为long测试，将进行完整的磁盘表面快速检查）</li>
+<li>conveyance （在设备的传输过程中标示是否存在损坏）</li>
+</ul>
+</blockquote>
+<p><code>-c</code>参数（或者<code>--capabilities</code>）输出设备支持的测试以及每个测试需要花费的时间</p>
+<pre><code>smartctl -c /dev/sda
+</code></pre>
+<p>运行结果：</p>
+<pre><code>=== START OF READ SMART DATA SECTION ===
+General SMART Values:
+Offline data collection status:  (0x00)    Offline data collection activity
+                    was never started.
+                    Auto Offline Data Collection: Disabled.
+Self-test execution status:      (   0)	The previous self-test routine completed
+    				without error or no self-test has ever 
+        			been run.
+Total time to complete Offline 
+data collection: 		(    0) seconds.
+Offline data collection
+capabilities: 			 (0x73) SMART execute Offline immediate.
+    				Auto Offline data collection on/off support.
+        			Suspend Offline collection upon new
+            		command.
+                	No Offline surface scan supported.
+                    Self-test supported.
+                    Conveyance Self-test supported.
+                    Selective Self-test supported.
+SMART capabilities:            (0x0003)	Saves SMART data before entering
+                    power-saving mode.
+                    Supports SMART auto save timer.
+Error logging capability:        (0x01)	Error logging supported.
+                    General Purpose Logging supported.
+Short self-test routine 
+recommended polling time: 	 (   1) minutes.
+Extended self-test routine
+recommended polling time: 	 ( 103) minutes.
+Conveyance self-test routine
+recommended polling time: 	 (   2) minutes.
+SCT capabilities: 	       (0x1031)	SCT Status supported.
+                    SCT Feature Control supported.
+                    SCT Data Table supported.
+</code></pre>
+<p>使用<code>-t</code>(或者<code>--test=&lt;test_name&gt;</code>)参数来运行一个测试</p>
+<pre><code>smartctl -t short /dev/&lt;device&gt;
+smartctl -t long /dev/&lt;device&gt;
+smartctl -t conveyance /dev/&lt;device&gt;
+</code></pre>
+<h2 id="查看测试结果"><a href="#查看测试结果" class="headerlink" title="查看测试结果"></a>查看测试结果</h2><p>可以使用<code>-H</code>参数来查看设备的健康概况。 “如果设备报告<code>failing health</code>状态，就意味着设备<br>已经故障，或者设备预测自己将在24小时内故障。这种情况下要尽可能快地将设备上的数据导出<br>到安全的存储中”</p>
+<pre><code>smartctl -H /dev/&lt;device&gt;  
+</code></pre>
+<p>可以列出最近的测试结果以及设备的详细信息</p>
+<pre><code>smartctl -l selftest /dev/&lt;device&gt;
+smartctl -a /dev/&lt;device&gt;
+</code></pre>
+<h2 id="快速测试案例"><a href="#快速测试案例" class="headerlink" title="快速测试案例"></a>快速测试案例</h2><p>启动一个短暂的自测试</p>
+<pre><code>sudo smartctl -t short /dev/sda
+</code></pre>
+<p>如果要中断测试（没有必要的话不要自行中断命令）</p>
+<pre><code>smartctl -X
+</code></pre>
+<p>短暂自测试大约2分钟，然后用下面的命令查看测试结果</p>
+<pre><code>sudo smartctl -l selftest /dev/sda
+</code></pre>
+<p>显示结果类似</p>
+<p>直接查看磁盘的健康状况</p>
+<pre><code>smartctl --health /dev/sda
+</code></pre>
+<p>显示</p>
+<pre><code>=== START OF READ SMART DATA SECTION ===
+SMART Health Status: OK
+</code></pre>
+<p>输出详细的设备信息</p>
+<pre><code>smartctl -a /dev/sda
+</code></pre>
+<p>输出结果类似</p>
+<h2 id="smartd"><a href="#smartd" class="headerlink" title="smartd"></a>smartd</h2><p><code>smartd</code> daemon监控SMART状态，并在发生问题时邮件通知。这个服务可以通过systemd管理，<br>并且使用<code>/etc/smartd.conf</code>配置文件。不过这个配置文件非常晦涩难懂，详细配置可以参<br>考<code>man 5 smartd.conf</code>或者<a target="_blank" rel="noopener" href="https://www.smartmontools.org/browser/trunk/smartmontools/smartd.conf.5.in">smartd.conf info</a></p>
+<h2 id="管理smartd服务"><a href="#管理smartd服务" class="headerlink" title="管理smartd服务"></a>管理smartd服务</h2><p>启动、检查状态、以及激活自启动和查看最近的日志</p>
+<pre><code>systemctl start smartd
+systemctl status smartd
+systemctl enable smartd
+journalctl -u smartd
+</code></pre>
+<h2 id="定义监控的设备"><a href="#定义监控的设备" class="headerlink" title="定义监控的设备"></a>定义监控的设备</h2><p>要监控所有可能SMART错误，则配置<code>/etc/smartd.conf</code>（在CentOS 7是<code>/etc/smartmontools/smartd.conf</code>）</p>
+<pre><code>DEVICESCAN -a
+</code></pre>
+<p>如果要只监控指定的磁盘，例如</p>
+<pre><code>/dev/sda -a
+/dev/sdb -a
+</code></pre>
+<p>也可以对外接的磁盘（如通过USB连接的备份用磁盘），需要通知SMARTd设备的UUID，这是因为每次<br>重启设备的<code>/dev/sdX</code>可能变化</p>
+<p>要获取需要监控的磁盘的UUID，可以使用<code>ls -lah /dev/disk/by-uuid/</code> 来查看需要监控的磁盘。<br>以下配置在smartd.conf中的配置就是针对USB磁盘</p>
+<pre><code>/dev/disk/by-uuid/820cdd8a-866a-444d-833c-1edb0f4becac -a
+</code></pre>
+<h2 id="使用电子邮件通知潜在的问题"><a href="#使用电子邮件通知潜在的问题" class="headerlink" title="使用电子邮件通知潜在的问题"></a>使用电子邮件通知潜在的问题</h2><p>要在故障或新的错误发生时通知，使用<code>-m</code>参数</p>
+<pre><code>DEVICESCAN -m address@domain.com
+</code></pre>
+<p>要发送给外部的email地址，需要确保系统有MTA(Mail Transport Agent)或者MUA(Mail User Agent)<br>并且已经正确配置。通常MTU是sendmail和Postfix。</p>
+<p>如果设置了<code>-M test</code>就会在smartd服务启动时发送一个测试邮件</p>
+<pre><code>DEVICESCAN -m address@domain.com -M test
+</code></pre>
+<p>由于电子邮件投递需要很长时间，而通常期望硬盘故障时立即被通知到以便采取措施。则可以定义<br>执行一个脚本来替代email</p>
+<pre><code>DEVICESCAN -m address@domain.com -M exec /usr/local/bin/smartdnotify
+</code></pre>
+<p>CentOS默认配置</p>
+<p>检查了CentOS 7默认配置的<code>/etc/smartmontools/smartd.conf</code>，配置内容实际只有一行</p>
+<pre><code>DEVICESCAN -H -m root -M exec /usr/libexec/smartmontools/smartdnotify -n standby,10,q
+</code></pre>
+<p>这里通知是发送给系统的root用户，并且执行了脚本<code>/usr/libexec/smartmontools/smartdnotify</code> 这<br>个脚本实现了email通知，同时将消息写到终端上</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><code class="hljs bash"><span class="hljs-meta">#! /bin/sh</span><br><br><span class="hljs-comment"># Send mail</span><br><span class="hljs-built_in">echo</span> <span class="hljs-string">&quot;<span class="hljs-variable">$SMARTD_MESSAGE</span>&quot;</span> | mail -s <span class="hljs-string">&quot;<span class="hljs-variable">$SMARTD_FAILTYPE</span>&quot;</span> <span class="hljs-string">&quot;<span class="hljs-variable">$SMARTD_ADDRESS</span>&quot;</span><br><br><span class="hljs-comment"># Notify desktop user</span><br>MESSAGE=<span class="hljs-string">&quot;WARNING: Your hard drive is failing&quot;</span><br><br><span class="hljs-comment"># direct write to terminals, do not use &#x27;wall&#x27;, because we don&#x27;t want its ugly header</span><br><span class="hljs-keyword">for</span> t <span class="hljs-keyword">in</span> $(<span class="hljs-built_in">who</span> | awk <span class="hljs-string">&#x27;&#123; print $2; &#125;&#x27;</span> | grep -e <span class="hljs-string">&#x27;^tty&#x27;</span> -e <span class="hljs-string">&#x27;^pts/&#x27;</span>)<br><span class="hljs-keyword">do</span><br>  <span class="hljs-built_in">echo</span> <span class="hljs-string">&quot;<span class="hljs-variable">$MESSAGE</span></span><br><span class="hljs-string"><span class="hljs-variable">$SMARTD_MESSAGE</span>&quot;</span> &gt;/dev/<span class="hljs-variable">$t</span> 2&gt;/dev/null ||:<br><span class="hljs-keyword">done</span><br></code></pre></td></tr></table></figure>
+<h2 id="电源管理"><a href="#电源管理" class="headerlink" title="电源管理"></a>电源管理</h2><p>可以用smartd来处理磁盘的低电压模式，这样可以通过smartd来响应SMART命令，磁盘转速。没<br>有这个参数，磁盘可能在低电压情况下仍然高速旋转：</p>
+<pre><code>DEVICESCAN -n standby,15,q
+</code></pre>
+<blockquote>
+<p>详细参考 <a target="_blank" rel="noopener" href="http://www.smartmontools.org/wiki/Powermode">smartmontools wiki</a></p>
+</blockquote>
+<h2 id="周期自测"><a href="#周期自测" class="headerlink" title="周期自测"></a>周期自测</h2><p>smartd可以告诉磁盘定期执行自检，以下配置设置磁盘每天早上2-3点进行short self-test，在<br>每个周六的早上3-4点进行详细自测</p>
+<pre><code>DEVICESCAN -s (S/../.././02|L/../../6/03)
+</code></pre>
+<h2 id="温度改变时告警"><a href="#温度改变时告警" class="headerlink" title="温度改变时告警"></a>温度改变时告警</h2><p>smartd可以跟踪磁盘问题并且在磁盘温度太快升高或者达到阀值时高进。以下配置在发生4度温度变化，或者温度达到35度，进行日志，在温度达到40度时日志和邮件告警</p>
+<pre><code>DEVICESCAN -W 4,35,40
+</code></pre>
+<p>可以使用命令检查当前磁盘温度<code>smartctl -A /dev/&lt;device&gt; | grep Temperature_Celsius</code></p>
+<h2 id="完整的smartd-conf配置"><a href="#完整的smartd-conf配置" class="headerlink" title="完整的smartd.conf配置"></a>完整的smartd.conf配置</h2><p>以下配置将上述所有配置集成</p>
+<p>DEVICESCAN (smartd scans for disks and monitors all it finds)</p>
+<pre><code>-a (monitor all attributes)
+-o on (enable automatic online data collection)
+-S on (enable automatic attribute autosave)
+-n standby,q (do not check if disk is in standby, and suppress log message to that effect so as not to cause a write to disk)
+-s ... (schedule short and long self-tests)
+-W ... (monitor temperature)
+-m ... (mail alerts)
+</code></pre>
+<p>配置如下</p>
+<pre><code>DEVICESCAN -a -o on -S on -n standby,q -s (S/../.././02|L/../../6/03) -W 4,35,40 -m &lt;username or email&gt;
+</code></pre>
+<p>这个配置非常完善，可参考</p>
+<h2 id="GSmartControl图形管理工具"><a href="#GSmartControl图形管理工具" class="headerlink" title="GSmartControl图形管理工具"></a>GSmartControl图形管理工具</h2><p><strong>GSmartControl</strong>是smartctl的的图形前端，显示所有的SMART数值，并且高亮显示那些旧值或者<br>即将故障，可以按照需要运行测试</p>
+<pre><code>GSmartControl main window
+</code></pre>
+<h2 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h2><pre><code>[Wikipedia: S.M.A.R.T.](https://en.wikipedia.org/wiki/S.M.A.R.T.)
+[archlinux: S.M.A.R.T. ](https://wiki.archlinux.org/index.php/S.M.A.R.T.)- 本文主要参考
+[Monitoring Hard Disks with SMART](http://www.linuxjournal.com/magazine/monitoring-hard-disks-smart)
+[Get the disk health status with SMART monitor tools on Debian and Ubuntu Linux](http://www.linuxjournal.com/magazine/monitoring-hard-disks-smart)
+[Using smartctl to get SMART status information on your hard drives](http://www.techrepublic.com/blog/linux-and-open-source/using-smartctl-to-get-smart-status-information-on-your-hard-drives/)
+[ubuntu: Smartmontools](https://help.ubuntu.com/community/Smartmontools) - 本文主要参考，提供了监控个人电脑和服务器的脚本以及处理经验
+[SMART tests with smartctl](https://www.thomas-krenn.com/en/wiki/SMART_tests_with_smartctl)
+[Monitoring Hard Drive Health on Linux with smartmontools](https://blog.shadypixel.com/monitoring-hard-drive-health-on-linux-with-smartmontools/)
+</code></pre>
+<p><strong>文章参考</strong><br><a target="_blank" rel="noopener" href="https://huataihuang.gitbooks.io/cloud-atlas/content/storage/das/smart.html">https://huataihuang.gitbooks.io/cloud-atlas/content/storage/das/smart.html</a></p>
+<p><strong>文章参考</strong><br><a target="_blank" rel="noopener" href="https://huataihuang.gitbooks.io/cloud-atlas/content/storage/das/smart.html">https://huataihuang.gitbooks.io/cloud-atlas/content/storage/das/smart.html</a></p>
+
+            </div>
+            <hr>
+            <div>
+              <div class="post-metas mb-3">
+                
+                  <div class="post-meta mr-3">
+                    <i class="iconfont icon-category"></i>
+                    
+                      <a class="hover-with-bg" href="/categories/OS/">OS</a>
+                    
+                  </div>
+                
+                
+                  <div class="post-meta">
+                    <i class="iconfont icon-tags"></i>
+                    
+                      <a class="hover-with-bg" href="/tags/i-o/">i/o</a>
+                    
+                      <a class="hover-with-bg" href="/tags/disk/">disk</a>
+                    
+                  </div>
+                
+              </div>
+              
+                <p class="note note-warning">
+                  
+                    本博客所有文章除特别声明外，均采用 <a target="_blank" href="https://creativecommons.org/licenses/by-sa/4.0/deed.zh" rel="nofollow noopener noopener">CC BY-SA 4.0 协议</a> ，转载请注明出处！
+                  
+                </p>
+              
+              
+                <div class="post-prevnext">
+                  <article class="post-prev col-6">
+                    
+                    
+                      <a href="/2018/04/28/2018-04-28-different-company-different-security-standard/">
+                        <i class="iconfont icon-arrowleft"></i>
+                        <span class="hidden-mobile">不同企业规模信息安全关注方向</span>
+                        <span class="visible-mobile">上一篇</span>
+                      </a>
+                    
+                  </article>
+                  <article class="post-next col-6">
+                    
+                    
+                      <a href="/2018/03/02/2018-03-02-memcaced-security-reinforcement/">
+                        <span class="hidden-mobile">memcached 安全加固</span>
+                        <span class="visible-mobile">下一篇</span>
+                        <i class="iconfont icon-arrowright"></i>
+                      </a>
+                    
+                  </article>
+                </div>
+              
+            </div>
+
+            
+              <!-- Comments -->
+              <article class="comments" id="comments" lazyload>
+                
+                  
+                
+                
+  <script type="text/javascript">
+    Fluid.utils.loadComments('#comments', function() {
+      var light = 'github-light';
+      var dark = 'github-dark';
+      var schema = document.documentElement.getAttribute('data-user-color-scheme');
+      if (schema === 'dark') {
+        schema = dark;
+      } else {
+        schema = light;
+      }
+      window.UtterancesThemeLight = light;
+      window.UtterancesThemeDark = dark;
+      var s = document.createElement('script');
+      s.setAttribute('src', 'https://utteranc.es/client.js');
+      s.setAttribute('repo', 'hksanduo/commit-utterances');
+      s.setAttribute('issue-term', 'title');
+      
+      s.setAttribute('label', 'utterances');
+      
+      s.setAttribute('theme', schema);
+      s.setAttribute('crossorigin', 'anonymous');
+      document.getElementById('comments').appendChild(s);
+    })
+  </script>
+  <noscript>Please enable JavaScript to view the comments</noscript>
+
+
+              </article>
+            
+          </article>
+        </div>
+      </div>
+    </div>
+    
+      <div class="d-none d-lg-block col-lg-2 toc-container" id="toc-ctn">
+        <div id="toc">
+  <p class="toc-header"><i class="iconfont icon-list"></i>&nbsp;目录</p>
+  <div class="toc-body" id="toc-body"></div>
+</div>
+
+      </div>
+    
+  </div>
+</div>
+
+<!-- Custom -->
+
+
+    
+
+    
+      <a id="scroll-top-button" aria-label="TOP" href="#" role="button">
+        <i class="iconfont icon-arrowup" aria-hidden="true"></i>
+      </a>
+    
+
+    
+      <div class="modal fade" id="modalSearch" tabindex="-1" role="dialog" aria-labelledby="ModalLabel"
+     aria-hidden="true">
+  <div class="modal-dialog modal-dialog-scrollable modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header text-center">
+        <h4 class="modal-title w-100 font-weight-bold">搜索</h4>
+        <button type="button" id="local-search-close" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body mx-3">
+        <div class="md-form mb-5">
+          <input type="text" id="local-search-input" class="form-control validate">
+          <label data-error="x" data-success="v"
+                 for="local-search-input">关键词</label>
+        </div>
+        <div class="list-group" id="local-search-result"></div>
+      </div>
+    </div>
+  </div>
+</div>
+    
+
+    
+  </main>
+
+  <footer class="text-center mt-5 py-3">
+  <div class="footer-content">
+     <a href="https://hexo.io" target="_blank" rel="nofollow noopener"><span>Hexo</span></a> <i class="iconfont icon-love"></i> <a href="https://github.com/fluid-dev/hexo-theme-fluid" target="_blank" rel="nofollow noopener"><span>Fluid</span></a> 
+  </div>
+  
+  <div class="statistics">
+    
+    
+
+    
+      
+        <!-- 不蒜子统计PV -->
+        <span id="busuanzi_container_site_pv" style="display: none">
+            总访问量 
+            <span id="busuanzi_value_site_pv"></span>
+             次
+          </span>
+      
+      
+        <!-- 不蒜子统计UV -->
+        <span id="busuanzi_container_site_uv" style="display: none">
+            总访客数 
+            <span id="busuanzi_value_site_uv"></span>
+             人
+          </span>
+      
+    
+  </div>
+
+
+  
+
+  
+</footer>
+
+
+  <!-- SCRIPTS -->
+  
+  <script  src="https://cdn.jsdelivr.net/npm/nprogress@0/nprogress.min.js" ></script>
+  <link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/nprogress@0/nprogress.min.css" />
+
+  <script>
+    NProgress.configure({"showSpinner":false,"trickleSpeed":100})
+    NProgress.start()
+    window.addEventListener('load', function() {
+      NProgress.done();
+    })
+  </script>
+
+
+<script  src="https://cdn.jsdelivr.net/npm/jquery@3/dist/jquery.min.js" ></script>
+<script  src="https://cdn.jsdelivr.net/npm/bootstrap@4/dist/js/bootstrap.min.js" ></script>
+<script  src="/js/events.js" ></script>
+<script  src="/js/plugins.js" ></script>
+
+<!-- Plugins -->
+
+
+  <script  src="/js/local-search.js" ></script>
+
+
+
+  
+    <script  src="/js/img-lazyload.js" ></script>
+  
+
+
+
+  
+
+
+
+  
+    <script  src="https://cdn.jsdelivr.net/npm/tocbot@4/dist/tocbot.min.js" ></script>
+  
+  
+    <script  src="https://cdn.jsdelivr.net/npm/@fancyapps/fancybox@3/dist/jquery.fancybox.min.js" ></script>
+  
+  
+    <script  src="https://cdn.jsdelivr.net/npm/anchor-js@4/anchor.min.js" ></script>
+  
+  
+    <script defer src="https://cdn.jsdelivr.net/npm/clipboard@2/dist/clipboard.min.js" ></script>
+  
+
+
+
+  <script defer src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js" ></script>
+
+
+
+
+  <script  src="https://cdn.jsdelivr.net/npm/typed.js@2/lib/typed.min.js" ></script>
+  <script>
+    (function (window, document) {
+      var typing = Fluid.plugins.typing;
+      var title = document.getElementById('subtitle').title;
+      
+      typing(title)
+      
+    })(window, document);
+  </script>
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+    <!-- Google Analytics -->
+    <script defer>
+      window.ga = window.ga || function () { (ga.q = ga.q || []).push(arguments) };
+      ga.l = +new Date;
+      ga('create', 'UA-167858469-1', 'auto');
+      ga('send', 'pageview');
+    </script>
+    <script async src='https://www.google-analytics.com/analytics.js'></script>
+  
+
+  
+
+  
+
+  
+
+  
+
+
+
+
+
+<!-- 主题的启动项 保持在最底部 -->
+<script  src="/js/boot.js" ></script>
+
+
+</body>
+</html>

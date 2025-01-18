@@ -1,0 +1,583 @@
+
+
+<!DOCTYPE html>
+<html lang="zh-CN" data-default-color-scheme=auto>
+
+
+
+<head>
+  <meta charset="UTF-8">
+  <link rel="apple-touch-icon" sizes="76x76" href="/img/favicon.png">
+  <link rel="icon" href="/img/favicon.png">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, shrink-to-fit=no">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  
+  <meta name="theme-color" content="#2f4154">
+  <meta name="description" content="">
+  <meta name="author" content="sanduo">
+  <meta name="keywords" content="">
+  <meta name="description" content="ubuntu server 安装nextcloud12 1.更新系统安装必要的依赖包12[user]$ sudo apt-get update &amp;&amp; sudo apt-get -y upgrade[user]$ sudo apt-get install software-properties-common nano wget 2.安装ＭariaDB10以上版本，如果不清楚安装的版本">
+<meta property="og:type" content="article">
+<meta property="og:title" content="ubuntu server 安装nextcloud12">
+<meta property="og:url" content="https://hksanduo.github.io/2018/02/21/2018-02-21-install-nextcloud12-on-ubuntu/index.html">
+<meta property="og:site_name" content="sanduo blog">
+<meta property="og:description" content="ubuntu server 安装nextcloud12 1.更新系统安装必要的依赖包12[user]$ sudo apt-get update &amp;&amp; sudo apt-get -y upgrade[user]$ sudo apt-get install software-properties-common nano wget 2.安装ＭariaDB10以上版本，如果不清楚安装的版本">
+<meta property="og:locale" content="zh_CN">
+<meta property="article:published_time" content="2018-02-21T06:05:41.000Z">
+<meta property="article:modified_time" content="2025-01-18T14:54:10.076Z">
+<meta property="article:author" content="sanduo">
+<meta property="article:tag" content="nextcloud">
+<meta name="twitter:card" content="summary_large_image">
+  
+  <title>ubuntu server 安装nextcloud12 - sanduo blog</title>
+
+  <link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4/dist/css/bootstrap.min.css" />
+
+
+  <link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/github-markdown-css@4/github-markdown.min.css" />
+  <link  rel="stylesheet" href="/lib/hint/hint.min.css" />
+
+  
+    
+    
+      
+      <link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/highlight.js@10/styles/github-gist.min.css" />
+    
+  
+
+  
+    <link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fancyapps/fancybox@3/dist/jquery.fancybox.min.css" />
+  
+
+
+<!-- 主题依赖的图标库，不要自行修改 -->
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1749284_ba1fz6golrf.css">
+
+
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1736178_kmeydafke9r.css">
+
+
+<link  rel="stylesheet" href="/css/main.css" />
+
+<!-- 自定义样式保持在最底部 -->
+
+
+  <script id="fluid-configs">
+    var Fluid = window.Fluid || {};
+    var CONFIG = {"hostname":"hksanduo.github.io","root":"/","version":"1.8.12","typing":{"enable":true,"typeSpeed":70,"cursorChar":"_","loop":false},"anchorjs":{"enable":true,"element":"h1,h2,h3,h4,h5,h6","placement":"right","visible":"hover","icon":""},"progressbar":{"enable":true,"height_px":3,"color":"#29d","options":{"showSpinner":false,"trickleSpeed":100}},"copy_btn":true,"image_zoom":{"enable":true,"img_url_replace":["",""]},"toc":{"enable":true,"headingSelector":"h1,h2,h3,h4,h5,h6","collapseDepth":0},"lazyload":{"enable":true,"loading_img":"/img/loading.gif","onlypost":false,"offset_factor":2},"web_analytics":{"enable":true,"baidu":null,"google":"UA-167858469-1","gtag":null,"tencent":{"sid":null,"cid":null},"woyaola":null,"cnzz":null,"leancloud":{"app_id":null,"app_key":null,"server_url":null,"path":"window.location.pathname"}},"search_path":"/local-search.xml"};
+  </script>
+  <script  src="/js/utils.js" ></script>
+  <script  src="/js/color-schema.js" ></script>
+<meta name="generator" content="Hexo 5.4.2"></head>
+
+
+<body>
+  <header style="height: 70vh;">
+    <nav id="navbar" class="navbar fixed-top  navbar-expand-lg navbar-dark scrolling-navbar">
+  <div class="container">
+    <a class="navbar-brand" href="/">
+      <strong>Welcome To Sanduo&#39;s Blog</strong>
+    </a>
+
+    <button id="navbar-toggler-btn" class="navbar-toggler" type="button" data-toggle="collapse"
+            data-target="#navbarSupportedContent"
+            aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+      <div class="animated-icon"><span></span><span></span><span></span></div>
+    </button>
+
+    <!-- Collapsible content -->
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+      <ul class="navbar-nav ml-auto text-center">
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/">
+                <i class="iconfont icon-home-fill"></i>
+                首页
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/archives/">
+                <i class="iconfont icon-archive-fill"></i>
+                归档
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/categories/">
+                <i class="iconfont icon-category-fill"></i>
+                分类
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/tags/">
+                <i class="iconfont icon-tags-fill"></i>
+                标签
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/about/">
+                <i class="iconfont icon-user-fill"></i>
+                关于
+              </a>
+            </li>
+          
+        
+        
+          <li class="nav-item" id="search-btn">
+            <a class="nav-link" target="_self" href="javascript:;" data-toggle="modal" data-target="#modalSearch" aria-label="Search">
+              &nbsp;<i class="iconfont icon-search"></i>&nbsp;
+            </a>
+          </li>
+        
+        
+          <li class="nav-item" id="color-toggle-btn">
+            <a class="nav-link" target="_self" href="javascript:;" aria-label="Color Toggle">&nbsp;<i
+                class="iconfont icon-dark" id="color-toggle-icon"></i>&nbsp;</a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+</nav>
+
+    <div class="banner" id="banner" parallax=true
+         style="background: url('/img/default.png') no-repeat center center;
+           background-size: cover;">
+      <div class="full-bg-img">
+        <div class="mask flex-center" style="background-color: rgba(0, 0, 0, 0.3)">
+          <div class="page-header text-center fade-in-up">
+            <span class="h2" id="subtitle" title="ubuntu server 安装nextcloud12">
+              
+            </span>
+
+            
+              <div class="mt-3">
+  
+  
+    <span class="post-meta">
+      <i class="iconfont icon-date-fill" aria-hidden="true"></i>
+      <time datetime="2018-02-21 06:05" pubdate>
+        2018年2月21日 早上
+      </time>
+    </span>
+  
+</div>
+
+<div class="mt-1">
+  
+    <span class="post-meta mr-2">
+      <i class="iconfont icon-chart"></i>
+      6.4k 字
+    </span>
+  
+
+  
+    <span class="post-meta mr-2">
+      <i class="iconfont icon-clock-fill"></i>
+      
+      
+      20 分钟
+    </span>
+  
+
+  
+  
+</div>
+
+            
+          </div>
+
+          
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <main>
+    
+      
+
+<div class="container-fluid nopadding-x">
+  <div class="row nomargin-x">
+    <div class="d-none d-lg-block col-lg-2"></div>
+    <div class="col-lg-8 nopadding-x-md">
+      <div class="container nopadding-x-md" id="board-ctn">
+        <div class="py-5" id="board">
+          <article class="post-content mx-auto">
+            <!-- SEO header -->
+            <h1 style="display: none">ubuntu server 安装nextcloud12</h1>
+            
+            <div class="markdown-body">
+              <h1 id="ubuntu-server-安装nextcloud12"><a href="#ubuntu-server-安装nextcloud12" class="headerlink" title="ubuntu server 安装nextcloud12"></a>ubuntu server 安装nextcloud12</h1><hr>
+<h2 id="1-更新系统安装必要的依赖包"><a href="#1-更新系统安装必要的依赖包" class="headerlink" title="1.更新系统安装必要的依赖包"></a>1.更新系统安装必要的依赖包</h2><figure class="highlight routeros"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><code class="hljs routeros">[user]$ sudo apt-<span class="hljs-built_in">get</span> update &amp;&amp; sudo apt-<span class="hljs-built_in">get</span> -y<span class="hljs-built_in"> upgrade</span><br><span class="hljs-built_in"></span>[user]$ sudo apt-<span class="hljs-built_in">get</span> install software-properties-common nano wget<br></code></pre></td></tr></table></figure>
+<h2 id="2-安装MariaDB10以上版本，如果不清楚安装的版本是否符合nextcloud要求，可以到官网上查询"><a href="#2-安装MariaDB10以上版本，如果不清楚安装的版本是否符合nextcloud要求，可以到官网上查询" class="headerlink" title="2.安装ＭariaDB10以上版本，如果不清楚安装的版本是否符合nextcloud要求，可以到官网上查询"></a>2.安装ＭariaDB10以上版本，如果不清楚安装的版本是否符合nextcloud要求，可以到官网上查询</h2><p>nextcloud官网：<a target="_blank" rel="noopener" href="https://nextcloud.com/install/#">https://nextcloud.com/install/#</a><br>MariaDB安装与配置:</p>
+<figure class="highlight pgsql"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs pgsql">[<span class="hljs-keyword">user</span>]$ sudo apt-<span class="hljs-keyword">get</span> install -y mariadb-<span class="hljs-keyword">server</span><br></code></pre></td></tr></table></figure>
+<p>安装完毕以后，运行：</p>
+<figure class="highlight angelscript"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs angelscript"><span class="hljs-string">[user]</span>$ mysql_secure_installation<br></code></pre></td></tr></table></figure>
+<p>这个的主要目的是更新和配置数据库，同时设置相应的root密码，我在安装的时候遇到一个问题就是在普通用户下无法成功连接到数据库，需要切换到root进行，目前没有解决这个问题，如果哪位大佬可以解决，请给我留言．<br>重启ＭariaDB服务：</p>
+<figure class="highlight pgsql"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs pgsql">[<span class="hljs-keyword">user</span>]$ sudo service mysql <span class="hljs-keyword">restart</span><br></code></pre></td></tr></table></figure>
+<p>登录数据库并且创建相应的数据库</p>
+<figure class="highlight angelscript"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs angelscript"><span class="hljs-string">[user]</span>$ mysql -uroot -p<br></code></pre></td></tr></table></figure>
+<p>***注意这一步如果登录失败，请切换root用户执行<br>创建数据库：</p>
+<figure class="highlight pgsql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><code class="hljs pgsql">MariaDB [(<span class="hljs-keyword">none</span>)]&gt; <span class="hljs-keyword">CREATE</span> <span class="hljs-keyword">DATABASE</span> nextcloud;<br>MariaDB [(<span class="hljs-keyword">none</span>)]&gt; <span class="hljs-keyword">GRANT</span> <span class="hljs-keyword">ALL</span> <span class="hljs-keyword">PRIVILEGES</span> <span class="hljs-keyword">ON</span> nextcloud.* <span class="hljs-keyword">TO</span> <span class="hljs-string">&#x27;nextcloud&#x27;</span>@<span class="hljs-string">&#x27;localhost&#x27;</span> IDENTIFIED <span class="hljs-keyword">BY</span> <span class="hljs-string">&#x27;strong_password&#x27;</span>;<br>MariaDB [(<span class="hljs-keyword">none</span>)]&gt; FLUSH <span class="hljs-keyword">PRIVILEGES</span>;<br>MariaDB [(<span class="hljs-keyword">none</span>)]&gt; \q<br></code></pre></td></tr></table></figure>
+<h2 id="3-安装php"><a href="#3-安装php" class="headerlink" title="3.安装php"></a>3.安装php</h2><figure class="highlight pgsql"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs pgsql">[<span class="hljs-keyword">user</span>]$ sudo apt-<span class="hljs-keyword">get</span> -y install php-fpm php-cli php-<span class="hljs-type">json</span> php-curl php-imap php-gd php-mysql php-<span class="hljs-type">xml</span> php-zip php-intl php-mcrypt php-imagick php-mbstring<br></code></pre></td></tr></table></figure>
+<p>这里设置的<strong>php memory</strong>为512MB，<strong>upload_max_filesize</strong> 和 <strong>post_max_size</strong> 为200MB</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><code class="hljs shell"><span class="hljs-meta prompt_">[user]$ </span><span class="language-bash">sed -i <span class="hljs-string">&quot;s/memory_limit = .*/memory_limit = 512M/&quot;</span> /etc/php/7.0/fpm/php.ini</span><br><span class="hljs-meta prompt_">[user]$ </span><span class="language-bash">sed -i <span class="hljs-string">&quot;s/;date.timezone.*/date.timezone = UTC/&quot;</span> /etc/php/7.0/fpm/php.ini</span><br><span class="hljs-meta prompt_">[user]$ </span><span class="language-bash">sed -i <span class="hljs-string">&quot;s/;cgi.fix_pathinfo=1/cgi.fix_pathinfo=1/&quot;</span> /etc/php/7.0/fpm/php.ini</span><br><span class="hljs-meta prompt_">[user]$ </span><span class="language-bash">sed -i <span class="hljs-string">&quot;s/upload_max_filesize = .*/upload_max_filesize = 200M/&quot;</span> /etc/php/7.0/fpm/php.ini</span><br><span class="hljs-meta prompt_">[user]$ </span><span class="language-bash">sed -i <span class="hljs-string">&quot;s/post_max_size = .*/post_max_size = 200M/&quot;</span> /etc/php/7.0/fpm/php.ini</span><br></code></pre></td></tr></table></figure>
+<p>*<strong>配置文件的位置</strong>：</p>
+<figure class="highlight dts"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs dts"><span class="hljs-symbol">php:</span><span class="hljs-keyword">/etc/</span>php/<span class="hljs-number">7.0</span><span class="hljs-keyword">/fpm/</span>php.ini<br></code></pre></td></tr></table></figure>
+<p>配置<strong>PHP-FPM</strong><br>配置文件使用默认的就好，如果有问题，请参考下面关于环境变量的配置</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs shell"><span class="hljs-meta prompt_">[user]$ </span><span class="language-bash"><span class="hljs-built_in">sudo</span> vim /etc/php/7.0/fpm/pool.d/www.conf</span><br></code></pre></td></tr></table></figure>
+<p><strong>环境变量</strong>：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><code class="hljs bash"><span class="hljs-built_in">env</span>[HOSTNAME] = <span class="hljs-variable">$HOSTNAME</span><br><span class="hljs-built_in">env</span>[PATH] = /usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin<br><span class="hljs-built_in">env</span>[TMP] = /tmp<br><span class="hljs-built_in">env</span>[TMPDIR] = /tmp<br><span class="hljs-built_in">env</span>[TEMP] = /tmp<br></code></pre></td></tr></table></figure>
+<p>重启<strong>PHP-FPM</strong>服务：</p>
+<figure class="highlight pgsql"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs pgsql">[<span class="hljs-keyword">user</span>]$ sudo service php7<span class="hljs-number">.0</span>-fpm <span class="hljs-keyword">restart</span><br></code></pre></td></tr></table></figure>
+<h2 id="4-下载并且安装NextCloud12"><a href="#4-下载并且安装NextCloud12" class="headerlink" title="4.下载并且安装ＮextCloud12"></a>4.下载并且安装ＮextCloud12</h2><p>这里将Nextcloud安装到**&#x2F;var&#x2F;www&#x2F;nextcloud&#x2F;**目录下，安装目录根据个人爱好就行</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><code class="hljs shell"><span class="hljs-meta prompt_">[user]$ </span><span class="language-bash">wget https://download.nextcloud.com/server/releases/nextcloud-12.0.0.zip</span><br><span class="hljs-meta prompt_">[user]$ </span><span class="language-bash">unzip nextcloud-12.0.0.zip</span><br><span class="hljs-meta prompt_">[user]$ </span><span class="language-bash"><span class="hljs-built_in">sudo</span> <span class="hljs-built_in">mkdir</span> /var/www/</span><br><span class="hljs-meta prompt_">[user]$ </span><span class="language-bash"><span class="hljs-built_in">sudo</span> <span class="hljs-built_in">mv</span> nextcloud /var/www/</span><br><span class="hljs-meta prompt_">[user]$ </span><span class="language-bash"><span class="hljs-built_in">rm</span> -f nextcloud-12.0.0.zip</span><br><span class="hljs-meta prompt_">[user]$ </span><span class="language-bash"><span class="hljs-built_in">sudo</span> <span class="hljs-built_in">chown</span> -R www-data: /var/www/nextcloud</span><br></code></pre></td></tr></table></figure>
+<h2 id="5-安装和配置nginx"><a href="#5-安装和配置nginx" class="headerlink" title="5.安装和配置nginx"></a>5.安装和配置nginx</h2><figure class="highlight csharp"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs csharp">[<span class="hljs-meta">user</span>]$ sudo apt-<span class="hljs-keyword">get</span> install nginx-extras nginx<br></code></pre></td></tr></table></figure>
+<h2 id="6-这里创建相应的ssl证书，方便大家访问，如果有相应的证书，将证书放置-x2F-etc-x2F-nginx-x2F-ssl目录下，如果是新手，请注意证书的名字"><a href="#6-这里创建相应的ssl证书，方便大家访问，如果有相应的证书，将证书放置-x2F-etc-x2F-nginx-x2F-ssl目录下，如果是新手，请注意证书的名字" class="headerlink" title="6.这里创建相应的ssl证书，方便大家访问，如果有相应的证书，将证书放置&#x2F;etc&#x2F;nginx&#x2F;ssl目录下，如果是新手，请注意证书的名字"></a>6.这里创建相应的ssl证书，方便大家访问，如果有相应的证书，将证书放置&#x2F;etc&#x2F;nginx&#x2F;ssl目录下，如果是新手，请注意证书的名字</h2><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><code class="hljs shell"><span class="hljs-meta prompt_">[user]$ </span><span class="language-bash"><span class="hljs-built_in">sudo</span> <span class="hljs-built_in">mkdir</span> -p /etc/nginx/ssl</span><br><span class="hljs-meta prompt_">[user]$ </span><span class="language-bash"><span class="hljs-built_in">cd</span> /etc/nginx/ssl</span><br><span class="hljs-meta prompt_">[user]$ </span><span class="language-bash"><span class="hljs-built_in">sudo</span> openssl genrsa -des3 -passout pass:x -out nextcloud.pass.key 2048</span><br><span class="hljs-meta prompt_">[user]$ </span><span class="language-bash"><span class="hljs-built_in">sudo</span> openssl rsa -passin pass:x -<span class="hljs-keyword">in</span> nextcloud.pass.key -out nextcloud.key</span><br><span class="hljs-meta prompt_">[user]$ </span><span class="language-bash"><span class="hljs-built_in">sudo</span> <span class="hljs-built_in">rm</span> nextcloud.pass.key</span><br><span class="hljs-meta prompt_">[user]$ </span><span class="language-bash"><span class="hljs-built_in">sudo</span> openssl req -new -key nextcloud.key -out nextcloud.csr</span><br><span class="hljs-meta prompt_">[user]$ </span><span class="language-bash"><span class="hljs-built_in">sudo</span> openssl x509 -req -days 365 -<span class="hljs-keyword">in</span> nextcloud.csr -signkey nextcloud.key -out nextcloud.crt</span><br></code></pre></td></tr></table></figure>
+<h2 id="7-为nginx服务器创建相应的配置文件："><a href="#7-为nginx服务器创建相应的配置文件：" class="headerlink" title="7.为nginx服务器创建相应的配置文件："></a>7.为nginx服务器创建相应的配置文件：</h2><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs shell"><span class="hljs-meta prompt_">[user]$ </span><span class="language-bash"><span class="hljs-built_in">sudo</span> nano /etc/nginx/sites-available/nextcloud</span><br></code></pre></td></tr></table></figure>
+<p>文件内容：</p>
+<figure class="highlight nginx"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br><span class="line">100</span><br><span class="line">101</span><br><span class="line">102</span><br></pre></td><td class="code"><pre><code class="hljs nginx"><span class="hljs-section">server</span> &#123;<br>    <span class="hljs-attribute">listen</span> <span class="hljs-number">80</span>;<br>    <span class="hljs-attribute">server_name</span> my.nextcloud.com;<br>    <span class="hljs-attribute">return</span> <span class="hljs-number">301</span> https://<span class="hljs-variable">$server_name</span><span class="hljs-variable">$request_uri</span>;<br>&#125;<br><span class="hljs-section">server</span> &#123;<br>    <span class="hljs-attribute">listen</span> <span class="hljs-number">443</span> ssl http2;<br>    <span class="hljs-attribute">server_name</span> my.nextcloud.com;<br>    <span class="hljs-attribute">root</span> /var/www/nextcloud;<br><br>    <span class="hljs-attribute">ssl</span> <span class="hljs-literal">on</span>;<br>    <span class="hljs-attribute">ssl_certificate</span>     /etc/nginx/ssl/nextcloud.crt;<br>    <span class="hljs-attribute">ssl_certificate_key</span> /etc/nginx/ssl/nextcloud.key;<br>    <span class="hljs-attribute">ssl_session_timeout</span> <span class="hljs-number">5m</span>;<br>    <span class="hljs-attribute">ssl_ciphers</span>               <span class="hljs-string">&#x27;AES128+EECDH:AES128+EDH:!aNULL&#x27;</span>;<br>    <span class="hljs-attribute">ssl_protocols</span>              TLSv1 TLSv1.<span class="hljs-number">1</span> TLSv1.<span class="hljs-number">2</span>;<br>    <span class="hljs-attribute">ssl_prefer_server_ciphers</span> <span class="hljs-literal">on</span>;<br><br>    <span class="hljs-attribute">add_header</span> X-Content-Type-Options nosniff;<br>    <span class="hljs-attribute">add_header</span> X-Frame-Options <span class="hljs-string">&quot;SAMEORIGIN&quot;</span>;<br>    <span class="hljs-attribute">add_header</span> X-XSS-Protection <span class="hljs-string">&quot;1; mode=block&quot;</span>;<br>    <span class="hljs-attribute">add_header</span> X-Robots-Tag <span class="hljs-literal">none</span>;<br>    <span class="hljs-attribute">add_header</span> X-Download-Options noopen;<br>    <span class="hljs-attribute">add_header</span> X-Permitted-Cross-Domain-Policies <span class="hljs-literal">none</span>;<br><br>    <span class="hljs-attribute">access_log</span>  /var/log/nginx/nextcloud.access.log;<br>    <span class="hljs-attribute">error_log</span>   /var/log/nginx/nextcloud.<span class="hljs-literal">error</span>.log;<br><br>    <span class="hljs-section">location</span> = /robots.txt &#123;<br>        <span class="hljs-attribute">allow</span> all;<br>        <span class="hljs-attribute">log_not_found</span> <span class="hljs-literal">off</span>;<br>        <span class="hljs-attribute">access_log</span> <span class="hljs-literal">off</span>;<br>    &#125;<br><br>    <span class="hljs-section">location</span> = /.well-known/carddav &#123; <br>        <span class="hljs-attribute">return</span> <span class="hljs-number">301</span> <span class="hljs-variable">$scheme</span>://<span class="hljs-variable">$host</span>/remote.php/dav; <br>    &#125;<br>    <span class="hljs-section">location</span> = /.well-known/caldav &#123; <br>        <span class="hljs-attribute">return</span> <span class="hljs-number">301</span> <span class="hljs-variable">$scheme</span>://<span class="hljs-variable">$host</span>/remote.php/dav; <br>    &#125;<br><br>    <span class="hljs-attribute">client_max_body_size</span> <span class="hljs-number">512M</span>;<br>    <span class="hljs-attribute">fastcgi_buffers</span> <span class="hljs-number">64</span> <span class="hljs-number">4K</span>;<br>    <span class="hljs-attribute">gzip</span> <span class="hljs-literal">off</span>;<br><br>    <span class="hljs-attribute">error_page</span> <span class="hljs-number">403</span> /core/templates/<span class="hljs-number">403</span>.php;<br>    <span class="hljs-attribute">error_page</span> <span class="hljs-number">404</span> /core/templates/<span class="hljs-number">404</span>.php;<br><br>    <span class="hljs-section">location</span> / &#123;<br>        <span class="hljs-attribute">rewrite</span><span class="hljs-regexp"> ^</span> /index.php<span class="hljs-variable">$uri</span>;<br>    &#125;<br><br>    <span class="hljs-section">location</span> <span class="hljs-regexp">~ ^/(?:build|tests|config|lib|3rdparty|templates|data)/</span> &#123;<br>        <span class="hljs-attribute">deny</span> all;<br>    &#125;<br><br>    <span class="hljs-section">location</span> <span class="hljs-regexp">~ ^/(?:\.|autotest|occ|issue|indie|db_|console)</span> &#123;<br>        <span class="hljs-attribute">deny</span> all;<br>    &#125;<br><br>    <span class="hljs-section">location</span> ~^/(?:index|remote|public|cron|core/ajax/update|status|ocs/v[<span class="hljs-number">12</span>]|updater/.+|ocs-provider/.+|core/templates/<span class="hljs-number">40</span>[<span class="hljs-number">34</span>])\.php(?:$|/) &#123;<br>        <span class="hljs-attribute">include</span> fastcgi_params;<br>        <span class="hljs-attribute">fastcgi_split_path_info</span><span class="hljs-regexp"> ^(.+\.php)(/.+)$</span>;<br>        <span class="hljs-attribute">fastcgi_param</span> SCRIPT_FILENAME <span class="hljs-variable">$document_root</span><span class="hljs-variable">$fastcgi_script_name</span>;<br>        <span class="hljs-attribute">fastcgi_param</span> PATH_INFO <span class="hljs-variable">$fastcgi_path_info</span>;<br>        <span class="hljs-attribute">fastcgi_param</span> HTTPS <span class="hljs-literal">on</span>;<br>        <span class="hljs-comment">#Avoid sending the security headers twice</span><br>        <span class="hljs-attribute">fastcgi_param</span> modHeadersAvailable <span class="hljs-literal">true</span>;<br>        <span class="hljs-attribute">fastcgi_param</span> front_controller_active <span class="hljs-literal">true</span>;<br>        <span class="hljs-attribute">fastcgi_pass</span> unix:/var/run/php/php7.0-fpm.sock;<br>        <span class="hljs-attribute">fastcgi_intercept_errors</span> <span class="hljs-literal">on</span>;<br>        <span class="hljs-attribute">fastcgi_request_buffering</span> <span class="hljs-literal">off</span>;<br>    &#125;<br><br>    <span class="hljs-section">location</span> <span class="hljs-regexp">~ ^/(?:updater|ocs-provider)(?:$|/)</span> &#123;<br>        <span class="hljs-attribute">try_files</span> <span class="hljs-variable">$uri</span>/ =<span class="hljs-number">404</span>;<br>        <span class="hljs-attribute">index</span> index.php;<br>    &#125;<br><br>    <span class="hljs-section">location</span> <span class="hljs-regexp">~* \.(?:css|js)$</span> &#123;<br>        <span class="hljs-attribute">try_files</span> <span class="hljs-variable">$uri</span> /index.php<span class="hljs-variable">$uri</span><span class="hljs-variable">$is_args</span><span class="hljs-variable">$args</span>;<br>        <span class="hljs-attribute">add_header</span> Cache-Control <span class="hljs-string">&quot;public, max-age=7200&quot;</span>;<br>        <span class="hljs-attribute">add_header</span> X-Content-Type-Options nosniff;<br>        <span class="hljs-attribute">add_header</span> X-Frame-Options <span class="hljs-string">&quot;SAMEORIGIN&quot;</span>;<br>        <span class="hljs-attribute">add_header</span> X-XSS-Protection <span class="hljs-string">&quot;1; mode=block&quot;</span>;<br>        <span class="hljs-attribute">add_header</span> X-Robots-Tag <span class="hljs-literal">none</span>;<br>        <span class="hljs-attribute">add_header</span> X-Download-Options noopen;<br>        <span class="hljs-attribute">add_header</span> X-Permitted-Cross-Domain-Policies <span class="hljs-literal">none</span>;<br>        <span class="hljs-comment"># Optional: Don&#x27;t log access to assets</span><br>        <span class="hljs-attribute">access_log</span> <span class="hljs-literal">off</span>;<br>    &#125;<br><br>    <span class="hljs-section">location</span> <span class="hljs-regexp">~* \.(?:svg|gif|png|html|ttf|woff|ico|jpg|jpeg)$</span> &#123;<br>        <span class="hljs-attribute">try_files</span> <span class="hljs-variable">$uri</span> /index.php<span class="hljs-variable">$uri</span><span class="hljs-variable">$is_args</span><span class="hljs-variable">$args</span>;<br>        <span class="hljs-attribute">access_log</span> <span class="hljs-literal">off</span>;<br>    &#125;<br><br>    <span class="hljs-section">location</span> <span class="hljs-regexp">~ /\.ht</span> &#123;<br>        <span class="hljs-attribute">deny</span> all;<br>    &#125;<br><br>&#125;<br></code></pre></td></tr></table></figure>
+<p>*<strong>注意：这里需要更改相应的域名，不要直接复制</strong><br>链接相应的配置文件：</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs shell"><span class="hljs-meta prompt_">[user]$ </span><span class="language-bash"><span class="hljs-built_in">sudo</span> <span class="hljs-built_in">ln</span> -s /etc/nginx/sites-available/nextcloud /etc/nginx/sites-enabled/nextcloud</span><br></code></pre></td></tr></table></figure>
+<p>重启nginx服务：</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><code class="hljs shell"><span class="hljs-meta prompt_">[user]$ </span><span class="language-bash"><span class="hljs-built_in">sudo</span> nginx -t</span><br><span class="hljs-meta prompt_">[user]$ </span><span class="language-bash"><span class="hljs-built_in">sudo</span> service nginx restart</span><br></code></pre></td></tr></table></figure>
+<h2 id="8-到此，安装已经完成，接下来需要登录nextcloud并且配置相应的文件存储位置："><a href="#8-到此，安装已经完成，接下来需要登录nextcloud并且配置相应的文件存储位置：" class="headerlink" title="8.到此，安装已经完成，接下来需要登录nextcloud并且配置相应的文件存储位置："></a>8.到此，安装已经完成，接下来需要登录nextcloud并且配置相应的文件存储位置：</h2><p>打开浏览器输入：<a target="_blank" rel="noopener" href="https://my.nextcloud.com/install.php">https://my.nextcloud.com/install.php</a></p>
+<blockquote>
+<p>注意这里设置的域名，如果没有设置域名，在相同的网段下使用ＩＰ进行访问，我这里在同一个路由下访问nextcloud,主机的ip为192.168.1.105，怎么查看自己主机的ip方法有很多，命令也行，路由也行，怎么方便怎么来．<br><strong><a target="_blank" rel="noopener" href="https://192.168.1.105/install.php">https://192.168.1.105/install.php</a></strong></p>
+</blockquote>
+<p>打开网页后，设置相应的管理员用户名和密码及相应的文件存储位置，这个位置可以随便设置，但是需要更改位置的组和拥有者为<strong>www-data</strong>,</p>
+<p>*<strong>注意</strong>：上传和下载大文件时可能会提示文件太大，需要更改上传和下载文件最大限制：</p>
+<p>配置文件需要修改：</p>
+<ol>
+<li><p>&#x2F;etc&#x2F;php&#x2F;7.0&#x2F;fpm&#x2F;php.ini　</p>
+ <figure class="highlight abnf"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><code class="hljs abnf">php memory<span class="hljs-comment">;</span><br>upload_max_filesize<span class="hljs-comment">;</span><br>post_max_size<span class="hljs-comment">;</span><br></code></pre></td></tr></table></figure>
+</li>
+<li><p>&#x2F;etc&#x2F;nginx&#x2F;sites-available&#x2F;nextcloud</p>
+ <figure class="highlight abnf"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs abnf">client_max_body_size<span class="hljs-comment">;</span><br></code></pre></td></tr></table></figure>
+</li>
+<li><p>&#x2F;var&#x2F;www&#x2F;nextcloud&#x2F;.htaccess</p>
+ <figure class="highlight abnf"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><code class="hljs abnf">php_value upload_max_filesize<span class="hljs-comment">; </span><br>php_value post_max_size<span class="hljs-comment">;</span><br>php_value memory_limit<span class="hljs-comment">;</span><br></code></pre></td></tr></table></figure></li>
+</ol>
+<p>*<strong>具体大小根据个人情况设置</strong></p>
+<p>配置完成以后重启相应的服务：</p>
+<figure class="highlight smali"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><code class="hljs smali">sudo<span class="hljs-keyword"> system</span>ctl restart php7.0-fpm <br>sudo<span class="hljs-keyword"> system</span>ctl restart nginx<br></code></pre></td></tr></table></figure>
+
+            </div>
+            <hr>
+            <div>
+              <div class="post-metas mb-3">
+                
+                  <div class="post-meta mr-3">
+                    <i class="iconfont icon-category"></i>
+                    
+                      <a class="hover-with-bg" href="/categories/Linux/">Linux</a>
+                    
+                  </div>
+                
+                
+                  <div class="post-meta">
+                    <i class="iconfont icon-tags"></i>
+                    
+                      <a class="hover-with-bg" href="/tags/nextcloud/">nextcloud</a>
+                    
+                  </div>
+                
+              </div>
+              
+                <p class="note note-warning">
+                  
+                    本博客所有文章除特别声明外，均采用 <a target="_blank" href="https://creativecommons.org/licenses/by-sa/4.0/deed.zh" rel="nofollow noopener noopener">CC BY-SA 4.0 协议</a> ，转载请注明出处！
+                  
+                </p>
+              
+              
+                <div class="post-prevnext">
+                  <article class="post-prev col-6">
+                    
+                    
+                      <a href="/2018/03/02/2018-03-02-memcaced-security-reinforcement/">
+                        <i class="iconfont icon-arrowleft"></i>
+                        <span class="hidden-mobile">memcached 安全加固</span>
+                        <span class="visible-mobile">上一篇</span>
+                      </a>
+                    
+                  </article>
+                  <article class="post-next col-6">
+                    
+                    
+                      <a href="/2018/02/20/2018-02-20-open-bbr-services/">
+                        <span class="hidden-mobile">开启TCP BBR拥塞控制算法</span>
+                        <span class="visible-mobile">下一篇</span>
+                        <i class="iconfont icon-arrowright"></i>
+                      </a>
+                    
+                  </article>
+                </div>
+              
+            </div>
+
+            
+              <!-- Comments -->
+              <article class="comments" id="comments" lazyload>
+                
+                  
+                
+                
+  <script type="text/javascript">
+    Fluid.utils.loadComments('#comments', function() {
+      var light = 'github-light';
+      var dark = 'github-dark';
+      var schema = document.documentElement.getAttribute('data-user-color-scheme');
+      if (schema === 'dark') {
+        schema = dark;
+      } else {
+        schema = light;
+      }
+      window.UtterancesThemeLight = light;
+      window.UtterancesThemeDark = dark;
+      var s = document.createElement('script');
+      s.setAttribute('src', 'https://utteranc.es/client.js');
+      s.setAttribute('repo', 'hksanduo/commit-utterances');
+      s.setAttribute('issue-term', 'title');
+      
+      s.setAttribute('label', 'utterances');
+      
+      s.setAttribute('theme', schema);
+      s.setAttribute('crossorigin', 'anonymous');
+      document.getElementById('comments').appendChild(s);
+    })
+  </script>
+  <noscript>Please enable JavaScript to view the comments</noscript>
+
+
+              </article>
+            
+          </article>
+        </div>
+      </div>
+    </div>
+    
+      <div class="d-none d-lg-block col-lg-2 toc-container" id="toc-ctn">
+        <div id="toc">
+  <p class="toc-header"><i class="iconfont icon-list"></i>&nbsp;目录</p>
+  <div class="toc-body" id="toc-body"></div>
+</div>
+
+      </div>
+    
+  </div>
+</div>
+
+<!-- Custom -->
+
+
+    
+
+    
+      <a id="scroll-top-button" aria-label="TOP" href="#" role="button">
+        <i class="iconfont icon-arrowup" aria-hidden="true"></i>
+      </a>
+    
+
+    
+      <div class="modal fade" id="modalSearch" tabindex="-1" role="dialog" aria-labelledby="ModalLabel"
+     aria-hidden="true">
+  <div class="modal-dialog modal-dialog-scrollable modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header text-center">
+        <h4 class="modal-title w-100 font-weight-bold">搜索</h4>
+        <button type="button" id="local-search-close" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body mx-3">
+        <div class="md-form mb-5">
+          <input type="text" id="local-search-input" class="form-control validate">
+          <label data-error="x" data-success="v"
+                 for="local-search-input">关键词</label>
+        </div>
+        <div class="list-group" id="local-search-result"></div>
+      </div>
+    </div>
+  </div>
+</div>
+    
+
+    
+  </main>
+
+  <footer class="text-center mt-5 py-3">
+  <div class="footer-content">
+     <a href="https://hexo.io" target="_blank" rel="nofollow noopener"><span>Hexo</span></a> <i class="iconfont icon-love"></i> <a href="https://github.com/fluid-dev/hexo-theme-fluid" target="_blank" rel="nofollow noopener"><span>Fluid</span></a> 
+  </div>
+  
+  <div class="statistics">
+    
+    
+
+    
+      
+        <!-- 不蒜子统计PV -->
+        <span id="busuanzi_container_site_pv" style="display: none">
+            总访问量 
+            <span id="busuanzi_value_site_pv"></span>
+             次
+          </span>
+      
+      
+        <!-- 不蒜子统计UV -->
+        <span id="busuanzi_container_site_uv" style="display: none">
+            总访客数 
+            <span id="busuanzi_value_site_uv"></span>
+             人
+          </span>
+      
+    
+  </div>
+
+
+  
+
+  
+</footer>
+
+
+  <!-- SCRIPTS -->
+  
+  <script  src="https://cdn.jsdelivr.net/npm/nprogress@0/nprogress.min.js" ></script>
+  <link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/nprogress@0/nprogress.min.css" />
+
+  <script>
+    NProgress.configure({"showSpinner":false,"trickleSpeed":100})
+    NProgress.start()
+    window.addEventListener('load', function() {
+      NProgress.done();
+    })
+  </script>
+
+
+<script  src="https://cdn.jsdelivr.net/npm/jquery@3/dist/jquery.min.js" ></script>
+<script  src="https://cdn.jsdelivr.net/npm/bootstrap@4/dist/js/bootstrap.min.js" ></script>
+<script  src="/js/events.js" ></script>
+<script  src="/js/plugins.js" ></script>
+
+<!-- Plugins -->
+
+
+  <script  src="/js/local-search.js" ></script>
+
+
+
+  
+    <script  src="/js/img-lazyload.js" ></script>
+  
+
+
+
+  
+
+
+
+  
+    <script  src="https://cdn.jsdelivr.net/npm/tocbot@4/dist/tocbot.min.js" ></script>
+  
+  
+    <script  src="https://cdn.jsdelivr.net/npm/@fancyapps/fancybox@3/dist/jquery.fancybox.min.js" ></script>
+  
+  
+    <script  src="https://cdn.jsdelivr.net/npm/anchor-js@4/anchor.min.js" ></script>
+  
+  
+    <script defer src="https://cdn.jsdelivr.net/npm/clipboard@2/dist/clipboard.min.js" ></script>
+  
+
+
+
+  <script defer src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js" ></script>
+
+
+
+
+  <script  src="https://cdn.jsdelivr.net/npm/typed.js@2/lib/typed.min.js" ></script>
+  <script>
+    (function (window, document) {
+      var typing = Fluid.plugins.typing;
+      var title = document.getElementById('subtitle').title;
+      
+      typing(title)
+      
+    })(window, document);
+  </script>
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+    <!-- Google Analytics -->
+    <script defer>
+      window.ga = window.ga || function () { (ga.q = ga.q || []).push(arguments) };
+      ga.l = +new Date;
+      ga('create', 'UA-167858469-1', 'auto');
+      ga('send', 'pageview');
+    </script>
+    <script async src='https://www.google-analytics.com/analytics.js'></script>
+  
+
+  
+
+  
+
+  
+
+  
+
+
+
+
+
+<!-- 主题的启动项 保持在最底部 -->
+<script  src="/js/boot.js" ></script>
+
+
+</body>
+</html>

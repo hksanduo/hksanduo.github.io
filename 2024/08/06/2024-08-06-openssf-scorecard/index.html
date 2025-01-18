@@ -1,0 +1,704 @@
+
+
+<!DOCTYPE html>
+<html lang="zh-CN" data-default-color-scheme=auto>
+
+
+
+<head>
+  <meta charset="UTF-8">
+  <link rel="apple-touch-icon" sizes="76x76" href="/img/favicon.png">
+  <link rel="icon" href="/img/favicon.png">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, shrink-to-fit=no">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  
+  <meta name="theme-color" content="#2f4154">
+  <meta name="description" content="">
+  <meta name="author" content="sanduo">
+  <meta name="keywords" content="">
+  <meta name="description" content="软件供应链健康度评估之scorecard Scorecard介绍Scorecard是一个自动化工具，评估开源项目的健康度。Scorecard通过评估与开源项目安全性相关的一系列指标项，每项10分。可以使用这些评分来了解需要改进的具体领域，以增强项目的安全性。同时，还可以评估依赖项带来的安全风险，如接受这些风险、评估替代方案或与维护者合作进行改进。 注意：由于scorecard项目不断迭代更新，检测">
+<meta property="og:type" content="article">
+<meta property="og:title" content="软件供应链健康度评估之scorecard">
+<meta property="og:url" content="https://hksanduo.github.io/2024/08/06/2024-08-06-openssf-scorecard/index.html">
+<meta property="og:site_name" content="sanduo blog">
+<meta property="og:description" content="软件供应链健康度评估之scorecard Scorecard介绍Scorecard是一个自动化工具，评估开源项目的健康度。Scorecard通过评估与开源项目安全性相关的一系列指标项，每项10分。可以使用这些评分来了解需要改进的具体领域，以增强项目的安全性。同时，还可以评估依赖项带来的安全风险，如接受这些风险、评估替代方案或与维护者合作进行改进。 注意：由于scorecard项目不断迭代更新，检测">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://hksanduo.github.io/img/20240806-01.png">
+<meta property="og:image" content="https://hksanduo.github.io/img/20240806-02.png">
+<meta property="og:image" content="https://hksanduo.github.io/img/20240806-03.png">
+<meta property="og:image" content="https://hksanduo.github.io/img/20240806-04.png">
+<meta property="article:published_time" content="2024-08-06T06:36:00.000Z">
+<meta property="article:modified_time" content="2025-01-18T14:54:10.083Z">
+<meta property="article:author" content="sanduo">
+<meta property="article:tag" content="Software Supply Chain">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:image" content="https://hksanduo.github.io/img/20240806-01.png">
+  
+  <title>软件供应链健康度评估之scorecard - sanduo blog</title>
+
+  <link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4/dist/css/bootstrap.min.css" />
+
+
+  <link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/github-markdown-css@4/github-markdown.min.css" />
+  <link  rel="stylesheet" href="/lib/hint/hint.min.css" />
+
+  
+    
+    
+      
+      <link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/highlight.js@10/styles/github-gist.min.css" />
+    
+  
+
+  
+    <link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fancyapps/fancybox@3/dist/jquery.fancybox.min.css" />
+  
+
+
+<!-- 主题依赖的图标库，不要自行修改 -->
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1749284_ba1fz6golrf.css">
+
+
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1736178_kmeydafke9r.css">
+
+
+<link  rel="stylesheet" href="/css/main.css" />
+
+<!-- 自定义样式保持在最底部 -->
+
+
+  <script id="fluid-configs">
+    var Fluid = window.Fluid || {};
+    var CONFIG = {"hostname":"hksanduo.github.io","root":"/","version":"1.8.12","typing":{"enable":true,"typeSpeed":70,"cursorChar":"_","loop":false},"anchorjs":{"enable":true,"element":"h1,h2,h3,h4,h5,h6","placement":"right","visible":"hover","icon":""},"progressbar":{"enable":true,"height_px":3,"color":"#29d","options":{"showSpinner":false,"trickleSpeed":100}},"copy_btn":true,"image_zoom":{"enable":true,"img_url_replace":["",""]},"toc":{"enable":true,"headingSelector":"h1,h2,h3,h4,h5,h6","collapseDepth":0},"lazyload":{"enable":true,"loading_img":"/img/loading.gif","onlypost":false,"offset_factor":2},"web_analytics":{"enable":true,"baidu":null,"google":"UA-167858469-1","gtag":null,"tencent":{"sid":null,"cid":null},"woyaola":null,"cnzz":null,"leancloud":{"app_id":null,"app_key":null,"server_url":null,"path":"window.location.pathname"}},"search_path":"/local-search.xml"};
+  </script>
+  <script  src="/js/utils.js" ></script>
+  <script  src="/js/color-schema.js" ></script>
+<meta name="generator" content="Hexo 5.4.2"></head>
+
+
+<body>
+  <header style="height: 70vh;">
+    <nav id="navbar" class="navbar fixed-top  navbar-expand-lg navbar-dark scrolling-navbar">
+  <div class="container">
+    <a class="navbar-brand" href="/">
+      <strong>Welcome To Sanduo&#39;s Blog</strong>
+    </a>
+
+    <button id="navbar-toggler-btn" class="navbar-toggler" type="button" data-toggle="collapse"
+            data-target="#navbarSupportedContent"
+            aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+      <div class="animated-icon"><span></span><span></span><span></span></div>
+    </button>
+
+    <!-- Collapsible content -->
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+      <ul class="navbar-nav ml-auto text-center">
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/">
+                <i class="iconfont icon-home-fill"></i>
+                首页
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/archives/">
+                <i class="iconfont icon-archive-fill"></i>
+                归档
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/categories/">
+                <i class="iconfont icon-category-fill"></i>
+                分类
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/tags/">
+                <i class="iconfont icon-tags-fill"></i>
+                标签
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/about/">
+                <i class="iconfont icon-user-fill"></i>
+                关于
+              </a>
+            </li>
+          
+        
+        
+          <li class="nav-item" id="search-btn">
+            <a class="nav-link" target="_self" href="javascript:;" data-toggle="modal" data-target="#modalSearch" aria-label="Search">
+              &nbsp;<i class="iconfont icon-search"></i>&nbsp;
+            </a>
+          </li>
+        
+        
+          <li class="nav-item" id="color-toggle-btn">
+            <a class="nav-link" target="_self" href="javascript:;" aria-label="Color Toggle">&nbsp;<i
+                class="iconfont icon-dark" id="color-toggle-icon"></i>&nbsp;</a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+</nav>
+
+    <div class="banner" id="banner" parallax=true
+         style="background: url('/img/default.png') no-repeat center center;
+           background-size: cover;">
+      <div class="full-bg-img">
+        <div class="mask flex-center" style="background-color: rgba(0, 0, 0, 0.3)">
+          <div class="page-header text-center fade-in-up">
+            <span class="h2" id="subtitle" title="软件供应链健康度评估之scorecard">
+              
+            </span>
+
+            
+              <div class="mt-3">
+  
+  
+    <span class="post-meta">
+      <i class="iconfont icon-date-fill" aria-hidden="true"></i>
+      <time datetime="2024-08-06 06:36" pubdate>
+        2024年8月6日 早上
+      </time>
+    </span>
+  
+</div>
+
+<div class="mt-1">
+  
+    <span class="post-meta mr-2">
+      <i class="iconfont icon-chart"></i>
+      12k 字
+    </span>
+  
+
+  
+    <span class="post-meta mr-2">
+      <i class="iconfont icon-clock-fill"></i>
+      
+      
+      36 分钟
+    </span>
+  
+
+  
+  
+</div>
+
+            
+          </div>
+
+          
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <main>
+    
+      
+
+<div class="container-fluid nopadding-x">
+  <div class="row nomargin-x">
+    <div class="d-none d-lg-block col-lg-2"></div>
+    <div class="col-lg-8 nopadding-x-md">
+      <div class="container nopadding-x-md" id="board-ctn">
+        <div class="py-5" id="board">
+          <article class="post-content mx-auto">
+            <!-- SEO header -->
+            <h1 style="display: none">软件供应链健康度评估之scorecard</h1>
+            
+            <div class="markdown-body">
+              <h1 id="软件供应链健康度评估之scorecard"><a href="#软件供应链健康度评估之scorecard" class="headerlink" title="软件供应链健康度评估之scorecard"></a>软件供应链健康度评估之scorecard</h1><hr>
+<h1 id="Scorecard介绍"><a href="#Scorecard介绍" class="headerlink" title="Scorecard介绍"></a>Scorecard介绍</h1><p>Scorecard是一个自动化工具，评估开源项目的健康度。Scorecard通过评估与开源项目安全性相关的一系列指标项，每项10分。可以使用这些评分来了解需要改进的具体领域，以增强项目的安全性。同时，还可以评估依赖项带来的安全风险，如接受这些风险、评估替代方案或与维护者合作进行改进。</p>
+<p>注意：由于scorecard项目不断迭代更新，检测规则也在变化，本文有效时间为：2024年08月06日前后</p>
+<h2 id="支持Scorecard项目"><a href="#支持Scorecard项目" class="headerlink" title="支持Scorecard项目"></a>支持Scorecard项目</h2><p>Scorecard已在数千个项目上运行，以监控和跟踪安全指标。主要使用Scorecard的项目包括：</p>
+<ul>
+<li>Tensorflow</li>
+<li>Angular</li>
+<li>Flutter</li>
+<li>sos.dev</li>
+<li>deps.dev</li>
+</ul>
+<p><img src="/img/20240806-01.png" srcset="/img/loading.gif" lazyload alt="deps fastjson results "></p>
+<h2 id="查看项目的评分"><a href="#查看项目的评分" class="headerlink" title="查看项目的评分"></a>查看项目的评分</h2><p>要查看Scorecard定期扫描的项目评分，请访问webviewer，并替换占位符文本为平台、用户&#x2F;组织和存储库名称：<br><code>https://scorecard.dev/viewer/?uri=&lt;github_or_gitlab&gt;.com/&lt;user_name_or_org&gt;/&lt;repository_name&gt;</code></p>
+<p>例如：</p>
+<p><a target="_blank" rel="noopener" href="https://scorecard.dev/viewer/?uri=github.com/alibaba/fastjson">https://scorecard.dev/viewer/?uri=github.com/alibaba/fastjson</a></p>
+<p><img src="/img/20240806-02.png" srcset="/img/loading.gif" lazyload alt="fastjson score "></p>
+<h2 id="公开数据"><a href="#公开数据" class="headerlink" title="公开数据"></a>公开数据</h2><p>每周对被认为是最关键的100万个开源项目进行Scorecard扫描，并将结果发布在BigQuery公开数据集中。最新的结果可在BigQuery视图openssf:scorecardcron.scorecard-v2_latest中查看。</p>
+<p>可以使用BigQuery Explorer查询数据，导航至Add Data &gt; Star a project by name &gt; ‘openssf’。例如，可能会对项目评分随时间的变化感兴趣：</p>
+<p><img src="/img/20240806-03.png" srcset="/img/loading.gif" lazyload alt="bigquery data query"></p>
+<figure class="highlight pgsql"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs pgsql"><span class="hljs-keyword">SELECT</span> <span class="hljs-type">date</span>, score <span class="hljs-keyword">FROM</span> `openssf.scorecardcron.scorecard-v2` <span class="hljs-keyword">WHERE</span> repo.name=&quot;github.com/alibaba/fastjson&quot; <span class="hljs-keyword">ORDER</span> <span class="hljs-keyword">BY</span> <span class="hljs-type">date</span> <span class="hljs-keyword">ASC</span><br></code></pre></td></tr></table></figure>
+<p><img src="/img/20240806-04.png" srcset="/img/loading.gif" lazyload alt="bigquery data query demo"></p>
+<p>还可以使用bq工具将最新结果提取到Google Cloud Storage中：</p>
+<figure class="highlight n1ql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><code class="hljs n1ql"># 获取最新的PARTITION_ID<br>bq query --nouse_legacy_sql &#x27;<span class="hljs-keyword">SELECT</span> partition_id <span class="hljs-keyword">FROM</span> openssf.scorecardcron.INFORMATION_SCHEMA.PARTITIONS <span class="hljs-keyword">WHERE</span> table_name=<span class="hljs-string">&quot;scorecard-v2&quot;</span> <span class="hljs-keyword">AND</span> partition_id!=<span class="hljs-string">&quot;__NULL__&quot;</span> <span class="hljs-keyword">ORDER</span> <span class="hljs-keyword">BY</span> partition_id <span class="hljs-keyword">DESC</span> <span class="hljs-keyword">LIMIT</span> <span class="hljs-number">1</span><span class="hljs-string">&#x27;</span><br><span class="hljs-string"></span><br><span class="hljs-string"># 提取到GCS</span><br><span class="hljs-string">bq extract --destination_format=NEWLINE_DELIMITED_JSON &#x27;</span>openssf:scorecardcron.scorecard-v2$&lt;partition_id&gt;<span class="hljs-string">&#x27; gs://bucket-name/filename-*.json</span><br></code></pre></td></tr></table></figure>
+
+
+<h1 id="Scorecard-使用"><a href="#Scorecard-使用" class="headerlink" title="Scorecard 使用"></a>Scorecard 使用</h1><h2 id="Scorecard-GitHub-Action"><a href="#Scorecard-GitHub-Action" class="headerlink" title="Scorecard GitHub Action"></a>Scorecard GitHub Action</h2><p>使用Scorecard GitHub Action是最简单的方法，在拥有的GitHub项目上运行Scorecard。该Action在任何存储库更改时运行，并在维护者可以在存储库的安全标签中查看警报。有关更多信息，请参阅Scorecard GitHub Action安装说明。</p>
+<h2 id="Scorecard命令行"><a href="#Scorecard命令行" class="headerlink" title="Scorecard命令行"></a>Scorecard命令行</h2><p>要在不拥有的项目上运行Scorecard扫描，请使用命令行界面安装选项。</p>
+<h3 id="安装"><a href="#安装" class="headerlink" title="安装"></a>安装</h3><h4 id="Docker"><a href="#Docker" class="headerlink" title="Docker"></a>Docker</h4><p>scorecard可以作为Docker容器使用：</p>
+<figure class="highlight awk"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs awk">docker pull gcr.io<span class="hljs-regexp">/openssf/</span>scorecard:stable<br></code></pre></td></tr></table></figure>
+<p>要使用特定的scorecard版本（例如v3.2.1），请运行：</p>
+<figure class="highlight apache"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs apache"><span class="hljs-attribute">docker</span> pull gcr.io/openssf/scorecard:v3.<span class="hljs-number">2</span>.<span class="hljs-number">1</span><br></code></pre></td></tr></table></figure>
+<h4 id="本地安装"><a href="#本地安装" class="headerlink" title="本地安装"></a>本地安装</h4><p>自行编译，或者直接从release下载对应的二进制文件即可</p>
+<figure class="highlight ebnf"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs ebnf"><span class="hljs-attribute">make build</span><br></code></pre></td></tr></table></figure>
+
+<p>使用包管理器</p>
+<table>
+<thead>
+<tr>
+<th>包管理器</th>
+<th>支持的分发版</th>
+<th>命令</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Nix</td>
+<td>NixOS</td>
+<td>nix-shell -p nixpkgs.scorecard</td>
+</tr>
+<tr>
+<td>AUR</td>
+<td>Arch Linux</td>
+<td>yaourt install scorecard</td>
+</tr>
+<tr>
+<td>Homebrew</td>
+<td>macOS或Linux</td>
+<td>brew install scorecard</td>
+</tr>
+</tbody></table>
+<h3 id="获取github-授权-token"><a href="#获取github-授权-token" class="headerlink" title="获取github 授权 token"></a>获取github 授权 token</h3><p>GitHub对未经认证的请求实施api速率限制。为了避免这些限制，必须在运行Scorecard之前对的请求进行认证。有两种方法可以认证的请求：创建GitHub个人访问令牌或创建GitHub App安装。</p>
+<p>创建经典的GitHub个人访问令牌。创建个人访问令牌时，建议选择public_repo范围。</p>
+<figure class="highlight routeros"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs routeros"><span class="hljs-built_in">export</span> <span class="hljs-attribute">GITHUB_AUTH_TOKEN</span>=&lt;your access token&gt;<br></code></pre></td></tr></table></figure>
+
+<h3 id="运行"><a href="#运行" class="headerlink" title="运行"></a>运行</h3><p>若要在特定存储库上运行scorecard：</p>
+<figure class="highlight routeros"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs routeros">scorecard <span class="hljs-attribute">--repo</span>=&lt;repo_url&gt;<br></code></pre></td></tr></table></figure>
+
+<p>例如：</p>
+<figure class="highlight awk"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs awk">scorecard --repo=https:<span class="hljs-regexp">//gi</span>thub.com<span class="hljs-regexp">/alibaba/</span>fastjson<br></code></pre></td></tr></table></figure>
+<p>结果如下：</p>
+<figure class="highlight gherkin"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br></pre></td><td class="code"><pre><code class="hljs gherkin">Starting [Token-Permissions]<br>Starting [Signed-Releases]<br>Starting [Packaging]<br>Starting [Dangerous-Workflow]<br>Starting [Contributors]<br>Starting [Security-Policy]<br>Starting [CI-Tests]<br>Starting [SAST]<br>Starting [License]<br>Starting [Binary-Artifacts]<br>Starting [CII-Best-Practices]<br>Starting [Pinned-Dependencies]<br>Starting [Code-Review]<br>Starting [Fuzzing]<br>Starting [Branch-Protection]<br>Starting [Vulnerabilities]<br>Starting [Dependency-Update-Tool]<br>Starting [Maintained]<br>Finished [Binary-Artifacts]<br>Finished [CII-Best-Practices]<br>Finished [Pinned-Dependencies]<br>Finished [Vulnerabilities]<br>Finished [Dependency-Update-Tool]<br>Finished [Maintained]<br>Finished [Code-Review]<br>Finished [Fuzzing]<br>Finished [Branch-Protection]<br>Finished [Token-Permissions]<br>Finished [Signed-Releases]<br>Finished [Packaging]<br>Finished [CI-Tests]<br>Finished [SAST]<br>Finished [License]<br>Finished [Dangerous-Workflow]<br>Finished [Contributors]<br>Finished [Security-Policy]<br><br>RESULTS<br>-------<br>Aggregate score: 3.9 / 10<br><br>Check scores:<br>|<span class="hljs-string">---------</span>|<span class="hljs-string">------------------------</span>|<span class="hljs-string">--------------------------------</span>|<span class="hljs-string">-----------------------------------------------------------------------------------------------------------------------</span>|<br>|<span class="hljs-string">  SCORE  </span>|<span class="hljs-string">          NAME          </span>|<span class="hljs-string">             REASON             </span>|<span class="hljs-string">                                               DOCUMENTATION/REMEDIATION                                               </span>|<br>|<span class="hljs-string">---------</span>|<span class="hljs-string">------------------------</span>|<span class="hljs-string">--------------------------------</span>|<span class="hljs-string">-----------------------------------------------------------------------------------------------------------------------</span>|<br>|<span class="hljs-string"> 10 / 10 </span>|<span class="hljs-string"> Binary-Artifacts       </span>|<span class="hljs-string"> no binaries found in the repo  </span>|<span class="hljs-string"> https://github.com/ossf/scorecard/blob/a8eae2d833553e93021a22f5641661cb6ad3e24c/docs/checks.md#binary-artifacts       </span>|<br>|<span class="hljs-string">---------</span>|<span class="hljs-string">------------------------</span>|<span class="hljs-string">--------------------------------</span>|<span class="hljs-string">-----------------------------------------------------------------------------------------------------------------------</span>|<br>|<span class="hljs-string"> 0 / 10  </span>|<span class="hljs-string"> Branch-Protection      </span>|<span class="hljs-string"> branch protection not enabled  </span>|<span class="hljs-string"> https://github.com/ossf/scorecard/blob/a8eae2d833553e93021a22f5641661cb6ad3e24c/docs/checks.md#branch-protection      </span>|<br>|<span class="hljs-string">         </span>|<span class="hljs-string">                        </span>|<span class="hljs-string"> on development/release         </span>|<span class="hljs-string">                                                                                                                       </span>|<br>|<span class="hljs-string">         </span>|<span class="hljs-string">                        </span>|<span class="hljs-string"> branches                       </span>|<span class="hljs-string">                                                                                                                       </span>|<br>|<span class="hljs-string">---------</span>|<span class="hljs-string">------------------------</span>|<span class="hljs-string">--------------------------------</span>|<span class="hljs-string">-----------------------------------------------------------------------------------------------------------------------</span>|<br>|<span class="hljs-string"> 0 / 10  </span>|<span class="hljs-string"> CI-Tests               </span>|<span class="hljs-string"> 0 out of 4 merged PRs          </span>|<span class="hljs-string"> https://github.com/ossf/scorecard/blob/a8eae2d833553e93021a22f5641661cb6ad3e24c/docs/checks.md#ci-tests               </span>|<br>|<span class="hljs-string">         </span>|<span class="hljs-string">                        </span>|<span class="hljs-string"> checked by a CI test -- score  </span>|<span class="hljs-string">                                                                                                                       </span>|<br>|<span class="hljs-string">         </span>|<span class="hljs-string">                        </span>|<span class="hljs-string"> normalized to 0                </span>|<span class="hljs-string">                                                                                                                       </span>|<br>|<span class="hljs-string">---------</span>|<span class="hljs-string">------------------------</span>|<span class="hljs-string">--------------------------------</span>|<span class="hljs-string">-----------------------------------------------------------------------------------------------------------------------</span>|<br>|<span class="hljs-string"> 0 / 10  </span>|<span class="hljs-string"> CII-Best-Practices     </span>|<span class="hljs-string"> no effort to earn an OpenSSF   </span>|<span class="hljs-string"> https://github.com/ossf/scorecard/blob/a8eae2d833553e93021a22f5641661cb6ad3e24c/docs/checks.md#cii-best-practices     </span>|<br>|<span class="hljs-string">         </span>|<span class="hljs-string">                        </span>|<span class="hljs-string"> best practices badge detected  </span>|<span class="hljs-string">                                                                                                                       </span>|<br>|<span class="hljs-string">---------</span>|<span class="hljs-string">------------------------</span>|<span class="hljs-string">--------------------------------</span>|<span class="hljs-string">-----------------------------------------------------------------------------------------------------------------------</span>|<br>|<span class="hljs-string"> 1 / 10  </span>|<span class="hljs-string"> Code-Review            </span>|<span class="hljs-string"> Found 3/28 approved changesets </span>|<span class="hljs-string"> https://github.com/ossf/scorecard/blob/a8eae2d833553e93021a22f5641661cb6ad3e24c/docs/checks.md#code-review            </span>|<br>|<span class="hljs-string">         </span>|<span class="hljs-string">                        </span>|<span class="hljs-string"> -- score normalized to 1       </span>|<span class="hljs-string">                                                                                                                       </span>|<br>|<span class="hljs-string">---------</span>|<span class="hljs-string">------------------------</span>|<span class="hljs-string">--------------------------------</span>|<span class="hljs-string">-----------------------------------------------------------------------------------------------------------------------</span>|<br>|<span class="hljs-string"> 10 / 10 </span>|<span class="hljs-string"> Contributors           </span>|<span class="hljs-string"> project has 18 contributing    </span>|<span class="hljs-string"> https://github.com/ossf/scorecard/blob/a8eae2d833553e93021a22f5641661cb6ad3e24c/docs/checks.md#contributors           </span>|<br>|<span class="hljs-string">         </span>|<span class="hljs-string">                        </span>|<span class="hljs-string"> companies or organizations     </span>|<span class="hljs-string">                                                                                                                       </span>|<br>|<span class="hljs-string">---------</span>|<span class="hljs-string">------------------------</span>|<span class="hljs-string">--------------------------------</span>|<span class="hljs-string">-----------------------------------------------------------------------------------------------------------------------</span>|<br>|<span class="hljs-string"> 10 / 10 </span>|<span class="hljs-string"> Dangerous-Workflow     </span>|<span class="hljs-string"> no dangerous workflow patterns </span>|<span class="hljs-string"> https://github.com/ossf/scorecard/blob/a8eae2d833553e93021a22f5641661cb6ad3e24c/docs/checks.md#dangerous-workflow     </span>|<br>|<span class="hljs-string">         </span>|<span class="hljs-string">                        </span>|<span class="hljs-string"> detected                       </span>|<span class="hljs-string">                                                                                                                       </span>|<br>|<span class="hljs-string">---------</span>|<span class="hljs-string">------------------------</span>|<span class="hljs-string">--------------------------------</span>|<span class="hljs-string">-----------------------------------------------------------------------------------------------------------------------</span>|<br>|<span class="hljs-string"> 10 / 10 </span>|<span class="hljs-string"> Dependency-Update-Tool </span>|<span class="hljs-string"> update tool detected           </span>|<span class="hljs-string"> https://github.com/ossf/scorecard/blob/a8eae2d833553e93021a22f5641661cb6ad3e24c/docs/checks.md#dependency-update-tool </span>|<br>|<span class="hljs-string">---------</span>|<span class="hljs-string">------------------------</span>|<span class="hljs-string">--------------------------------</span>|<span class="hljs-string">-----------------------------------------------------------------------------------------------------------------------</span>|<br>|<span class="hljs-string"> 0 / 10  </span>|<span class="hljs-string"> Fuzzing                </span>|<span class="hljs-string"> project is not fuzzed          </span>|<span class="hljs-string"> https://github.com/ossf/scorecard/blob/a8eae2d833553e93021a22f5641661cb6ad3e24c/docs/checks.md#fuzzing                </span>|<br>|<span class="hljs-string">---------</span>|<span class="hljs-string">------------------------</span>|<span class="hljs-string">--------------------------------</span>|<span class="hljs-string">-----------------------------------------------------------------------------------------------------------------------</span>|<br>|<span class="hljs-string"> 10 / 10 </span>|<span class="hljs-string"> License                </span>|<span class="hljs-string"> license file detected          </span>|<span class="hljs-string"> https://github.com/ossf/scorecard/blob/a8eae2d833553e93021a22f5641661cb6ad3e24c/docs/checks.md#license                </span>|<br>|<span class="hljs-string">---------</span>|<span class="hljs-string">------------------------</span>|<span class="hljs-string">--------------------------------</span>|<span class="hljs-string">-----------------------------------------------------------------------------------------------------------------------</span>|<br>|<span class="hljs-string"> 0 / 10  </span>|<span class="hljs-string"> Maintained             </span>|<span class="hljs-string"> 0 commit(s) and 0 issue        </span>|<span class="hljs-string"> https://github.com/ossf/scorecard/blob/a8eae2d833553e93021a22f5641661cb6ad3e24c/docs/checks.md#maintained             </span>|<br>|<span class="hljs-string">         </span>|<span class="hljs-string">                        </span>|<span class="hljs-string"> activity found in the last 90  </span>|<span class="hljs-string">                                                                                                                       </span>|<br>|<span class="hljs-string">         </span>|<span class="hljs-string">                        </span>|<span class="hljs-string"> days -- score normalized to 0  </span>|<span class="hljs-string">                                                                                                                       </span>|<br>|<span class="hljs-string">---------</span>|<span class="hljs-string">------------------------</span>|<span class="hljs-string">--------------------------------</span>|<span class="hljs-string">-----------------------------------------------------------------------------------------------------------------------</span>|<br>|<span class="hljs-string"> ?       </span>|<span class="hljs-string"> Packaging              </span>|<span class="hljs-string"> packaging workflow not         </span>|<span class="hljs-string"> https://github.com/ossf/scorecard/blob/a8eae2d833553e93021a22f5641661cb6ad3e24c/docs/checks.md#packaging              </span>|<br>|<span class="hljs-string">         </span>|<span class="hljs-string">                        </span>|<span class="hljs-string"> detected                       </span>|<span class="hljs-string">                                                                                                                       </span>|<br>|<span class="hljs-string">---------</span>|<span class="hljs-string">------------------------</span>|<span class="hljs-string">--------------------------------</span>|<span class="hljs-string">-----------------------------------------------------------------------------------------------------------------------</span>|<br>|<span class="hljs-string"> 0 / 10  </span>|<span class="hljs-string"> Pinned-Dependencies    </span>|<span class="hljs-string"> dependency not pinned by hash  </span>|<span class="hljs-string"> https://github.com/ossf/scorecard/blob/a8eae2d833553e93021a22f5641661cb6ad3e24c/docs/checks.md#pinned-dependencies    </span>|<br>|<span class="hljs-string">         </span>|<span class="hljs-string">                        </span>|<span class="hljs-string"> detected -- score normalized   </span>|<span class="hljs-string">                                                                                                                       </span>|<br>|<span class="hljs-string">         </span>|<span class="hljs-string">                        </span>|<span class="hljs-string"> to 0                           </span>|<span class="hljs-string">                                                                                                                       </span>|<br>|<span class="hljs-string">---------</span>|<span class="hljs-string">------------------------</span>|<span class="hljs-string">--------------------------------</span>|<span class="hljs-string">-----------------------------------------------------------------------------------------------------------------------</span>|<br>|<span class="hljs-string"> 0 / 10  </span>|<span class="hljs-string"> SAST                   </span>|<span class="hljs-string"> SAST tool is not run on all    </span>|<span class="hljs-string"> https://github.com/ossf/scorecard/blob/a8eae2d833553e93021a22f5641661cb6ad3e24c/docs/checks.md#sast                   </span>|<br>|<span class="hljs-string">         </span>|<span class="hljs-string">                        </span>|<span class="hljs-string"> commits -- score normalized to </span>|<span class="hljs-string">                                                                                                                       </span>|<br>|<span class="hljs-string">         </span>|<span class="hljs-string">                        </span>|<span class="hljs-string"> 0                              </span>|<span class="hljs-string">                                                                                                                       </span>|<br>|<span class="hljs-string">---------</span>|<span class="hljs-string">------------------------</span>|<span class="hljs-string">--------------------------------</span>|<span class="hljs-string">-----------------------------------------------------------------------------------------------------------------------</span>|<br>|<span class="hljs-string"> 10 / 10 </span>|<span class="hljs-string"> Security-Policy        </span>|<span class="hljs-string"> security policy file detected  </span>|<span class="hljs-string"> https://github.com/ossf/scorecard/blob/a8eae2d833553e93021a22f5641661cb6ad3e24c/docs/checks.md#security-policy        </span>|<br>|<span class="hljs-string">---------</span>|<span class="hljs-string">------------------------</span>|<span class="hljs-string">--------------------------------</span>|<span class="hljs-string">-----------------------------------------------------------------------------------------------------------------------</span>|<br>|<span class="hljs-string"> ?       </span>|<span class="hljs-string"> Signed-Releases        </span>|<span class="hljs-string"> no releases found              </span>|<span class="hljs-string"> https://github.com/ossf/scorecard/blob/a8eae2d833553e93021a22f5641661cb6ad3e24c/docs/checks.md#signed-releases        </span>|<br>|<span class="hljs-string">---------</span>|<span class="hljs-string">------------------------</span>|<span class="hljs-string">--------------------------------</span>|<span class="hljs-string">-----------------------------------------------------------------------------------------------------------------------</span>|<br>|<span class="hljs-string"> 0 / 10  </span>|<span class="hljs-string"> Token-Permissions      </span>|<span class="hljs-string"> detected GitHub workflow       </span>|<span class="hljs-string"> https://github.com/ossf/scorecard/blob/a8eae2d833553e93021a22f5641661cb6ad3e24c/docs/checks.md#token-permissions      </span>|<br>|<span class="hljs-string">         </span>|<span class="hljs-string">                        </span>|<span class="hljs-string"> tokens with excessive          </span>|<span class="hljs-string">                                                                                                                       </span>|<br>|<span class="hljs-string">         </span>|<span class="hljs-string">                        </span>|<span class="hljs-string"> permissions                    </span>|<span class="hljs-string">                                                                                                                       </span>|<br>|<span class="hljs-string">---------</span>|<span class="hljs-string">------------------------</span>|<span class="hljs-string">--------------------------------</span>|<span class="hljs-string">-----------------------------------------------------------------------------------------------------------------------</span>|<br>|<span class="hljs-string"> 0 / 10  </span>|<span class="hljs-string"> Vulnerabilities        </span>|<span class="hljs-string"> 22 existing vulnerabilities    </span>|<span class="hljs-string"> https://github.com/ossf/scorecard/blob/a8eae2d833553e93021a22f5641661cb6ad3e24c/docs/checks.md#vulnerabilities        </span>|<br>|<span class="hljs-string">         </span>|<span class="hljs-string">                        </span>|<span class="hljs-string"> detected                       </span>|<span class="hljs-string">                                                                                                                       </span>|<br>|<span class="hljs-string">---------</span>|<span class="hljs-string">------------------------</span>|<span class="hljs-string">--------------------------------</span>|<span class="hljs-string">-----------------------------------------------------------------------------------------------------------------------</span>|<br></code></pre></td></tr></table></figure>
+
+<p>在默认情况下，Scorecard会对所有检查运行。要运行特定检查，请使用：</p>
+<figure class="highlight bnf"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs bnf">scorecard --repo=<span class="hljs-attribute">&lt;repo_url&gt;</span> --checks <span class="hljs-attribute">&lt;check1,check2&gt;</span><br></code></pre></td></tr></table></figure>
+<p>例如：</p>
+<figure class="highlight jboss-cli"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs jboss-cli">scorecard <span class="hljs-params">--repo=https</span>:<span class="hljs-string">//github.com/ossf/scorecard</span> <span class="hljs-params">--checks</span> Code-Review,Maintained<br></code></pre></td></tr></table></figure>
+
+<p>使用SARIF文件导出到GitHub Security<br>可以将Scorecard检查结果导出到GitHub Security工具（由GitHub Actions自动生成）。为此，使用–format参数生成一个SARIF文件并上传：</p>
+<figure class="highlight stylus"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><code class="hljs stylus">scorecard <span class="hljs-attr">--repo</span>=&lt;repo_url&gt; <span class="hljs-attr">--format</span> sarif &gt; results<span class="hljs-selector-class">.sarif</span><br>gh upload results.sarif<br></code></pre></td></tr></table></figure>
+
+<p>使用原始数据导出<br>默认情况下，scorecard导出json格式的结果。可以使用以下参数导出结果：</p>
+<figure class="highlight brainfuck"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs brainfuck"><span class="hljs-comment">scorecard</span> <span class="hljs-literal">--</span><span class="hljs-comment">repo=</span>&lt;<span class="hljs-comment">repo_url</span>&gt; <span class="hljs-literal">--</span><span class="hljs-comment">format json</span> <span class="hljs-literal">--</span><span class="hljs-comment">show</span><span class="hljs-literal">-</span><span class="hljs-comment">details</span> &gt; <span class="hljs-comment">results</span><span class="hljs-string">.</span><span class="hljs-comment">json</span><br></code></pre></td></tr></table></figure>
+
+<h2 id="检查项介绍"><a href="#检查项介绍" class="headerlink" title="检查项介绍"></a>检查项介绍</h2><p>检查项详细来源：<a target="_blank" rel="noopener" href="https://github.com/ossf/scorecard/blob/main/docs/checks.md">https://github.com/ossf/scorecard/blob/main/docs/checks.md</a></p>
+<table>
+<thead>
+<tr>
+<th>名称</th>
+<th>描述</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Binary-Artifacts(二进制组件)</td>
+<td>检查项目中是否包含二进制文件</td>
+</tr>
+<tr>
+<td>Branch-Protection(分支保护)</td>
+<td>github 是否启用分支保护</td>
+</tr>
+<tr>
+<td>CI-Tests(CI测试)</td>
+<td>在合并分支请求之前是否配置CI测试</td>
+</tr>
+<tr>
+<td>CII-Best-Practices(CII最佳实践)</td>
+<td>是否遵循CII最佳实践</td>
+</tr>
+<tr>
+<td>Code-Review(代码审计)</td>
+<td>检测项目在合并代码之前是否进行代码审计</td>
+</tr>
+<tr>
+<td>Contributors(贡献者)</td>
+<td>检查项目是否有多个贡献者</td>
+</tr>
+<tr>
+<td>Dangerous-Workflow(不安全的工作流)</td>
+<td>检查github action配置是否不安全</td>
+</tr>
+<tr>
+<td>Dependency-Update-Tool(依赖更新工具)</td>
+<td>检查项目是否使用依赖更新工具</td>
+</tr>
+<tr>
+<td>Fuzzing(模糊测试)</td>
+<td>检查项目是否进行模糊测试</td>
+</tr>
+<tr>
+<td>License(许可协议)</td>
+<td>检查项目是否声明了许可协议</td>
+</tr>
+<tr>
+<td>Maintained(维护)</td>
+<td>检查项目是否积极维护</td>
+</tr>
+<tr>
+<td>Packaging(打包)</td>
+<td>检查项目是否使用组件包的形式进行发布</td>
+</tr>
+<tr>
+<td>Pinned-Dependencies(依赖标识)</td>
+<td>检查项目是否使用包管理器声明依赖信息</td>
+</tr>
+<tr>
+<td>SAST(静态代码扫描)</td>
+<td>检查项目是否进行静态代码扫描</td>
+</tr>
+<tr>
+<td>Security-Policy(安全策略)</td>
+<td>检查项目是否声明安全策略</td>
+</tr>
+<tr>
+<td>Signed-Releases(签名发行)</td>
+<td>检查项目是否对发布的组件进行签名</td>
+</tr>
+<tr>
+<td>Token-Permissions(令牌权限)</td>
+<td>检查workflow token是否遵顼最小权限原则</td>
+</tr>
+<tr>
+<td>Vulnerabilities(漏洞)</td>
+<td>使用osv等开源漏洞库检测代码和组件是否包含漏洞</td>
+</tr>
+</tbody></table>
+<h2 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h2><h3 id="企业实践"><a href="#企业实践" class="headerlink" title="企业实践"></a>企业实践</h3><p>1、使用 Scorecard 对第三方开源项目进行安全性评估，综合判断引入的第三方组件的健壮性。<br>2、对企业开源的项目进行评估，提高被维护项目的安全性。</p>
+<h3 id="开发者"><a href="#开发者" class="headerlink" title="开发者"></a>开发者</h3><p>1、对自己开发的项目进行评估，综合提高项目安全性。<br>2、评估引入的第三方组件，提高项目整理健壮性。</p>
+<h2 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h2><ul>
+<li><a target="_blank" rel="noopener" href="https://deps.dev/">https://deps.dev/</a></li>
+<li><a target="_blank" rel="noopener" href="https://osv.dev/">https://osv.dev/</a></li>
+<li><a target="_blank" rel="noopener" href="https://github.com/ossf/scorecard">https://github.com/ossf/scorecard</a></li>
+</ul>
+
+            </div>
+            <hr>
+            <div>
+              <div class="post-metas mb-3">
+                
+                  <div class="post-meta mr-3">
+                    <i class="iconfont icon-category"></i>
+                    
+                      <a class="hover-with-bg" href="/categories/Security/">Security</a>
+                    
+                  </div>
+                
+                
+                  <div class="post-meta">
+                    <i class="iconfont icon-tags"></i>
+                    
+                      <a class="hover-with-bg" href="/tags/Software-Supply-Chain/">Software Supply Chain</a>
+                    
+                  </div>
+                
+              </div>
+              
+                <p class="note note-warning">
+                  
+                    本博客所有文章除特别声明外，均采用 <a target="_blank" href="https://creativecommons.org/licenses/by-sa/4.0/deed.zh" rel="nofollow noopener noopener">CC BY-SA 4.0 协议</a> ，转载请注明出处！
+                  
+                </p>
+              
+              
+                <div class="post-prevnext">
+                  <article class="post-prev col-6">
+                    
+                    
+                      <a href="/2024/10/31/2024-10-31-aigc-security-check/">
+                        <i class="iconfont icon-arrowleft"></i>
+                        <span class="hidden-mobile">AIGC安全评估</span>
+                        <span class="visible-mobile">上一篇</span>
+                      </a>
+                    
+                  </article>
+                  <article class="post-next col-6">
+                    
+                    
+                      <a href="/2024/08/05/2024-08-05-MinerU/">
+                        <span class="hidden-mobile">MinerU 介绍</span>
+                        <span class="visible-mobile">下一篇</span>
+                        <i class="iconfont icon-arrowright"></i>
+                      </a>
+                    
+                  </article>
+                </div>
+              
+            </div>
+
+            
+              <!-- Comments -->
+              <article class="comments" id="comments" lazyload>
+                
+                  
+                
+                
+  <script type="text/javascript">
+    Fluid.utils.loadComments('#comments', function() {
+      var light = 'github-light';
+      var dark = 'github-dark';
+      var schema = document.documentElement.getAttribute('data-user-color-scheme');
+      if (schema === 'dark') {
+        schema = dark;
+      } else {
+        schema = light;
+      }
+      window.UtterancesThemeLight = light;
+      window.UtterancesThemeDark = dark;
+      var s = document.createElement('script');
+      s.setAttribute('src', 'https://utteranc.es/client.js');
+      s.setAttribute('repo', 'hksanduo/commit-utterances');
+      s.setAttribute('issue-term', 'title');
+      
+      s.setAttribute('label', 'utterances');
+      
+      s.setAttribute('theme', schema);
+      s.setAttribute('crossorigin', 'anonymous');
+      document.getElementById('comments').appendChild(s);
+    })
+  </script>
+  <noscript>Please enable JavaScript to view the comments</noscript>
+
+
+              </article>
+            
+          </article>
+        </div>
+      </div>
+    </div>
+    
+      <div class="d-none d-lg-block col-lg-2 toc-container" id="toc-ctn">
+        <div id="toc">
+  <p class="toc-header"><i class="iconfont icon-list"></i>&nbsp;目录</p>
+  <div class="toc-body" id="toc-body"></div>
+</div>
+
+      </div>
+    
+  </div>
+</div>
+
+<!-- Custom -->
+
+
+    
+
+    
+      <a id="scroll-top-button" aria-label="TOP" href="#" role="button">
+        <i class="iconfont icon-arrowup" aria-hidden="true"></i>
+      </a>
+    
+
+    
+      <div class="modal fade" id="modalSearch" tabindex="-1" role="dialog" aria-labelledby="ModalLabel"
+     aria-hidden="true">
+  <div class="modal-dialog modal-dialog-scrollable modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header text-center">
+        <h4 class="modal-title w-100 font-weight-bold">搜索</h4>
+        <button type="button" id="local-search-close" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body mx-3">
+        <div class="md-form mb-5">
+          <input type="text" id="local-search-input" class="form-control validate">
+          <label data-error="x" data-success="v"
+                 for="local-search-input">关键词</label>
+        </div>
+        <div class="list-group" id="local-search-result"></div>
+      </div>
+    </div>
+  </div>
+</div>
+    
+
+    
+  </main>
+
+  <footer class="text-center mt-5 py-3">
+  <div class="footer-content">
+     <a href="https://hexo.io" target="_blank" rel="nofollow noopener"><span>Hexo</span></a> <i class="iconfont icon-love"></i> <a href="https://github.com/fluid-dev/hexo-theme-fluid" target="_blank" rel="nofollow noopener"><span>Fluid</span></a> 
+  </div>
+  
+  <div class="statistics">
+    
+    
+
+    
+      
+        <!-- 不蒜子统计PV -->
+        <span id="busuanzi_container_site_pv" style="display: none">
+            总访问量 
+            <span id="busuanzi_value_site_pv"></span>
+             次
+          </span>
+      
+      
+        <!-- 不蒜子统计UV -->
+        <span id="busuanzi_container_site_uv" style="display: none">
+            总访客数 
+            <span id="busuanzi_value_site_uv"></span>
+             人
+          </span>
+      
+    
+  </div>
+
+
+  
+
+  
+</footer>
+
+
+  <!-- SCRIPTS -->
+  
+  <script  src="https://cdn.jsdelivr.net/npm/nprogress@0/nprogress.min.js" ></script>
+  <link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/nprogress@0/nprogress.min.css" />
+
+  <script>
+    NProgress.configure({"showSpinner":false,"trickleSpeed":100})
+    NProgress.start()
+    window.addEventListener('load', function() {
+      NProgress.done();
+    })
+  </script>
+
+
+<script  src="https://cdn.jsdelivr.net/npm/jquery@3/dist/jquery.min.js" ></script>
+<script  src="https://cdn.jsdelivr.net/npm/bootstrap@4/dist/js/bootstrap.min.js" ></script>
+<script  src="/js/events.js" ></script>
+<script  src="/js/plugins.js" ></script>
+
+<!-- Plugins -->
+
+
+  <script  src="/js/local-search.js" ></script>
+
+
+
+  
+    <script  src="/js/img-lazyload.js" ></script>
+  
+
+
+
+  
+
+
+
+  
+    <script  src="https://cdn.jsdelivr.net/npm/tocbot@4/dist/tocbot.min.js" ></script>
+  
+  
+    <script  src="https://cdn.jsdelivr.net/npm/@fancyapps/fancybox@3/dist/jquery.fancybox.min.js" ></script>
+  
+  
+    <script  src="https://cdn.jsdelivr.net/npm/anchor-js@4/anchor.min.js" ></script>
+  
+  
+    <script defer src="https://cdn.jsdelivr.net/npm/clipboard@2/dist/clipboard.min.js" ></script>
+  
+
+
+
+  <script defer src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js" ></script>
+
+
+
+
+  <script  src="https://cdn.jsdelivr.net/npm/typed.js@2/lib/typed.min.js" ></script>
+  <script>
+    (function (window, document) {
+      var typing = Fluid.plugins.typing;
+      var title = document.getElementById('subtitle').title;
+      
+      typing(title)
+      
+    })(window, document);
+  </script>
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+    <!-- Google Analytics -->
+    <script defer>
+      window.ga = window.ga || function () { (ga.q = ga.q || []).push(arguments) };
+      ga.l = +new Date;
+      ga('create', 'UA-167858469-1', 'auto');
+      ga('send', 'pageview');
+    </script>
+    <script async src='https://www.google-analytics.com/analytics.js'></script>
+  
+
+  
+
+  
+
+  
+
+  
+
+
+
+
+
+<!-- 主题的启动项 保持在最底部 -->
+<script  src="/js/boot.js" ></script>
+
+
+</body>
+</html>

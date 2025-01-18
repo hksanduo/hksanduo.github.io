@@ -1,0 +1,594 @@
+
+
+<!DOCTYPE html>
+<html lang="zh-CN" data-default-color-scheme=auto>
+
+
+
+<head>
+  <meta charset="UTF-8">
+  <link rel="apple-touch-icon" sizes="76x76" href="/img/favicon.png">
+  <link rel="icon" href="/img/favicon.png">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, shrink-to-fit=no">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  
+  <meta name="theme-color" content="#2f4154">
+  <meta name="description" content="">
+  <meta name="author" content="sanduo">
+  <meta name="keywords" content="">
+  <meta name="description" content="mqtt-pwn 介绍 背景介绍最近在学习车联网相关知识，碰巧媳妇公司CTF题目中有一道车联网的题目，题目方向是MQTT，发现一个mqtt测试工具：mqtt-pwn，这里做记录和学习一下。 mqtt 安全风险相关 授权：匿名连接问题，匿名访问则代表任何人都可以发布或订阅消息。如果存在敏感数据或指令，将导致信息泄漏或者被恶意攻击者发起恶意指令； 传输：默认未加密，则可被中间人攻击。可获取其验证的用户">
+<meta property="og:type" content="article">
+<meta property="og:title" content="mqtt-pwn 介绍">
+<meta property="og:url" content="https://hksanduo.github.io/2024/07/09/2024-07-09-introduce-mqtt-pwn/index.html">
+<meta property="og:site_name" content="sanduo blog">
+<meta property="og:description" content="mqtt-pwn 介绍 背景介绍最近在学习车联网相关知识，碰巧媳妇公司CTF题目中有一道车联网的题目，题目方向是MQTT，发现一个mqtt测试工具：mqtt-pwn，这里做记录和学习一下。 mqtt 安全风险相关 授权：匿名连接问题，匿名访问则代表任何人都可以发布或订阅消息。如果存在敏感数据或指令，将导致信息泄漏或者被恶意攻击者发起恶意指令； 传输：默认未加密，则可被中间人攻击。可获取其验证的用户">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://hksanduo.github.io/img/20240709-01.png">
+<meta property="og:image" content="https://hksanduo.github.io/img/20240709-02.png">
+<meta property="article:published_time" content="2024-07-09T06:36:00.000Z">
+<meta property="article:modified_time" content="2025-01-18T14:54:10.082Z">
+<meta property="article:author" content="sanduo">
+<meta property="article:tag" content="Car">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:image" content="https://hksanduo.github.io/img/20240709-01.png">
+  
+  <title>mqtt-pwn 介绍 - sanduo blog</title>
+
+  <link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4/dist/css/bootstrap.min.css" />
+
+
+  <link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/github-markdown-css@4/github-markdown.min.css" />
+  <link  rel="stylesheet" href="/lib/hint/hint.min.css" />
+
+  
+    
+    
+      
+      <link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/highlight.js@10/styles/github-gist.min.css" />
+    
+  
+
+  
+    <link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fancyapps/fancybox@3/dist/jquery.fancybox.min.css" />
+  
+
+
+<!-- 主题依赖的图标库，不要自行修改 -->
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1749284_ba1fz6golrf.css">
+
+
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1736178_kmeydafke9r.css">
+
+
+<link  rel="stylesheet" href="/css/main.css" />
+
+<!-- 自定义样式保持在最底部 -->
+
+
+  <script id="fluid-configs">
+    var Fluid = window.Fluid || {};
+    var CONFIG = {"hostname":"hksanduo.github.io","root":"/","version":"1.8.12","typing":{"enable":true,"typeSpeed":70,"cursorChar":"_","loop":false},"anchorjs":{"enable":true,"element":"h1,h2,h3,h4,h5,h6","placement":"right","visible":"hover","icon":""},"progressbar":{"enable":true,"height_px":3,"color":"#29d","options":{"showSpinner":false,"trickleSpeed":100}},"copy_btn":true,"image_zoom":{"enable":true,"img_url_replace":["",""]},"toc":{"enable":true,"headingSelector":"h1,h2,h3,h4,h5,h6","collapseDepth":0},"lazyload":{"enable":true,"loading_img":"/img/loading.gif","onlypost":false,"offset_factor":2},"web_analytics":{"enable":true,"baidu":null,"google":"UA-167858469-1","gtag":null,"tencent":{"sid":null,"cid":null},"woyaola":null,"cnzz":null,"leancloud":{"app_id":null,"app_key":null,"server_url":null,"path":"window.location.pathname"}},"search_path":"/local-search.xml"};
+  </script>
+  <script  src="/js/utils.js" ></script>
+  <script  src="/js/color-schema.js" ></script>
+<meta name="generator" content="Hexo 5.4.2"></head>
+
+
+<body>
+  <header style="height: 70vh;">
+    <nav id="navbar" class="navbar fixed-top  navbar-expand-lg navbar-dark scrolling-navbar">
+  <div class="container">
+    <a class="navbar-brand" href="/">
+      <strong>Welcome To Sanduo&#39;s Blog</strong>
+    </a>
+
+    <button id="navbar-toggler-btn" class="navbar-toggler" type="button" data-toggle="collapse"
+            data-target="#navbarSupportedContent"
+            aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+      <div class="animated-icon"><span></span><span></span><span></span></div>
+    </button>
+
+    <!-- Collapsible content -->
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+      <ul class="navbar-nav ml-auto text-center">
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/">
+                <i class="iconfont icon-home-fill"></i>
+                首页
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/archives/">
+                <i class="iconfont icon-archive-fill"></i>
+                归档
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/categories/">
+                <i class="iconfont icon-category-fill"></i>
+                分类
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/tags/">
+                <i class="iconfont icon-tags-fill"></i>
+                标签
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/about/">
+                <i class="iconfont icon-user-fill"></i>
+                关于
+              </a>
+            </li>
+          
+        
+        
+          <li class="nav-item" id="search-btn">
+            <a class="nav-link" target="_self" href="javascript:;" data-toggle="modal" data-target="#modalSearch" aria-label="Search">
+              &nbsp;<i class="iconfont icon-search"></i>&nbsp;
+            </a>
+          </li>
+        
+        
+          <li class="nav-item" id="color-toggle-btn">
+            <a class="nav-link" target="_self" href="javascript:;" aria-label="Color Toggle">&nbsp;<i
+                class="iconfont icon-dark" id="color-toggle-icon"></i>&nbsp;</a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+</nav>
+
+    <div class="banner" id="banner" parallax=true
+         style="background: url('/img/default.png') no-repeat center center;
+           background-size: cover;">
+      <div class="full-bg-img">
+        <div class="mask flex-center" style="background-color: rgba(0, 0, 0, 0.3)">
+          <div class="page-header text-center fade-in-up">
+            <span class="h2" id="subtitle" title="mqtt-pwn 介绍">
+              
+            </span>
+
+            
+              <div class="mt-3">
+  
+  
+    <span class="post-meta">
+      <i class="iconfont icon-date-fill" aria-hidden="true"></i>
+      <time datetime="2024-07-09 06:36" pubdate>
+        2024年7月9日 早上
+      </time>
+    </span>
+  
+</div>
+
+<div class="mt-1">
+  
+    <span class="post-meta mr-2">
+      <i class="iconfont icon-chart"></i>
+      1.5k 字
+    </span>
+  
+
+  
+    <span class="post-meta mr-2">
+      <i class="iconfont icon-clock-fill"></i>
+      
+      
+      5 分钟
+    </span>
+  
+
+  
+  
+</div>
+
+            
+          </div>
+
+          
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <main>
+    
+      
+
+<div class="container-fluid nopadding-x">
+  <div class="row nomargin-x">
+    <div class="d-none d-lg-block col-lg-2"></div>
+    <div class="col-lg-8 nopadding-x-md">
+      <div class="container nopadding-x-md" id="board-ctn">
+        <div class="py-5" id="board">
+          <article class="post-content mx-auto">
+            <!-- SEO header -->
+            <h1 style="display: none">mqtt-pwn 介绍</h1>
+            
+            <div class="markdown-body">
+              <h1 id="mqtt-pwn-介绍"><a href="#mqtt-pwn-介绍" class="headerlink" title="mqtt-pwn 介绍"></a>mqtt-pwn 介绍</h1><hr>
+<h2 id="背景介绍"><a href="#背景介绍" class="headerlink" title="背景介绍"></a>背景介绍</h2><p>最近在学习车联网相关知识，碰巧媳妇公司CTF题目中有一道车联网的题目，题目方向是MQTT，发现一个mqtt测试工具：mqtt-pwn，这里做记录和学习一下。</p>
+<h2 id="mqtt-安全风险相关"><a href="#mqtt-安全风险相关" class="headerlink" title="mqtt 安全风险相关"></a>mqtt 安全风险相关</h2><ul>
+<li>授权：匿名连接问题，匿名访问则代表任何人都可以发布或订阅消息。如果存在敏感数据或指令，将导致信息泄漏或者被恶意攻击者发起恶意指令；</li>
+<li>传输：默认未加密，则可被中间人攻击。可获取其验证的用户名和密码；</li>
+<li>认证：弱口令问题，由于可被爆破，设置了弱口令，同样也会存在安全风险；</li>
+<li>应用：订阅端明文配置导致泄漏其验证的用户名和密码；</li>
+<li>漏洞：服务端软件自身存在缺陷可被利用，或者订阅端或服务端解析内容不当产生安全漏洞，这将导致整个系统。</li>
+</ul>
+<table>
+<thead>
+<tr>
+<th>id</th>
+<th>漏洞详情</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>1</td>
+<td>1、Eclipse Mosquitto 1.0～1.5.5 存在授权问题漏洞 漏洞公告：<a target="_blank" rel="noopener" href="https://www.anquanke.com/vul/id/1514742">https://www.anquanke.com/vul/id/1514742</a></td>
+</tr>
+<tr>
+<td>2</td>
+<td>1、Eclipse Mosquitto &lt;&#x3D; 1.4.15 存在拒绝服务漏洞 漏洞公告：<a target="_blank" rel="noopener" href="http://www.nsfocus.net/vulndb/40015">http://www.nsfocus.net/vulndb/40015</a></td>
+</tr>
+<tr>
+<td>3</td>
+<td>2、 Eclipse Mosquitto 1.0～1.5.5存在访问控制漏洞 漏洞公告：<a target="_blank" rel="noopener" href="https://www.anquanke.com/vul/id/1514740">https://www.anquanke.com/vul/id/1514740</a></td>
+</tr>
+<tr>
+<td>4</td>
+<td>3、 MQTT 3.4.6之前版本和4.0.5之前的4.0.x版本存在拒绝服务漏洞 漏洞公告：<a target="_blank" rel="noopener" href="https://www.anquanke.com/vul/id/1132531">https://www.anquanke.com/vul/id/1132531</a></td>
+</tr>
+<tr>
+<td>5</td>
+<td>4、 MQTT protocol 3.1.1版本中存在安全漏洞 漏洞公告：<a target="_blank" rel="noopener" href="https://www.anquanke.com/vul/id/2051251">https://www.anquanke.com/vul/id/2051251</a></td>
+</tr>
+</tbody></table>
+<h2 id="mqtt-pwn-介绍-1"><a href="#mqtt-pwn-介绍-1" class="headerlink" title="mqtt-pwn 介绍"></a>mqtt-pwn 介绍</h2><p>MQTT-PWN是Akamai Threat Research 开发的一个针对物联网（IoT）Broker进行渗透测试和安全评估的强大工具集。但是项目当年未维护，无法直接运行，重新修改后地址如下：<a target="_blank" rel="noopener" href="https://github.com/hksanduo/mqtt-pwn">https://github.com/hksanduo/mqtt-pwn</a></p>
+<h3 id="构建"><a href="#构建" class="headerlink" title="构建"></a>构建</h3><figure class="highlight brainfuck"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs brainfuck"><span class="hljs-comment">docker</span><span class="hljs-literal">-</span><span class="hljs-comment">compose up</span> <span class="hljs-literal">--</span><span class="hljs-comment">build</span> <span class="hljs-literal">--</span><span class="hljs-comment">detach</span><br></code></pre></td></tr></table></figure>
+
+<h3 id="使用"><a href="#使用" class="headerlink" title="使用"></a>使用</h3><h4 id="客户端运行"><a href="#客户端运行" class="headerlink" title="客户端运行"></a>客户端运行</h4><figure class="highlight routeros"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs routeros">docker-compose <span class="hljs-built_in">run</span> cli<br></code></pre></td></tr></table></figure>
+<p><img src="/img/20240709-01.png" srcset="/img/loading.gif" lazyload alt="启动界面"></p>
+<h4 id="MQTT-PWN-使用"><a href="#MQTT-PWN-使用" class="headerlink" title="MQTT-PWN 使用"></a>MQTT-PWN 使用</h4><p>功能模块支持：</p>
+<ul>
+<li>爆破（Credentials Brute Force）</li>
+<li>执行命令（Command &amp; Control）</li>
+<li>连接（Connect to a Broker）</li>
+<li>信息收集（Infromation Grabber）</li>
+<li>GPS泄露检测（Owntracks(GPS Tracker)）</li>
+<li>Sonofff测试（Sonoff Exploiter）</li>
+<li>topic探测枚举（Enumeration）</li>
+</ul>
+<p><img src="/img/20240709-02.png" srcset="/img/loading.gif" lazyload alt="help"></p>
+<h4 id="使用注意事项"><a href="#使用注意事项" class="headerlink" title="使用注意事项"></a>使用注意事项</h4><p>1、MQTT-PWN不支持EMQX，主要原因是EMQX对返回的数据做了处理，如果获取不到MQTT Server数据的小伙伴不要慌张，对于EMQX可以使用的功能是凭证爆破，也可以用mqtts工具测试，上一篇博客有介绍。 </p>
+<p>2、MQTT-PWN的原理也较为简单，测试EMQX之外的服务，尽可能工具扫描和手动测试结合，主要是探测Topic。 </p>
+<p>3、此处就不一一介绍mqtt-pwn的使用了，各位可以参考官方wiki，写的很详细：<a target="_blank" rel="noopener" href="https://mqtt-pwn.readthedocs.io/en/latest/intro.html">https://mqtt-pwn.readthedocs.io/en/latest/intro.html</a></p>
+<h2 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h2><ul>
+<li><a target="_blank" rel="noopener" href="https://github.com/SPuerBRead/mqtts">https://github.com/SPuerBRead/mqtts</a></li>
+<li><a target="_blank" rel="noopener" href="https://www.anquanke.com/post/id/212335">https://www.anquanke.com/post/id/212335</a></li>
+<li><a target="_blank" rel="noopener" href="https://mqtt-pwn.readthedocs.io/en/latest/intro.html">https://mqtt-pwn.readthedocs.io/en/latest/intro.html</a></li>
+<li><a target="_blank" rel="noopener" href="https://www.secpulse.com/archives/160231.html">https://www.secpulse.com/archives/160231.html</a></li>
+</ul>
+
+            </div>
+            <hr>
+            <div>
+              <div class="post-metas mb-3">
+                
+                  <div class="post-meta mr-3">
+                    <i class="iconfont icon-category"></i>
+                    
+                      <a class="hover-with-bg" href="/categories/Security/">Security</a>
+                    
+                  </div>
+                
+                
+                  <div class="post-meta">
+                    <i class="iconfont icon-tags"></i>
+                    
+                      <a class="hover-with-bg" href="/tags/Car/">Car</a>
+                    
+                  </div>
+                
+              </div>
+              
+                <p class="note note-warning">
+                  
+                    本博客所有文章除特别声明外，均采用 <a target="_blank" href="https://creativecommons.org/licenses/by-sa/4.0/deed.zh" rel="nofollow noopener noopener">CC BY-SA 4.0 协议</a> ，转载请注明出处！
+                  
+                </p>
+              
+              
+                <div class="post-prevnext">
+                  <article class="post-prev col-6">
+                    
+                    
+                      <a href="/2024/07/18/2024-07-18-commemorate-the-past-three-years-of-work/">
+                        <i class="iconfont icon-arrowleft"></i>
+                        <span class="hidden-mobile">纪念与W工作的三年</span>
+                        <span class="visible-mobile">上一篇</span>
+                      </a>
+                    
+                  </article>
+                  <article class="post-next col-6">
+                    
+                    
+                      <a href="/2024/06/24/2024-06-24-introduce-mqtts/">
+                        <span class="hidden-mobile">mqtts 介绍</span>
+                        <span class="visible-mobile">下一篇</span>
+                        <i class="iconfont icon-arrowright"></i>
+                      </a>
+                    
+                  </article>
+                </div>
+              
+            </div>
+
+            
+              <!-- Comments -->
+              <article class="comments" id="comments" lazyload>
+                
+                  
+                
+                
+  <script type="text/javascript">
+    Fluid.utils.loadComments('#comments', function() {
+      var light = 'github-light';
+      var dark = 'github-dark';
+      var schema = document.documentElement.getAttribute('data-user-color-scheme');
+      if (schema === 'dark') {
+        schema = dark;
+      } else {
+        schema = light;
+      }
+      window.UtterancesThemeLight = light;
+      window.UtterancesThemeDark = dark;
+      var s = document.createElement('script');
+      s.setAttribute('src', 'https://utteranc.es/client.js');
+      s.setAttribute('repo', 'hksanduo/commit-utterances');
+      s.setAttribute('issue-term', 'title');
+      
+      s.setAttribute('label', 'utterances');
+      
+      s.setAttribute('theme', schema);
+      s.setAttribute('crossorigin', 'anonymous');
+      document.getElementById('comments').appendChild(s);
+    })
+  </script>
+  <noscript>Please enable JavaScript to view the comments</noscript>
+
+
+              </article>
+            
+          </article>
+        </div>
+      </div>
+    </div>
+    
+      <div class="d-none d-lg-block col-lg-2 toc-container" id="toc-ctn">
+        <div id="toc">
+  <p class="toc-header"><i class="iconfont icon-list"></i>&nbsp;目录</p>
+  <div class="toc-body" id="toc-body"></div>
+</div>
+
+      </div>
+    
+  </div>
+</div>
+
+<!-- Custom -->
+
+
+    
+
+    
+      <a id="scroll-top-button" aria-label="TOP" href="#" role="button">
+        <i class="iconfont icon-arrowup" aria-hidden="true"></i>
+      </a>
+    
+
+    
+      <div class="modal fade" id="modalSearch" tabindex="-1" role="dialog" aria-labelledby="ModalLabel"
+     aria-hidden="true">
+  <div class="modal-dialog modal-dialog-scrollable modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header text-center">
+        <h4 class="modal-title w-100 font-weight-bold">搜索</h4>
+        <button type="button" id="local-search-close" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body mx-3">
+        <div class="md-form mb-5">
+          <input type="text" id="local-search-input" class="form-control validate">
+          <label data-error="x" data-success="v"
+                 for="local-search-input">关键词</label>
+        </div>
+        <div class="list-group" id="local-search-result"></div>
+      </div>
+    </div>
+  </div>
+</div>
+    
+
+    
+  </main>
+
+  <footer class="text-center mt-5 py-3">
+  <div class="footer-content">
+     <a href="https://hexo.io" target="_blank" rel="nofollow noopener"><span>Hexo</span></a> <i class="iconfont icon-love"></i> <a href="https://github.com/fluid-dev/hexo-theme-fluid" target="_blank" rel="nofollow noopener"><span>Fluid</span></a> 
+  </div>
+  
+  <div class="statistics">
+    
+    
+
+    
+      
+        <!-- 不蒜子统计PV -->
+        <span id="busuanzi_container_site_pv" style="display: none">
+            总访问量 
+            <span id="busuanzi_value_site_pv"></span>
+             次
+          </span>
+      
+      
+        <!-- 不蒜子统计UV -->
+        <span id="busuanzi_container_site_uv" style="display: none">
+            总访客数 
+            <span id="busuanzi_value_site_uv"></span>
+             人
+          </span>
+      
+    
+  </div>
+
+
+  
+
+  
+</footer>
+
+
+  <!-- SCRIPTS -->
+  
+  <script  src="https://cdn.jsdelivr.net/npm/nprogress@0/nprogress.min.js" ></script>
+  <link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/nprogress@0/nprogress.min.css" />
+
+  <script>
+    NProgress.configure({"showSpinner":false,"trickleSpeed":100})
+    NProgress.start()
+    window.addEventListener('load', function() {
+      NProgress.done();
+    })
+  </script>
+
+
+<script  src="https://cdn.jsdelivr.net/npm/jquery@3/dist/jquery.min.js" ></script>
+<script  src="https://cdn.jsdelivr.net/npm/bootstrap@4/dist/js/bootstrap.min.js" ></script>
+<script  src="/js/events.js" ></script>
+<script  src="/js/plugins.js" ></script>
+
+<!-- Plugins -->
+
+
+  <script  src="/js/local-search.js" ></script>
+
+
+
+  
+    <script  src="/js/img-lazyload.js" ></script>
+  
+
+
+
+  
+
+
+
+  
+    <script  src="https://cdn.jsdelivr.net/npm/tocbot@4/dist/tocbot.min.js" ></script>
+  
+  
+    <script  src="https://cdn.jsdelivr.net/npm/@fancyapps/fancybox@3/dist/jquery.fancybox.min.js" ></script>
+  
+  
+    <script  src="https://cdn.jsdelivr.net/npm/anchor-js@4/anchor.min.js" ></script>
+  
+  
+    <script defer src="https://cdn.jsdelivr.net/npm/clipboard@2/dist/clipboard.min.js" ></script>
+  
+
+
+
+  <script defer src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js" ></script>
+
+
+
+
+  <script  src="https://cdn.jsdelivr.net/npm/typed.js@2/lib/typed.min.js" ></script>
+  <script>
+    (function (window, document) {
+      var typing = Fluid.plugins.typing;
+      var title = document.getElementById('subtitle').title;
+      
+      typing(title)
+      
+    })(window, document);
+  </script>
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+    <!-- Google Analytics -->
+    <script defer>
+      window.ga = window.ga || function () { (ga.q = ga.q || []).push(arguments) };
+      ga.l = +new Date;
+      ga('create', 'UA-167858469-1', 'auto');
+      ga('send', 'pageview');
+    </script>
+    <script async src='https://www.google-analytics.com/analytics.js'></script>
+  
+
+  
+
+  
+
+  
+
+  
+
+
+
+
+
+<!-- 主题的启动项 保持在最底部 -->
+<script  src="/js/boot.js" ></script>
+
+
+</body>
+</html>

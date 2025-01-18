@@ -1,0 +1,567 @@
+
+
+<!DOCTYPE html>
+<html lang="zh-CN" data-default-color-scheme=auto>
+
+
+
+<head>
+  <meta charset="UTF-8">
+  <link rel="apple-touch-icon" sizes="76x76" href="/img/favicon.png">
+  <link rel="icon" href="/img/favicon.png">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, shrink-to-fit=no">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  
+  <meta name="theme-color" content="#2f4154">
+  <meta name="description" content="">
+  <meta name="author" content="sanduo">
+  <meta name="keywords" content="">
+  <meta name="description" content="API BOM - ASPM数据关联分析纽带API BOMAPI物料清单(API BOM)，这个概念是之前调研ASPM厂商OX Security提出的一个概念，目前没有统一的定义，可以参考软件物料清单(SBOM)。笔者在做ASPM数据分析调研的时候，主要的目的是需要寻求一种合理的方式对多个安全平台收集的数据进行去重分析，早期可以通过制定统一的漏洞分类分级标准，使用CWE编号或者支持统一的漏洞编号，">
+<meta property="og:type" content="article">
+<meta property="og:title" content="API BOM - ASPM数据关联分析纽带 ">
+<meta property="og:url" content="https://hksanduo.github.io/2025/01/12/2025-01-12-api-bom/index.html">
+<meta property="og:site_name" content="sanduo blog">
+<meta property="og:description" content="API BOM - ASPM数据关联分析纽带API BOMAPI物料清单(API BOM)，这个概念是之前调研ASPM厂商OX Security提出的一个概念，目前没有统一的定义，可以参考软件物料清单(SBOM)。笔者在做ASPM数据分析调研的时候，主要的目的是需要寻求一种合理的方式对多个安全平台收集的数据进行去重分析，早期可以通过制定统一的漏洞分类分级标准，使用CWE编号或者支持统一的漏洞编号，">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://hksanduo.github.io/img/20250112-01.png">
+<meta property="og:image" content="https://hksanduo.github.io/img/20250112-02.png">
+<meta property="og:image" content="https://hksanduo.github.io/img/20250112-03.png">
+<meta property="og:image" content="https://hksanduo.github.io/img/20250112-05.png">
+<meta property="og:image" content="https://hksanduo.github.io/img/20250112-04.png">
+<meta property="article:published_time" content="2025-01-12T08:05:00.000Z">
+<meta property="article:modified_time" content="2025-01-18T14:54:10.083Z">
+<meta property="article:author" content="sanduo">
+<meta property="article:tag" content="SDL">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:image" content="https://hksanduo.github.io/img/20250112-01.png">
+  
+  <title>API BOM - ASPM数据关联分析纽带  - sanduo blog</title>
+
+  <link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4/dist/css/bootstrap.min.css" />
+
+
+  <link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/github-markdown-css@4/github-markdown.min.css" />
+  <link  rel="stylesheet" href="/lib/hint/hint.min.css" />
+
+  
+    
+    
+      
+      <link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/highlight.js@10/styles/github-gist.min.css" />
+    
+  
+
+  
+    <link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fancyapps/fancybox@3/dist/jquery.fancybox.min.css" />
+  
+
+
+<!-- 主题依赖的图标库，不要自行修改 -->
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1749284_ba1fz6golrf.css">
+
+
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1736178_kmeydafke9r.css">
+
+
+<link  rel="stylesheet" href="/css/main.css" />
+
+<!-- 自定义样式保持在最底部 -->
+
+
+  <script id="fluid-configs">
+    var Fluid = window.Fluid || {};
+    var CONFIG = {"hostname":"hksanduo.github.io","root":"/","version":"1.8.12","typing":{"enable":true,"typeSpeed":70,"cursorChar":"_","loop":false},"anchorjs":{"enable":true,"element":"h1,h2,h3,h4,h5,h6","placement":"right","visible":"hover","icon":""},"progressbar":{"enable":true,"height_px":3,"color":"#29d","options":{"showSpinner":false,"trickleSpeed":100}},"copy_btn":true,"image_zoom":{"enable":true,"img_url_replace":["",""]},"toc":{"enable":true,"headingSelector":"h1,h2,h3,h4,h5,h6","collapseDepth":0},"lazyload":{"enable":true,"loading_img":"/img/loading.gif","onlypost":false,"offset_factor":2},"web_analytics":{"enable":true,"baidu":null,"google":"UA-167858469-1","gtag":null,"tencent":{"sid":null,"cid":null},"woyaola":null,"cnzz":null,"leancloud":{"app_id":null,"app_key":null,"server_url":null,"path":"window.location.pathname"}},"search_path":"/local-search.xml"};
+  </script>
+  <script  src="/js/utils.js" ></script>
+  <script  src="/js/color-schema.js" ></script>
+<meta name="generator" content="Hexo 5.4.2"></head>
+
+
+<body>
+  <header style="height: 70vh;">
+    <nav id="navbar" class="navbar fixed-top  navbar-expand-lg navbar-dark scrolling-navbar">
+  <div class="container">
+    <a class="navbar-brand" href="/">
+      <strong>Welcome To Sanduo&#39;s Blog</strong>
+    </a>
+
+    <button id="navbar-toggler-btn" class="navbar-toggler" type="button" data-toggle="collapse"
+            data-target="#navbarSupportedContent"
+            aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+      <div class="animated-icon"><span></span><span></span><span></span></div>
+    </button>
+
+    <!-- Collapsible content -->
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+      <ul class="navbar-nav ml-auto text-center">
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/">
+                <i class="iconfont icon-home-fill"></i>
+                首页
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/archives/">
+                <i class="iconfont icon-archive-fill"></i>
+                归档
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/categories/">
+                <i class="iconfont icon-category-fill"></i>
+                分类
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/tags/">
+                <i class="iconfont icon-tags-fill"></i>
+                标签
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/about/">
+                <i class="iconfont icon-user-fill"></i>
+                关于
+              </a>
+            </li>
+          
+        
+        
+          <li class="nav-item" id="search-btn">
+            <a class="nav-link" target="_self" href="javascript:;" data-toggle="modal" data-target="#modalSearch" aria-label="Search">
+              &nbsp;<i class="iconfont icon-search"></i>&nbsp;
+            </a>
+          </li>
+        
+        
+          <li class="nav-item" id="color-toggle-btn">
+            <a class="nav-link" target="_self" href="javascript:;" aria-label="Color Toggle">&nbsp;<i
+                class="iconfont icon-dark" id="color-toggle-icon"></i>&nbsp;</a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+</nav>
+
+    <div class="banner" id="banner" parallax=true
+         style="background: url('/img/default.png') no-repeat center center;
+           background-size: cover;">
+      <div class="full-bg-img">
+        <div class="mask flex-center" style="background-color: rgba(0, 0, 0, 0.3)">
+          <div class="page-header text-center fade-in-up">
+            <span class="h2" id="subtitle" title="API BOM - ASPM数据关联分析纽带 ">
+              
+            </span>
+
+            
+              <div class="mt-3">
+  
+  
+    <span class="post-meta">
+      <i class="iconfont icon-date-fill" aria-hidden="true"></i>
+      <time datetime="2025-01-12 08:05" pubdate>
+        2025年1月12日 早上
+      </time>
+    </span>
+  
+</div>
+
+<div class="mt-1">
+  
+    <span class="post-meta mr-2">
+      <i class="iconfont icon-chart"></i>
+      2.1k 字
+    </span>
+  
+
+  
+    <span class="post-meta mr-2">
+      <i class="iconfont icon-clock-fill"></i>
+      
+      
+      7 分钟
+    </span>
+  
+
+  
+  
+</div>
+
+            
+          </div>
+
+          
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <main>
+    
+      
+
+<div class="container-fluid nopadding-x">
+  <div class="row nomargin-x">
+    <div class="d-none d-lg-block col-lg-2"></div>
+    <div class="col-lg-8 nopadding-x-md">
+      <div class="container nopadding-x-md" id="board-ctn">
+        <div class="py-5" id="board">
+          <article class="post-content mx-auto">
+            <!-- SEO header -->
+            <h1 style="display: none">API BOM - ASPM数据关联分析纽带 </h1>
+            
+            <div class="markdown-body">
+              <h1 id="API-BOM-ASPM数据关联分析纽带"><a href="#API-BOM-ASPM数据关联分析纽带" class="headerlink" title="API BOM - ASPM数据关联分析纽带"></a>API BOM - ASPM数据关联分析纽带</h1><h2 id="API-BOM"><a href="#API-BOM" class="headerlink" title="API BOM"></a>API BOM</h2><p>API物料清单(API BOM)，这个概念是之前调研ASPM厂商OX Security提出的一个概念，目前没有统一的定义，可以参考软件物料清单(SBOM)。笔者在做ASPM数据分析调研的时候，主要的目的是需要寻求一种合理的方式对多个安全平台收集的数据进行去重分析，早期可以通过制定统一的漏洞分类分级标准，使用CWE编号或者支持统一的漏洞编号，比如：CVE，CNNVD，CNVD等，进行统一划分或者去重分析，但是实际实践效果就会差很多，主要原因有很多，最主要的原因是xAST产品种类繁杂，检出的结果标准不一，中间关联关系较弱，检出的风险无法进行有效的关联分析和漏洞优先级排序(VPT)。这次调研发现OX Security提出API BOM的理念和落地实践，为漏洞数据关联分析和漏洞优先级排序方面增加了新的可能。</p>
+<h2 id="API-BOM-获取方式"><a href="#API-BOM-获取方式" class="headerlink" title="API BOM 获取方式"></a>API BOM 获取方式</h2><p>获取应用程序公开的所有 API 端点的详细列表，将检测到的安全风险映射到公开的 API（受支持的语言编写的 API）。API BOM，为用户提供应用程序代码中定义的 API 端点（内部和外部）的详细清单，相关的平台可以识别以下来源的API信息：</p>
+<ul>
+<li>由用户的代码直接声明定义的。</li>
+<li>由存储库中的 OpenAPI 规范文件定义的。</li>
+<li>通过API管理平台(比如：ApiPost，Postman)等获取。</li>
+<li>通过前置的WAF、RASP、API网关获取。</li>
+<li>使用EBPF或者流量镜像设备获取。</li>
+<li>使用IAST等Agent插桩的方式获取。</li>
+<li>可以通过日志或者其他可以获取API信息的平台获取。</li>
+<li>利用被动代理平台或者工具来收集(burpsuite、API Parrot等)</li>
+</ul>
+<p>其中前两点是目前OX Security已经实现的，后面几点是笔者的观点，如果有欠缺可以一起讨论。</p>
+<p><img src="/img/20250112-01.png" srcset="/img/loading.gif" lazyload alt="ox security api bom"></p>
+<h2 id="API-BOM重要性"><a href="#API-BOM重要性" class="headerlink" title="API BOM重要性"></a>API BOM重要性</h2><p>API BOM让用户能够更好地了解用户的应用对外暴露情况，进而更轻松地：</p>
+<ul>
+<li>确保用户的所有 API 都经过适当的安全审查程序。这对于管理新添加的 API 的审核特别有帮助。</li>
+<li>管理 API 中危险的请求方式，即使它们是合法且有意包含在代码中的。比如：一个包含 <code>DELETE</code> 方法可能会改变用户的应用程序配置或用户数据。安全人员要意识到代码中存在此方法，这可能存在潜在的风险。</li>
+<li>方便安全运营人员优先考虑 <code>API</code> 暴露的风险（攻击者可以利用暴露的API，优先进行利用）。</li>
+</ul>
+<h2 id="API-BOM-数据分析实践"><a href="#API-BOM-数据分析实践" class="headerlink" title="API BOM 数据分析实践"></a>API BOM 数据分析实践</h2><p>将源代码、开源组件、漏洞、情报等信息关联映射到API上，通常从以下两个维度将API和源代码进行关联<br>• API 是通过源代码检测发现的。<br>• API 是用支持此功能的语言或者框架编写的。<br>当 API 处理程序函数和包含问题的函数之间存在函数调用路径时，就可以认为该 API 的暴露进一步增加检出风险的威胁等级。</p>
+<p>此处说的可能有些模糊，我举个例子来说明：</p>
+<p>1、通过分析源代码，发现对外暴露的接口，此处目前有部分Jetbrians插件(Apipost-Helper、Cool Request)可以支持，目前这两个插件都是闭源产品，忍不住分析了一下，重新逆向实现后发现都是利用Jetbrians psiClass来解析api接口，效果如下：</p>
+<p><img src="/img/20250112-02.png" srcset="/img/loading.gif" lazyload alt="Api Post效果"></p>
+<p>也可以使用JavaParser来实现，实现效果如下：<br><img src="/img/20250112-03.png" srcset="/img/loading.gif" lazyload alt="api parser"></p>
+<p>以上两种API解析，对于参数声明复杂参数，暂时解析不准，可以和API管理平台或者声明文件进行关联和补全。</p>
+<p>2、将所有的数据存储到数据库或者数据湖当中，然后进行关联分析，利用API进行汇总分析，可以关联xAST分析结果，如果SCA支持漏洞可达性分析，可以将组件漏洞通过代码和API进行关联。当安全事件发生时，可以通过API迅速定位漏洞位置，及时止损。</p>
+<p>3、利用漏洞优先级排序(VPT)模型或者平台，对所有检出结果进行排序，根据排序结果分配工单依次进行修复。其中，对外暴露的API在VPT计算模型的权重较高，修复优先级也越高。</p>
+<p>注意：以上笔者目前只预研完成了第一步，后续关联分析都只是设想，如果哪位同学成功运营实现，请不吝赐教。</p>
+<p>OX API BOM信息汇总效果如下：<br><img src="/img/20250112-05.png" srcset="/img/loading.gif" lazyload alt="OX API BOM信息汇总效果"></p>
+<p>目前OX Security 攻击路径实现效果如下：<br><img src="/img/20250112-04.png" srcset="/img/loading.gif" lazyload alt="ox security 关联分析效果"><br>可以直观分析受影响的应用、请求API、源代码提交信息、源代码路径、漏洞信息、情报等信息，提高安全运营人员的效率。此处使用的是理想的测试数据，但是在日常的安全运营工作当中，可以尽可能的关联有效信息，减少海量告警信息，优化工单分配，这就极大的提升运营效率。</p>
+<h2 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h2><p>1、API BOM可以将代码和xAST工具的检测结果进行关联，拉通API和 Source Code之间关联，进而拉通所有数据之间的关系。<br>2、丰富ASPM管理的维度。<br>3、丰富VPT计算因素，如：暴露的API，URL请求路径可达等<br>4、可以进行漏洞去重，并不局限于必须有漏洞编号、必须有统一的漏洞评价标准，可以通过API及关联的漏洞类型进行去重<br>5、降低运营人员排查难度，通过API关联数据，一个统一的平台可以检测所有受影响的系统、代码、组件，利用AI或者人工研判灵活处置分析漏洞，根据实际情况进行漏洞修复。</p>
+<h2 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h2><ul>
+<li><a target="_blank" rel="noopener" href="https://docs.ox.security/a-tour-of-ox/api-bom">https://docs.ox.security/a-tour-of-ox/api-bom</a></li>
+<li><a target="_blank" rel="noopener" href="https://www.apipost.cn/">https://www.apipost.cn/</a></li>
+<li><a target="_blank" rel="noopener" href="https://coolrequest.dev/">https://coolrequest.dev/</a></li>
+<li><a target="_blank" rel="noopener" href="https://apiparrot.com/">https://apiparrot.com/</a></li>
+</ul>
+
+            </div>
+            <hr>
+            <div>
+              <div class="post-metas mb-3">
+                
+                  <div class="post-meta mr-3">
+                    <i class="iconfont icon-category"></i>
+                    
+                      <a class="hover-with-bg" href="/categories/Security/">Security</a>
+                    
+                  </div>
+                
+                
+                  <div class="post-meta">
+                    <i class="iconfont icon-tags"></i>
+                    
+                      <a class="hover-with-bg" href="/tags/SDL/">SDL</a>
+                    
+                  </div>
+                
+              </div>
+              
+                <p class="note note-warning">
+                  
+                    本博客所有文章除特别声明外，均采用 <a target="_blank" href="https://creativecommons.org/licenses/by-sa/4.0/deed.zh" rel="nofollow noopener noopener">CC BY-SA 4.0 协议</a> ，转载请注明出处！
+                  
+                </p>
+              
+              
+                <div class="post-prevnext">
+                  <article class="post-prev col-6">
+                    
+                    
+                  </article>
+                  <article class="post-next col-6">
+                    
+                    
+                      <a href="/2024/11/27/2024-12-27-unemployment/">
+                        <span class="hidden-mobile">今年的冬天真冷</span>
+                        <span class="visible-mobile">下一篇</span>
+                        <i class="iconfont icon-arrowright"></i>
+                      </a>
+                    
+                  </article>
+                </div>
+              
+            </div>
+
+            
+              <!-- Comments -->
+              <article class="comments" id="comments" lazyload>
+                
+                  
+                
+                
+  <script type="text/javascript">
+    Fluid.utils.loadComments('#comments', function() {
+      var light = 'github-light';
+      var dark = 'github-dark';
+      var schema = document.documentElement.getAttribute('data-user-color-scheme');
+      if (schema === 'dark') {
+        schema = dark;
+      } else {
+        schema = light;
+      }
+      window.UtterancesThemeLight = light;
+      window.UtterancesThemeDark = dark;
+      var s = document.createElement('script');
+      s.setAttribute('src', 'https://utteranc.es/client.js');
+      s.setAttribute('repo', 'hksanduo/commit-utterances');
+      s.setAttribute('issue-term', 'title');
+      
+      s.setAttribute('label', 'utterances');
+      
+      s.setAttribute('theme', schema);
+      s.setAttribute('crossorigin', 'anonymous');
+      document.getElementById('comments').appendChild(s);
+    })
+  </script>
+  <noscript>Please enable JavaScript to view the comments</noscript>
+
+
+              </article>
+            
+          </article>
+        </div>
+      </div>
+    </div>
+    
+      <div class="d-none d-lg-block col-lg-2 toc-container" id="toc-ctn">
+        <div id="toc">
+  <p class="toc-header"><i class="iconfont icon-list"></i>&nbsp;目录</p>
+  <div class="toc-body" id="toc-body"></div>
+</div>
+
+      </div>
+    
+  </div>
+</div>
+
+<!-- Custom -->
+
+
+    
+
+    
+      <a id="scroll-top-button" aria-label="TOP" href="#" role="button">
+        <i class="iconfont icon-arrowup" aria-hidden="true"></i>
+      </a>
+    
+
+    
+      <div class="modal fade" id="modalSearch" tabindex="-1" role="dialog" aria-labelledby="ModalLabel"
+     aria-hidden="true">
+  <div class="modal-dialog modal-dialog-scrollable modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header text-center">
+        <h4 class="modal-title w-100 font-weight-bold">搜索</h4>
+        <button type="button" id="local-search-close" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body mx-3">
+        <div class="md-form mb-5">
+          <input type="text" id="local-search-input" class="form-control validate">
+          <label data-error="x" data-success="v"
+                 for="local-search-input">关键词</label>
+        </div>
+        <div class="list-group" id="local-search-result"></div>
+      </div>
+    </div>
+  </div>
+</div>
+    
+
+    
+  </main>
+
+  <footer class="text-center mt-5 py-3">
+  <div class="footer-content">
+     <a href="https://hexo.io" target="_blank" rel="nofollow noopener"><span>Hexo</span></a> <i class="iconfont icon-love"></i> <a href="https://github.com/fluid-dev/hexo-theme-fluid" target="_blank" rel="nofollow noopener"><span>Fluid</span></a> 
+  </div>
+  
+  <div class="statistics">
+    
+    
+
+    
+      
+        <!-- 不蒜子统计PV -->
+        <span id="busuanzi_container_site_pv" style="display: none">
+            总访问量 
+            <span id="busuanzi_value_site_pv"></span>
+             次
+          </span>
+      
+      
+        <!-- 不蒜子统计UV -->
+        <span id="busuanzi_container_site_uv" style="display: none">
+            总访客数 
+            <span id="busuanzi_value_site_uv"></span>
+             人
+          </span>
+      
+    
+  </div>
+
+
+  
+
+  
+</footer>
+
+
+  <!-- SCRIPTS -->
+  
+  <script  src="https://cdn.jsdelivr.net/npm/nprogress@0/nprogress.min.js" ></script>
+  <link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/nprogress@0/nprogress.min.css" />
+
+  <script>
+    NProgress.configure({"showSpinner":false,"trickleSpeed":100})
+    NProgress.start()
+    window.addEventListener('load', function() {
+      NProgress.done();
+    })
+  </script>
+
+
+<script  src="https://cdn.jsdelivr.net/npm/jquery@3/dist/jquery.min.js" ></script>
+<script  src="https://cdn.jsdelivr.net/npm/bootstrap@4/dist/js/bootstrap.min.js" ></script>
+<script  src="/js/events.js" ></script>
+<script  src="/js/plugins.js" ></script>
+
+<!-- Plugins -->
+
+
+  <script  src="/js/local-search.js" ></script>
+
+
+
+  
+    <script  src="/js/img-lazyload.js" ></script>
+  
+
+
+
+  
+
+
+
+  
+    <script  src="https://cdn.jsdelivr.net/npm/tocbot@4/dist/tocbot.min.js" ></script>
+  
+  
+    <script  src="https://cdn.jsdelivr.net/npm/@fancyapps/fancybox@3/dist/jquery.fancybox.min.js" ></script>
+  
+  
+    <script  src="https://cdn.jsdelivr.net/npm/anchor-js@4/anchor.min.js" ></script>
+  
+  
+    <script defer src="https://cdn.jsdelivr.net/npm/clipboard@2/dist/clipboard.min.js" ></script>
+  
+
+
+
+  <script defer src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js" ></script>
+
+
+
+
+  <script  src="https://cdn.jsdelivr.net/npm/typed.js@2/lib/typed.min.js" ></script>
+  <script>
+    (function (window, document) {
+      var typing = Fluid.plugins.typing;
+      var title = document.getElementById('subtitle').title;
+      
+      typing(title)
+      
+    })(window, document);
+  </script>
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+    <!-- Google Analytics -->
+    <script defer>
+      window.ga = window.ga || function () { (ga.q = ga.q || []).push(arguments) };
+      ga.l = +new Date;
+      ga('create', 'UA-167858469-1', 'auto');
+      ga('send', 'pageview');
+    </script>
+    <script async src='https://www.google-analytics.com/analytics.js'></script>
+  
+
+  
+
+  
+
+  
+
+  
+
+
+
+
+
+<!-- 主题的启动项 保持在最底部 -->
+<script  src="/js/boot.js" ></script>
+
+
+</body>
+</html>

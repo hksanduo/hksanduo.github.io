@@ -1,0 +1,609 @@
+
+
+<!DOCTYPE html>
+<html lang="zh-CN" data-default-color-scheme=auto>
+
+
+
+<head>
+  <meta charset="UTF-8">
+  <link rel="apple-touch-icon" sizes="76x76" href="/img/favicon.png">
+  <link rel="icon" href="/img/favicon.png">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, shrink-to-fit=no">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  
+  <meta name="theme-color" content="#2f4154">
+  <meta name="description" content="">
+  <meta name="author" content="sanduo">
+  <meta name="keywords" content="">
+  <meta name="description" content="在星际蜗牛J1900平台上上安装ESXI 6.7及openwrt  背景之前做NAS，替换出一块电源和一块星际蜗牛的主板，从咸鱼上淘了一个千兆USB网卡，就组成了一个简单的X86软路由，由于固态容量只有16G，安装一个openwrt虚拟机磁盘就占的的差不多了，最近想扩容一下固态，在重新安装ESXI和openwrt过程中，之前遇到的坑又走了一遍，所以记录下来，供以后参考。 准备 ESXI 6.7 安">
+<meta property="og:type" content="article">
+<meta property="og:title" content="在星际蜗牛上安装ESXI 6.7 及openwrt">
+<meta property="og:url" content="https://hksanduo.github.io/2021/11/06/2021-11-06-install-esxi-on-interstellar-snails/index.html">
+<meta property="og:site_name" content="sanduo blog">
+<meta property="og:description" content="在星际蜗牛J1900平台上上安装ESXI 6.7及openwrt  背景之前做NAS，替换出一块电源和一块星际蜗牛的主板，从咸鱼上淘了一个千兆USB网卡，就组成了一个简单的X86软路由，由于固态容量只有16G，安装一个openwrt虚拟机磁盘就占的的差不多了，最近想扩容一下固态，在重新安装ESXI和openwrt过程中，之前遇到的坑又走了一遍，所以记录下来，供以后参考。 准备 ESXI 6.7 安">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://hksanduo.github.io/img/20211106-01.jpg">
+<meta property="og:image" content="https://hksanduo.github.io/img/20211106-04.jpg">
+<meta property="og:image" content="https://hksanduo.github.io/img/20211106-05.png">
+<meta property="og:image" content="https://hksanduo.github.io/img/20211106-02.jpg">
+<meta property="og:image" content="https://hksanduo.github.io/img/20211106-03.jpg">
+<meta property="og:image" content="https://hksanduo.github.io/img/20211106-06.jpg">
+<meta property="og:image" content="https://hksanduo.github.io/img/20211106-08.png">
+<meta property="og:image" content="https://hksanduo.github.io/img/20211106-07.png">
+<meta property="og:image" content="https://hksanduo.github.io/img/20211106-09.png">
+<meta property="og:image" content="https://hksanduo.github.io/img/20211106-10.png">
+<meta property="og:image" content="https://hksanduo.github.io/img/20211106-11.jpg">
+<meta property="og:image" content="https://hksanduo.github.io/img/20211106-12.png">
+<meta property="og:image" content="https://hksanduo.github.io/img/20211106-13.png">
+<meta property="og:image" content="https://hksanduo.github.io/img/20211106-14.png">
+<meta property="og:image" content="https://hksanduo.github.io/img/20211106-16.png">
+<meta property="og:image" content="https://hksanduo.github.io/img/20211106-15.png">
+<meta property="og:image" content="https://hksanduo.github.io/img/20211106-17.png">
+<meta property="og:image" content="https://hksanduo.github.io/img/20211106-18.png">
+<meta property="og:image" content="https://hksanduo.github.io/img/20211106-19.png">
+<meta property="og:image" content="https://hksanduo.github.io/img/20211106-20.png">
+<meta property="og:image" content="https://hksanduo.github.io/img/20211106-22.png">
+<meta property="og:image" content="https://hksanduo.github.io/img/20211106-23.png">
+<meta property="og:image" content="https://hksanduo.github.io/img/20211106-21.png">
+<meta property="og:image" content="https://hksanduo.github.io/img/20211106-24.png">
+<meta property="og:image" content="https://hksanduo.github.io/img/20211106-25.png">
+<meta property="og:image" content="https://hksanduo.github.io/img/20211106-26.jpg">
+<meta property="article:published_time" content="2021-11-06T11:50:00.000Z">
+<meta property="article:modified_time" content="2025-01-18T14:54:10.080Z">
+<meta property="article:author" content="sanduo">
+<meta property="article:tag" content="openwrt">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:image" content="https://hksanduo.github.io/img/20211106-01.jpg">
+  
+  <title>在星际蜗牛上安装ESXI 6.7 及openwrt - sanduo blog</title>
+
+  <link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4/dist/css/bootstrap.min.css" />
+
+
+  <link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/github-markdown-css@4/github-markdown.min.css" />
+  <link  rel="stylesheet" href="/lib/hint/hint.min.css" />
+
+  
+    
+    
+      
+      <link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/highlight.js@10/styles/github-gist.min.css" />
+    
+  
+
+  
+    <link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fancyapps/fancybox@3/dist/jquery.fancybox.min.css" />
+  
+
+
+<!-- 主题依赖的图标库，不要自行修改 -->
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1749284_ba1fz6golrf.css">
+
+
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1736178_kmeydafke9r.css">
+
+
+<link  rel="stylesheet" href="/css/main.css" />
+
+<!-- 自定义样式保持在最底部 -->
+
+
+  <script id="fluid-configs">
+    var Fluid = window.Fluid || {};
+    var CONFIG = {"hostname":"hksanduo.github.io","root":"/","version":"1.8.12","typing":{"enable":true,"typeSpeed":70,"cursorChar":"_","loop":false},"anchorjs":{"enable":true,"element":"h1,h2,h3,h4,h5,h6","placement":"right","visible":"hover","icon":""},"progressbar":{"enable":true,"height_px":3,"color":"#29d","options":{"showSpinner":false,"trickleSpeed":100}},"copy_btn":true,"image_zoom":{"enable":true,"img_url_replace":["",""]},"toc":{"enable":true,"headingSelector":"h1,h2,h3,h4,h5,h6","collapseDepth":0},"lazyload":{"enable":true,"loading_img":"/img/loading.gif","onlypost":false,"offset_factor":2},"web_analytics":{"enable":true,"baidu":null,"google":"UA-167858469-1","gtag":null,"tencent":{"sid":null,"cid":null},"woyaola":null,"cnzz":null,"leancloud":{"app_id":null,"app_key":null,"server_url":null,"path":"window.location.pathname"}},"search_path":"/local-search.xml"};
+  </script>
+  <script  src="/js/utils.js" ></script>
+  <script  src="/js/color-schema.js" ></script>
+<meta name="generator" content="Hexo 5.4.2"></head>
+
+
+<body>
+  <header style="height: 70vh;">
+    <nav id="navbar" class="navbar fixed-top  navbar-expand-lg navbar-dark scrolling-navbar">
+  <div class="container">
+    <a class="navbar-brand" href="/">
+      <strong>Welcome To Sanduo&#39;s Blog</strong>
+    </a>
+
+    <button id="navbar-toggler-btn" class="navbar-toggler" type="button" data-toggle="collapse"
+            data-target="#navbarSupportedContent"
+            aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+      <div class="animated-icon"><span></span><span></span><span></span></div>
+    </button>
+
+    <!-- Collapsible content -->
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+      <ul class="navbar-nav ml-auto text-center">
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/">
+                <i class="iconfont icon-home-fill"></i>
+                首页
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/archives/">
+                <i class="iconfont icon-archive-fill"></i>
+                归档
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/categories/">
+                <i class="iconfont icon-category-fill"></i>
+                分类
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/tags/">
+                <i class="iconfont icon-tags-fill"></i>
+                标签
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/about/">
+                <i class="iconfont icon-user-fill"></i>
+                关于
+              </a>
+            </li>
+          
+        
+        
+          <li class="nav-item" id="search-btn">
+            <a class="nav-link" target="_self" href="javascript:;" data-toggle="modal" data-target="#modalSearch" aria-label="Search">
+              &nbsp;<i class="iconfont icon-search"></i>&nbsp;
+            </a>
+          </li>
+        
+        
+          <li class="nav-item" id="color-toggle-btn">
+            <a class="nav-link" target="_self" href="javascript:;" aria-label="Color Toggle">&nbsp;<i
+                class="iconfont icon-dark" id="color-toggle-icon"></i>&nbsp;</a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+</nav>
+
+    <div class="banner" id="banner" parallax=true
+         style="background: url('/img/default.png') no-repeat center center;
+           background-size: cover;">
+      <div class="full-bg-img">
+        <div class="mask flex-center" style="background-color: rgba(0, 0, 0, 0.3)">
+          <div class="page-header text-center fade-in-up">
+            <span class="h2" id="subtitle" title="在星际蜗牛上安装ESXI 6.7 及openwrt">
+              
+            </span>
+
+            
+              <div class="mt-3">
+  
+  
+    <span class="post-meta">
+      <i class="iconfont icon-date-fill" aria-hidden="true"></i>
+      <time datetime="2021-11-06 11:50" pubdate>
+        2021年11月6日 中午
+      </time>
+    </span>
+  
+</div>
+
+<div class="mt-1">
+  
+    <span class="post-meta mr-2">
+      <i class="iconfont icon-chart"></i>
+      3.3k 字
+    </span>
+  
+
+  
+    <span class="post-meta mr-2">
+      <i class="iconfont icon-clock-fill"></i>
+      
+      
+      10 分钟
+    </span>
+  
+
+  
+  
+</div>
+
+            
+          </div>
+
+          
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <main>
+    
+      
+
+<div class="container-fluid nopadding-x">
+  <div class="row nomargin-x">
+    <div class="d-none d-lg-block col-lg-2"></div>
+    <div class="col-lg-8 nopadding-x-md">
+      <div class="container nopadding-x-md" id="board-ctn">
+        <div class="py-5" id="board">
+          <article class="post-content mx-auto">
+            <!-- SEO header -->
+            <h1 style="display: none">在星际蜗牛上安装ESXI 6.7 及openwrt</h1>
+            
+            <div class="markdown-body">
+              <p>在星际蜗牛J1900平台上上安装ESXI 6.7及openwrt</p>
+<hr>
+<h2 id="背景"><a href="#背景" class="headerlink" title="背景"></a>背景</h2><p>之前做NAS，替换出一块电源和一块星际蜗牛的主板，从咸鱼上淘了一个千兆USB网卡，就组成了一个简单的X86软路由，由于固态容量只有16G，安装一个openwrt虚拟机磁盘就占的的差不多了，最近想扩容一下固态，在重新安装ESXI和openwrt过程中，之前遇到的坑又走了一遍，所以记录下来，供以后参考。</p>
+<h2 id="准备"><a href="#准备" class="headerlink" title="准备"></a>准备</h2><ul>
+<li>ESXI 6.7 安装镜像(我这里用的是VMware-VMvisor-Installer-6.7.0.update03-14320388.x86_64.iso)</li>
+<li>Ventoy安装优盘一个，也可以是烧录的光盘和优盘</li>
+<li>openwrt vmdk 虚拟磁盘一个</li>
+<li>ESXI 6.7 RTL8157 驱动</li>
+</ul>
+<blockquote>
+<p>Ventoy是一个制作可启动U盘的开源工具。有了Ventoy你就无需反复地格式化U盘，你只需要把 ISO&#x2F;WIM&#x2F;IMG&#x2F;VHD(x)&#x2F;EFI 等类型的文件直接拷贝到U盘里面就可以启动了，无需其他操作。可以一次性拷贝很多个不同类型的镜像文件，Ventoy 会在启动时显示一个菜单来供你进行选择。Ventoy 安装之后，同一个U盘可以同时支持 x86 Legacy BIOS、IA32 UEFI、x86_64 UEFI、ARM64 UEFI 和 MIPS64EL UEFI 模式，同时还不影响U盘的日常使用。Ventoy 支持大部分常见类型的操作系统 （Windows&#x2F;WinPE&#x2F;Linux&#x2F;ChromeOS&#x2F;Unix&#x2F;VMware&#x2F;Xen …）</p>
+</blockquote>
+<h2 id="ESXI6-7-安装"><a href="#ESXI6-7-安装" class="headerlink" title="ESXI6.7 安装"></a>ESXI6.7 安装</h2><h3 id="引导安装"><a href="#引导安装" class="headerlink" title="引导安装"></a>引导安装</h3><p>引导ventoy，选择esxi安装镜像<br><img src="/img/20211106-01.jpg" srcset="/img/loading.gif" lazyload alt="20211106-01.jpg"></p>
+<p>进入esxi安装引导<br><img src="/img/20211106-04.jpg" srcset="/img/loading.gif" lazyload alt="20211106-04.jpg"></p>
+<p>进入VMware加载界面，倒计时5s的时候，按 Shift+O 键添加启动参数：ignoreHeadless&#x3D;TRUE<br><img src="/img/20211106-05.png" srcset="/img/loading.gif" lazyload alt="20211106-05.png"></p>
+<p><img src="/img/20211106-02.jpg" srcset="/img/loading.gif" lazyload alt="20211106-02.jpg"><br>接着直接按回车，完成ESXI的安装，直到重启。安装完重启之后使用同样的方法插入启动参数来进入系统，然后永久配置。<br><img src="/img/20211106-03.jpg" srcset="/img/loading.gif" lazyload alt="20211106-03.jpg"></p>
+<blockquote>
+<p>这里的主要解决卡顿的坑：<br>J1900&#x2F;N3150因为核显的问题不能直接装ESXI，开机会卡在Relocating modules and starting up the kernel，忘了截图了，图片来源于互联网。<br><img src="/img/20211106-06.jpg" srcset="/img/loading.gif" lazyload alt="20211106-06.jpg"><br>增加ignoreHeadless&#x3D;TRUE即可，临时解决本次引导卡顿问题，后续安装完毕ESXI，还需要永久配置。</p>
+</blockquote>
+<p>注意一点：可以先将ESXI接入一个私有网络下面，给ESXI配置一个静态IP，方便以后管理；也可以给ESXI配置一个静态IP，用网线把ESXI主机和自己的电脑连接起来，比如我的ESXI配置的IP是192.168.3.110&#x2F;24 网关是：192.168.3.1，个人PC配置的ip是192.168.3.100&#x2F;24,网关是192.168.3.1，这样在PC上直接访问: <a target="_blank" rel="noopener" href="https://192.168.3.110/">https://192.168.3.110</a> ,即可访问到ESXI的管理界面。<br><img src="/img/20211106-08.png" srcset="/img/loading.gif" lazyload alt="20211106-08.png"></p>
+<h3 id="永久配置ignoreHeadless"><a href="#永久配置ignoreHeadless" class="headerlink" title="永久配置ignoreHeadless"></a>永久配置ignoreHeadless</h3><p>1、启用ssh<br>点击 操作-》服务-》启用安全SHELL(SSH) 选项，启用ssh<br><img src="/img/20211106-07.png" srcset="/img/loading.gif" lazyload alt="20211106-07.png"><br>使用XSHELL访问对应的ip，输入root用户名及密码登录上去。<br><img src="/img/20211106-09.png" srcset="/img/loading.gif" lazyload alt="20211106-09.png">   </p>
+<p>2、配置<br>执行以下命令进行配置：</p>
+<figure class="highlight ada"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs ada">esxcfg-advcfg -k <span class="hljs-literal">TRUE</span> ignoreHeadless<br></code></pre></td></tr></table></figure>
+<p>执行以下命令判断是否配置成功：</p>
+<figure class="highlight ebnf"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs ebnf"><span class="hljs-attribute">esxcfg-advcfg -j ignoreHeadless</span><br></code></pre></td></tr></table></figure>
+<p>返回TRUE说明成功了<br><img src="/img/20211106-10.png" srcset="/img/loading.gif" lazyload alt="20211106-10.png"><br>我这里直接通过启用ssh，远程进行配置，也可以直接启用ESXI SHELL进行配置。 </p>
+<h3 id="安装ESXI-6-7-RTL8157-驱动"><a href="#安装ESXI-6-7-RTL8157-驱动" class="headerlink" title="安装ESXI 6.7 RTL8157 驱动"></a>安装ESXI 6.7 RTL8157 驱动</h3><p>我这块板子上只有一个千兆网卡，别问我为什么不使用双网口的板子，问就是穷，穷人家的板子早当家。<br><img src="/img/20211106-11.jpg" srcset="/img/loading.gif" lazyload alt="20211106-11.jpg">  </p>
+<p>ESXI默认不包含8157的驱动，需要自行安装。下载链接详见附件，根据ESXI的版本进行下载。<br><img src="/img/20211106-12.png" srcset="/img/loading.gif" lazyload alt="20211106-12.png"></p>
+<p>我这里使用tftp进行上传，也可以使用scp，上传上去即可，放到&#x2F;tmp目录下。<br><img src="/img/20211106-13.png" srcset="/img/loading.gif" lazyload alt="20211106-13.png"></p>
+<p>使用unzip命令解压驱动压缩包<br><img src="/img/20211106-14.png" srcset="/img/loading.gif" lazyload alt="20211106-14.png"><br>使用以下指令安装驱动。</p>
+<figure class="highlight apache"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs apache"><span class="hljs-attribute">esxcli</span> software vib install -v /tmp/vib20/vmkusb-nic-fling/VMW_bootbank_vmkusb-nic-fling_2.<span class="hljs-number">1</span>-<span class="hljs-number">6</span>vmw.<span class="hljs-number">670.2.48.392</span>03948.vib --no-sig-check<br></code></pre></td></tr></table></figure>
+<p><img src="/img/20211106-16.png" srcset="/img/loading.gif" lazyload alt="20211106-16.png"></p>
+<blockquote>
+<p>这里有个坑，离线安装不加–no-sig-check参数，可能存在签名验证失败导致安装失败的问题，这里由于是直接从官网上下载的，使用 –no-sig-check 参数忽略掉。<br><img src="/img/20211106-15.png" srcset="/img/loading.gif" lazyload alt="20211106-15.png"></p>
+</blockquote>
+<p>安装完成以后需要重启系统，重启系统以后，在网络-》物理网卡界面下发现USB网卡已经成功加载<br><img src="/img/20211106-17.png" srcset="/img/loading.gif" lazyload alt="20211106-17.png"></p>
+<h3 id="配置网络"><a href="#配置网络" class="headerlink" title="配置网络"></a>配置网络</h3><p>1、增加一个虚拟交换机，点击网络-》虚拟交换机-》添加标准虚拟交换机，增加一个名为vSwitch1的虚拟交换机，上行链路选择vusb0<br><img src="/img/20211106-18.png" srcset="/img/loading.gif" lazyload alt="20211106-18.png"><br>点击添加<br><img src="/img/20211106-19.png" srcset="/img/loading.gif" lazyload alt="20211106-19.png"></p>
+<p>2、增加一个端口组，点击网络-》端口组-》添加端口组，添加一个名为VM Network1的端口组，虚拟交换机选择vSwitch1。<br><img src="/img/20211106-20.png" srcset="/img/loading.gif" lazyload alt="20211106-20.png"></p>
+<p>至此，ESXI网络已经配置完成，主板上的网口准备配置成lan，USB网口准备配置成wan。</p>
+<h2 id="安装Openwrt虚拟机"><a href="#安装Openwrt虚拟机" class="headerlink" title="安装Openwrt虚拟机"></a>安装Openwrt虚拟机</h2><p>openwrt x86虚拟机镜像我是从其他地方下载的，这里就不提供下载地址了，建议使用openwrt官方的，可以使用工具将img格式的镜像转换成ESXI支持的vmdk格式。这里就不提供详细的安装步骤了，重点强调一下几个需要注意的地方：<br>1、配置磁盘<br>首先需要移除系统默认添加的磁盘，然后点击添加硬盘-》现有硬盘，选择合适的位置，点击上载，将openwrt虚拟磁盘文件(vmdk)上传上来并选择。<br><img src="/img/20211106-22.png" srcset="/img/loading.gif" lazyload alt="20211106-22.png"></p>
+<p><img src="/img/20211106-23.png" srcset="/img/loading.gif" lazyload alt="20211106-23.png"></p>
+<p>2、配置网络<br>需要再增加一个网络适配器，选择VM Network1端口组。<br><img src="/img/20211106-21.png" srcset="/img/loading.gif" lazyload alt="20211106-21.png"></p>
+<p>配置完成，启动虚拟机，我这里的虚拟机默认的管理ip是192.168.1.1，但是我需要配置192.168.3.1，这是需要从ESXI提供的控制台进入openwrt的虚拟终端进行配置，配置位置位于：&#x2F;etc&#x2F;config&#x2F;network</p>
+<p><img src="/img/20211106-24.png" srcset="/img/loading.gif" lazyload alt="20211106-24.png"><br>使用以下命令重启网络，使配置生效：</p>
+<figure class="highlight swift"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs swift"><span class="hljs-regexp">/etc/</span><span class="hljs-keyword">init</span>.d<span class="hljs-operator">/</span>network restart<br></code></pre></td></tr></table></figure>
+<p>浏览器访问：192.168.3.1，可以成功访问到openwrt的管理界面：<br><img src="/img/20211106-25.png" srcset="/img/loading.gif" lazyload alt="20211106-25.png"></p>
+<h2 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h2><p>以前玩软路由，都是基于各种各样的板子编译对应的估计，我花费时间最长的一次是编译88F6281的一块板子固件，花费了大概有两个多月，主要原因包括：板子资料太少，编译不熟练，网络编译环境不兼容等等问题，最终结果是好的，但是总感觉投入与产出负相关，这大概是自己转入X86平台的原因。贴一张自己软路由的照片，加了一个风扇，主要是夏天有些热，怕散热不行影响性能，当时直接拿亚克力板用简易的工具做了一个支撑壳，将就能用。<br><img src="/img/20211106-26.jpg" srcset="/img/loading.gif" lazyload alt="20211106-26.jpg"></p>
+<h2 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h2><ul>
+<li><a target="_blank" rel="noopener" href="https://blog.jemnluo.top/%E8%BD%AF%E8%B7%AF%E7%94%B1%EF%BC%88J1900-N3150%EF%BC%89%E5%AE%89%E8%A3%85ESXI%E8%99%9A%E6%8B%9F%E6%9C%BA%E5%8D%A1%E5%B1%8F%E8%A7%A3%E5%86%B3/#%E6%B7%BB%E5%8A%A0%E5%90%AF%E5%8A%A8%E5%8F%82%E6%95%B0">https://blog.jemnluo.top/%E8%BD%AF%E8%B7%AF%E7%94%B1%EF%BC%88J1900-N3150%EF%BC%89%E5%AE%89%E8%A3%85ESXI%E8%99%9A%E6%8B%9F%E6%9C%BA%E5%8D%A1%E5%B1%8F%E8%A7%A3%E5%86%B3/#%E6%B7%BB%E5%8A%A0%E5%90%AF%E5%8A%A8%E5%8F%82%E6%95%B0</a>【软路由（J1900&#x2F;N3150）安装ESXI虚拟机卡屏解决】</li>
+<li><a target="_blank" rel="noopener" href="https://flings.vmware.com/usb-network-native-driver-for-esxi">https://flings.vmware.com/usb-network-native-driver-for-esxi</a>【USB Network Native Driver for ESXi】</li>
+<li><a target="_blank" rel="noopener" href="https://www.right.com.cn/forum/thread-506950-1-1.html">https://www.right.com.cn/forum/thread-506950-1-1.html</a>【矿渣之蜗牛星际(j1900 4盘位NAS)在ESXI6.7安装软路由LEDE 保姆级教程】</li>
+<li><a target="_blank" rel="noopener" href="https://linhongbo.com/posts/openwrt-on-esxi/">https://linhongbo.com/posts/openwrt-on-esxi/</a>【ESXi 安装&amp;配置 OpenWrt】</li>
+</ul>
+
+            </div>
+            <hr>
+            <div>
+              <div class="post-metas mb-3">
+                
+                  <div class="post-meta mr-3">
+                    <i class="iconfont icon-category"></i>
+                    
+                      <a class="hover-with-bg" href="/categories/Linux/">Linux</a>
+                    
+                  </div>
+                
+                
+                  <div class="post-meta">
+                    <i class="iconfont icon-tags"></i>
+                    
+                      <a class="hover-with-bg" href="/tags/openwrt/">openwrt</a>
+                    
+                  </div>
+                
+              </div>
+              
+                <p class="note note-warning">
+                  
+                    本博客所有文章除特别声明外，均采用 <a target="_blank" href="https://creativecommons.org/licenses/by-sa/4.0/deed.zh" rel="nofollow noopener noopener">CC BY-SA 4.0 协议</a> ，转载请注明出处！
+                  
+                </p>
+              
+              
+                <div class="post-prevnext">
+                  <article class="post-prev col-6">
+                    
+                    
+                      <a href="/2021/11/08/2021-11-08-systemd-miner-analysis/">
+                        <i class="iconfont icon-arrowleft"></i>
+                        <span class="hidden-mobile">SystemdMiner 挖矿木马分析</span>
+                        <span class="visible-mobile">上一篇</span>
+                      </a>
+                    
+                  </article>
+                  <article class="post-next col-6">
+                    
+                    
+                      <a href="/2021/08/28/2021-08-28-archlinux-sddm-plasma-display-bug/">
+                        <span class="hidden-mobile">plasma使用扩展屏幕无法加载任务栏bug</span>
+                        <span class="visible-mobile">下一篇</span>
+                        <i class="iconfont icon-arrowright"></i>
+                      </a>
+                    
+                  </article>
+                </div>
+              
+            </div>
+
+            
+              <!-- Comments -->
+              <article class="comments" id="comments" lazyload>
+                
+                  
+                
+                
+  <script type="text/javascript">
+    Fluid.utils.loadComments('#comments', function() {
+      var light = 'github-light';
+      var dark = 'github-dark';
+      var schema = document.documentElement.getAttribute('data-user-color-scheme');
+      if (schema === 'dark') {
+        schema = dark;
+      } else {
+        schema = light;
+      }
+      window.UtterancesThemeLight = light;
+      window.UtterancesThemeDark = dark;
+      var s = document.createElement('script');
+      s.setAttribute('src', 'https://utteranc.es/client.js');
+      s.setAttribute('repo', 'hksanduo/commit-utterances');
+      s.setAttribute('issue-term', 'title');
+      
+      s.setAttribute('label', 'utterances');
+      
+      s.setAttribute('theme', schema);
+      s.setAttribute('crossorigin', 'anonymous');
+      document.getElementById('comments').appendChild(s);
+    })
+  </script>
+  <noscript>Please enable JavaScript to view the comments</noscript>
+
+
+              </article>
+            
+          </article>
+        </div>
+      </div>
+    </div>
+    
+      <div class="d-none d-lg-block col-lg-2 toc-container" id="toc-ctn">
+        <div id="toc">
+  <p class="toc-header"><i class="iconfont icon-list"></i>&nbsp;目录</p>
+  <div class="toc-body" id="toc-body"></div>
+</div>
+
+      </div>
+    
+  </div>
+</div>
+
+<!-- Custom -->
+
+
+    
+
+    
+      <a id="scroll-top-button" aria-label="TOP" href="#" role="button">
+        <i class="iconfont icon-arrowup" aria-hidden="true"></i>
+      </a>
+    
+
+    
+      <div class="modal fade" id="modalSearch" tabindex="-1" role="dialog" aria-labelledby="ModalLabel"
+     aria-hidden="true">
+  <div class="modal-dialog modal-dialog-scrollable modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header text-center">
+        <h4 class="modal-title w-100 font-weight-bold">搜索</h4>
+        <button type="button" id="local-search-close" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body mx-3">
+        <div class="md-form mb-5">
+          <input type="text" id="local-search-input" class="form-control validate">
+          <label data-error="x" data-success="v"
+                 for="local-search-input">关键词</label>
+        </div>
+        <div class="list-group" id="local-search-result"></div>
+      </div>
+    </div>
+  </div>
+</div>
+    
+
+    
+  </main>
+
+  <footer class="text-center mt-5 py-3">
+  <div class="footer-content">
+     <a href="https://hexo.io" target="_blank" rel="nofollow noopener"><span>Hexo</span></a> <i class="iconfont icon-love"></i> <a href="https://github.com/fluid-dev/hexo-theme-fluid" target="_blank" rel="nofollow noopener"><span>Fluid</span></a> 
+  </div>
+  
+  <div class="statistics">
+    
+    
+
+    
+      
+        <!-- 不蒜子统计PV -->
+        <span id="busuanzi_container_site_pv" style="display: none">
+            总访问量 
+            <span id="busuanzi_value_site_pv"></span>
+             次
+          </span>
+      
+      
+        <!-- 不蒜子统计UV -->
+        <span id="busuanzi_container_site_uv" style="display: none">
+            总访客数 
+            <span id="busuanzi_value_site_uv"></span>
+             人
+          </span>
+      
+    
+  </div>
+
+
+  
+
+  
+</footer>
+
+
+  <!-- SCRIPTS -->
+  
+  <script  src="https://cdn.jsdelivr.net/npm/nprogress@0/nprogress.min.js" ></script>
+  <link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/nprogress@0/nprogress.min.css" />
+
+  <script>
+    NProgress.configure({"showSpinner":false,"trickleSpeed":100})
+    NProgress.start()
+    window.addEventListener('load', function() {
+      NProgress.done();
+    })
+  </script>
+
+
+<script  src="https://cdn.jsdelivr.net/npm/jquery@3/dist/jquery.min.js" ></script>
+<script  src="https://cdn.jsdelivr.net/npm/bootstrap@4/dist/js/bootstrap.min.js" ></script>
+<script  src="/js/events.js" ></script>
+<script  src="/js/plugins.js" ></script>
+
+<!-- Plugins -->
+
+
+  <script  src="/js/local-search.js" ></script>
+
+
+
+  
+    <script  src="/js/img-lazyload.js" ></script>
+  
+
+
+
+  
+
+
+
+  
+    <script  src="https://cdn.jsdelivr.net/npm/tocbot@4/dist/tocbot.min.js" ></script>
+  
+  
+    <script  src="https://cdn.jsdelivr.net/npm/@fancyapps/fancybox@3/dist/jquery.fancybox.min.js" ></script>
+  
+  
+    <script  src="https://cdn.jsdelivr.net/npm/anchor-js@4/anchor.min.js" ></script>
+  
+  
+    <script defer src="https://cdn.jsdelivr.net/npm/clipboard@2/dist/clipboard.min.js" ></script>
+  
+
+
+
+  <script defer src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js" ></script>
+
+
+
+
+  <script  src="https://cdn.jsdelivr.net/npm/typed.js@2/lib/typed.min.js" ></script>
+  <script>
+    (function (window, document) {
+      var typing = Fluid.plugins.typing;
+      var title = document.getElementById('subtitle').title;
+      
+      typing(title)
+      
+    })(window, document);
+  </script>
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+    <!-- Google Analytics -->
+    <script defer>
+      window.ga = window.ga || function () { (ga.q = ga.q || []).push(arguments) };
+      ga.l = +new Date;
+      ga('create', 'UA-167858469-1', 'auto');
+      ga('send', 'pageview');
+    </script>
+    <script async src='https://www.google-analytics.com/analytics.js'></script>
+  
+
+  
+
+  
+
+  
+
+  
+
+
+
+
+
+<!-- 主题的启动项 保持在最底部 -->
+<script  src="/js/boot.js" ></script>
+
+
+</body>
+</html>

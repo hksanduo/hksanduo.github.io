@@ -1,0 +1,655 @@
+
+
+<!DOCTYPE html>
+<html lang="zh-CN" data-default-color-scheme=auto>
+
+
+
+<head>
+  <meta charset="UTF-8">
+  <link rel="apple-touch-icon" sizes="76x76" href="/img/favicon.png">
+  <link rel="icon" href="/img/favicon.png">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, shrink-to-fit=no">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  
+  <meta name="theme-color" content="#2f4154">
+  <meta name="description" content="">
+  <meta name="author" content="sanduo">
+  <meta name="keywords" content="">
+  <meta name="description" content="安装ollama并运行QWEN1.5模型介绍ollama是一个在本地启动并运行大型语言模型的框架。ollama 通过对模型文件进行转化，配置和优化，方便进行多平台部署，包括GPU的使用做了一定的优化，另外LangChain也对其做了集成。 注意：由于ollama及LLM社区日新月异，本文章可能存在时效性，请酌情参考。 部署linux部署需要提前安装lspci或者lshw 1curl -fsSL [">
+<meta property="og:type" content="article">
+<meta property="og:title" content="安装ollama并运行QWEN1.5模型">
+<meta property="og:url" content="https://hksanduo.github.io/2024/02/27/2024-02-27-install-ollama-and-run-qwen-v1.5-model/index.html">
+<meta property="og:site_name" content="sanduo blog">
+<meta property="og:description" content="安装ollama并运行QWEN1.5模型介绍ollama是一个在本地启动并运行大型语言模型的框架。ollama 通过对模型文件进行转化，配置和优化，方便进行多平台部署，包括GPU的使用做了一定的优化，另外LangChain也对其做了集成。 注意：由于ollama及LLM社区日新月异，本文章可能存在时效性，请酌情参考。 部署linux部署需要提前安装lspci或者lshw 1curl -fsSL [">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://hksanduo.github.io/img/20240227-01.png">
+<meta property="og:image" content="https://hksanduo.github.io/img/20240227-02.png">
+<meta property="og:image" content="https://hksanduo.github.io/img/20240227-03.png">
+<meta property="og:image" content="https://hksanduo.github.io/img/20240227-04.png">
+<meta property="og:image" content="https://hksanduo.github.io/img/20240227-05.png">
+<meta property="og:image" content="https://hksanduo.github.io/img/20240227-06.png">
+<meta property="og:image" content="https://hksanduo.github.io/img/20240227-07.png">
+<meta property="og:image" content="https://hksanduo.github.io/img/20240227-08.png">
+<meta property="og:image" content="https://hksanduo.github.io/img/20240227-09.png">
+<meta property="og:image" content="https://hksanduo.github.io/img/20240227-10.png">
+<meta property="og:image" content="https://hksanduo.github.io/img/20240227-11.png">
+<meta property="article:published_time" content="2024-02-27T06:27:00.000Z">
+<meta property="article:modified_time" content="2025-01-18T14:54:10.082Z">
+<meta property="article:author" content="sanduo">
+<meta property="article:tag" content="ML">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:image" content="https://hksanduo.github.io/img/20240227-01.png">
+  
+  <title>安装ollama并运行QWEN1.5模型 - sanduo blog</title>
+
+  <link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4/dist/css/bootstrap.min.css" />
+
+
+  <link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/github-markdown-css@4/github-markdown.min.css" />
+  <link  rel="stylesheet" href="/lib/hint/hint.min.css" />
+
+  
+    
+    
+      
+      <link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/highlight.js@10/styles/github-gist.min.css" />
+    
+  
+
+  
+    <link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fancyapps/fancybox@3/dist/jquery.fancybox.min.css" />
+  
+
+
+<!-- 主题依赖的图标库，不要自行修改 -->
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1749284_ba1fz6golrf.css">
+
+
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1736178_kmeydafke9r.css">
+
+
+<link  rel="stylesheet" href="/css/main.css" />
+
+<!-- 自定义样式保持在最底部 -->
+
+
+  <script id="fluid-configs">
+    var Fluid = window.Fluid || {};
+    var CONFIG = {"hostname":"hksanduo.github.io","root":"/","version":"1.8.12","typing":{"enable":true,"typeSpeed":70,"cursorChar":"_","loop":false},"anchorjs":{"enable":true,"element":"h1,h2,h3,h4,h5,h6","placement":"right","visible":"hover","icon":""},"progressbar":{"enable":true,"height_px":3,"color":"#29d","options":{"showSpinner":false,"trickleSpeed":100}},"copy_btn":true,"image_zoom":{"enable":true,"img_url_replace":["",""]},"toc":{"enable":true,"headingSelector":"h1,h2,h3,h4,h5,h6","collapseDepth":0},"lazyload":{"enable":true,"loading_img":"/img/loading.gif","onlypost":false,"offset_factor":2},"web_analytics":{"enable":true,"baidu":null,"google":"UA-167858469-1","gtag":null,"tencent":{"sid":null,"cid":null},"woyaola":null,"cnzz":null,"leancloud":{"app_id":null,"app_key":null,"server_url":null,"path":"window.location.pathname"}},"search_path":"/local-search.xml"};
+  </script>
+  <script  src="/js/utils.js" ></script>
+  <script  src="/js/color-schema.js" ></script>
+<meta name="generator" content="Hexo 5.4.2"></head>
+
+
+<body>
+  <header style="height: 70vh;">
+    <nav id="navbar" class="navbar fixed-top  navbar-expand-lg navbar-dark scrolling-navbar">
+  <div class="container">
+    <a class="navbar-brand" href="/">
+      <strong>Welcome To Sanduo&#39;s Blog</strong>
+    </a>
+
+    <button id="navbar-toggler-btn" class="navbar-toggler" type="button" data-toggle="collapse"
+            data-target="#navbarSupportedContent"
+            aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+      <div class="animated-icon"><span></span><span></span><span></span></div>
+    </button>
+
+    <!-- Collapsible content -->
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+      <ul class="navbar-nav ml-auto text-center">
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/">
+                <i class="iconfont icon-home-fill"></i>
+                首页
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/archives/">
+                <i class="iconfont icon-archive-fill"></i>
+                归档
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/categories/">
+                <i class="iconfont icon-category-fill"></i>
+                分类
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/tags/">
+                <i class="iconfont icon-tags-fill"></i>
+                标签
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/about/">
+                <i class="iconfont icon-user-fill"></i>
+                关于
+              </a>
+            </li>
+          
+        
+        
+          <li class="nav-item" id="search-btn">
+            <a class="nav-link" target="_self" href="javascript:;" data-toggle="modal" data-target="#modalSearch" aria-label="Search">
+              &nbsp;<i class="iconfont icon-search"></i>&nbsp;
+            </a>
+          </li>
+        
+        
+          <li class="nav-item" id="color-toggle-btn">
+            <a class="nav-link" target="_self" href="javascript:;" aria-label="Color Toggle">&nbsp;<i
+                class="iconfont icon-dark" id="color-toggle-icon"></i>&nbsp;</a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+</nav>
+
+    <div class="banner" id="banner" parallax=true
+         style="background: url('/img/default.png') no-repeat center center;
+           background-size: cover;">
+      <div class="full-bg-img">
+        <div class="mask flex-center" style="background-color: rgba(0, 0, 0, 0.3)">
+          <div class="page-header text-center fade-in-up">
+            <span class="h2" id="subtitle" title="安装ollama并运行QWEN1.5模型">
+              
+            </span>
+
+            
+              <div class="mt-3">
+  
+  
+    <span class="post-meta">
+      <i class="iconfont icon-date-fill" aria-hidden="true"></i>
+      <time datetime="2024-02-27 06:27" pubdate>
+        2024年2月27日 早上
+      </time>
+    </span>
+  
+</div>
+
+<div class="mt-1">
+  
+    <span class="post-meta mr-2">
+      <i class="iconfont icon-chart"></i>
+      5.1k 字
+    </span>
+  
+
+  
+    <span class="post-meta mr-2">
+      <i class="iconfont icon-clock-fill"></i>
+      
+      
+      16 分钟
+    </span>
+  
+
+  
+  
+</div>
+
+            
+          </div>
+
+          
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <main>
+    
+      
+
+<div class="container-fluid nopadding-x">
+  <div class="row nomargin-x">
+    <div class="d-none d-lg-block col-lg-2"></div>
+    <div class="col-lg-8 nopadding-x-md">
+      <div class="container nopadding-x-md" id="board-ctn">
+        <div class="py-5" id="board">
+          <article class="post-content mx-auto">
+            <!-- SEO header -->
+            <h1 style="display: none">安装ollama并运行QWEN1.5模型</h1>
+            
+            <div class="markdown-body">
+              <h1 id="安装ollama并运行QWEN1-5模型"><a href="#安装ollama并运行QWEN1-5模型" class="headerlink" title="安装ollama并运行QWEN1.5模型"></a>安装ollama并运行QWEN1.5模型</h1><h2 id="介绍"><a href="#介绍" class="headerlink" title="介绍"></a>介绍</h2><p>ollama是一个在本地启动并运行大型语言模型的框架。ollama 通过对模型文件进行转化，配置和优化，方便进行多平台部署，包括GPU的使用做了一定的优化，另外LangChain也对其做了集成。</p>
+<p>注意：由于ollama及LLM社区日新月异，本文章可能存在时效性，请酌情参考。</p>
+<h2 id="部署"><a href="#部署" class="headerlink" title="部署"></a>部署</h2><h3 id="linux部署"><a href="#linux部署" class="headerlink" title="linux部署"></a>linux部署</h3><p>需要提前安装lspci或者lshw</p>
+<figure class="highlight jsx"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs jsx">curl -fsSL [<span class="hljs-attr">https</span>:<span class="hljs-comment">//ollama.com/install.sh](https://ollama.com/install.sh) | sh</span><br></code></pre></td></tr></table></figure>
+
+<p>正常安装，看提示判断是否安装成功。如果不成功，根据实际错误自行解决。</p>
+<p>新增以下脚本，并且允许外网访问：</p>
+<figure class="highlight jsx"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><code class="hljs jsx">#!<span class="hljs-regexp">/bin/</span>bash<br># enable <span class="hljs-variable language_">global</span> access<br><span class="hljs-keyword">export</span> <span class="hljs-variable constant_">OLLAMA_HOST</span>=<span class="hljs-number">0.0</span><span class="hljs-number">.0</span><span class="hljs-number">.0</span><br><br>/usr/local/bin/ollama  serve<br></code></pre></td></tr></table></figure>
+
+<p>加载官方已发布镜像</p>
+<figure class="highlight jsx"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs jsx">ollama run <span class="hljs-attr">gemma</span>:7b<br></code></pre></td></tr></table></figure>
+
+<p><img src="/img/20240227-01.png" srcset="/img/loading.gif" lazyload alt="加载gemma"></p>
+<ul>
+<li>魔法上网，效果更好。</li>
+</ul>
+<p><img src="/img/20240227-02.png" srcset="/img/loading.gif" lazyload alt="加载成功"></p>
+<p>ollama会将缓冲保存到本地用户目录下：<code>~/.ollama/models</code> 文件保存类似于docker存储方式</p>
+<p><img src="/img/20240227-03.png" srcset="/img/loading.gif" lazyload alt="缓存"></p>
+<p>如果想从当前服务中移除运行的镜像，有两种方法，1、重启ollama 服务  2、使用rm删除当前镜像，第二种方法有个问题就是镜像得重新下载。</p>
+<h2 id="自定义镜像"><a href="#自定义镜像" class="headerlink" title="自定义镜像"></a>自定义镜像</h2><h3 id="导入支持CGUF格式模型"><a href="#导入支持CGUF格式模型" class="headerlink" title="导入支持CGUF格式模型"></a>导入支持CGUF格式模型</h3><p>导入cguf格式模型较为简单</p>
+<p>1、创建**<code>Modelfile</code>文件**</p>
+<p>首先创建一个Modelfile。该文件是模型的蓝图，指定权重、参数、提示模板等。</p>
+<figure class="highlight jsx"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs jsx"><span class="hljs-variable constant_">FROM</span> ./mistral-7b-v0<span class="hljs-number">.1</span>.<span class="hljs-property">Q4_0</span>.<span class="hljs-property">gguf</span><br></code></pre></td></tr></table></figure>
+
+<p>（可选）许多聊天模型需要提示模板才能正确回答。可以使用Modelfile中的TEMPLATE指令指定默认提示模板：</p>
+<figure class="highlight jsx"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><code class="hljs jsx"><span class="hljs-variable constant_">FROM</span> ./mistral-7b-v0<span class="hljs-number">.1</span>.<span class="hljs-property">Q4_0</span>.<span class="hljs-property">gguf</span><br><span class="hljs-variable constant_">TEMPLATE</span> <span class="hljs-string">&quot;[INST] &#123;&#123; .Prompt &#125;&#125; [/INST]&quot;</span><br></code></pre></td></tr></table></figure>
+
+<p>2、创建Ollama模型</p>
+<figure class="highlight jsx"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs jsx">ollama create example -f <span class="hljs-title class_">Modelfile</span><br></code></pre></td></tr></table></figure>
+
+<p>3、运行模型</p>
+<figure class="highlight jsx"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs jsx">ollama run example <span class="hljs-string">&quot;What is your favourite condiment?&quot;</span><br></code></pre></td></tr></table></figure>
+
+<h3 id="导入支持-PyTorch-amp-Safetensors-格式模型"><a href="#导入支持-PyTorch-amp-Safetensors-格式模型" class="headerlink" title="导入支持**(PyTorch &amp; Safetensors)格式模型**"></a>导入支持**(PyTorch &amp; Safetensors)格式模型**</h3><p>从PyTorch和Safetensors导入的过程比从GGUF导入的过程更长。</p>
+<p>1、克隆ollama项目</p>
+<figure class="highlight jsx"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs jsx">git clone <span class="hljs-attr">https</span>:<span class="hljs-comment">//github.com/ollama/ollama</span><br></code></pre></td></tr></table></figure>
+
+<p>2、 fetch  <code>llama.cpp</code> 子模块:</p>
+<figure class="highlight jsx"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><code class="hljs jsx">git submodule init<br>git submodule update llm/llama.<span class="hljs-property">cpp</span><br></code></pre></td></tr></table></figure>
+
+<p>3、安装依赖</p>
+<figure class="highlight jsx"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><code class="hljs jsx">conda create -n ollama python=<span class="hljs-number">3.10</span><br>conda activate ollama<br>pip install -r llm/llama.<span class="hljs-property">cpp</span>/requirements.<span class="hljs-property">txt</span><br></code></pre></td></tr></table></figure>
+
+<p>4、构建quantize工具</p>
+<figure class="highlight jsx"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs jsx">make -C llm/llama.<span class="hljs-property">cpp</span> quantize<br></code></pre></td></tr></table></figure>
+
+<p>5、获取或者下载模型到本地</p>
+<p>6、转换模型</p>
+<p>某些模型架构需要使用特定的转换脚本。例如，Qwen模型需要运行convert-hf-to-gguf.py而不是convert.py</p>
+<figure class="highlight jsx"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs jsx">python llm/llama.<span class="hljs-property">cpp</span>/convert.<span class="hljs-property">py</span> ./model --outtype f16 --outfile converted.<span class="hljs-property">bin</span><br></code></pre></td></tr></table></figure>
+
+<p>这里不太清楚是否可以直接使用量化模型，先尝试qwen1.5-Qwen1.5-14B-Chat-GPTQ-Int8</p>
+<p>转换模型命令如下：</p>
+<figure class="highlight jsx"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs jsx">python llm/llama.<span class="hljs-property">cpp</span>/convert-hf-to-gguf.<span class="hljs-property">py</span> /data/models/<span class="hljs-title class_">Qwen1</span><span class="hljs-number">.5</span>-14B-<span class="hljs-title class_">Chat</span>-<span class="hljs-variable constant_">GPTQ</span>-<span class="hljs-title class_">Int8</span> --outtype q8_0 --outfile converted.<span class="hljs-property">bin</span><br></code></pre></td></tr></table></figure>
+
+<p>目前不支持，错误如下：</p>
+<p>[<code>convert-hf-to-gguf.py](http://convert-hf-to-gguf.py/): error: argument --outtype: invalid choice: &#39;q8_0&#39; (choose from &#39;f32&#39;, &#39;f16&#39;)</code></p>
+<p>指定f16遇到新的错误，暂时不清楚如何解决，网上没有检索到类似的错误：</p>
+<figure class="highlight jsx"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><code class="hljs jsx"><span class="hljs-title class_">Loading</span> <span class="hljs-attr">model</span>: <span class="hljs-title class_">Qwen1</span><span class="hljs-number">.5</span>-14B-<span class="hljs-title class_">Chat</span>-<span class="hljs-variable constant_">GPTQ</span>-<span class="hljs-title class_">Int8</span><br><span class="hljs-attr">gguf</span>: <span class="hljs-title class_">This</span> <span class="hljs-variable constant_">GGUF</span> file is <span class="hljs-keyword">for</span> <span class="hljs-title class_">Little</span> <span class="hljs-title class_">Endian</span> only<br><span class="hljs-title class_">Set</span> model parameters<br><span class="hljs-title class_">Set</span> model tokenizer<br><span class="hljs-title class_">Special</span> tokens have been added <span class="hljs-keyword">in</span> the vocabulary, make sure the associated word embeddings are fine-tuned or trained.<br><span class="hljs-attr">gguf</span>: <span class="hljs-title class_">Adding</span> <span class="hljs-number">151387</span> <span class="hljs-title function_">merge</span>(s).<br><span class="hljs-attr">gguf</span>: <span class="hljs-title class_">Setting</span> special token type eos to <span class="hljs-number">151643</span><br><span class="hljs-attr">gguf</span>: <span class="hljs-title class_">Setting</span> special token type pad to <span class="hljs-number">151643</span><br><span class="hljs-attr">gguf</span>: <span class="hljs-title class_">Setting</span> special token type bos to <span class="hljs-number">151643</span><br><span class="hljs-attr">gguf</span>: <span class="hljs-title class_">Setting</span> chat_template to &#123;% <span class="hljs-keyword">for</span> message <span class="hljs-keyword">in</span> messages %&#125;&#123;&#123;<span class="hljs-string">&#x27;&lt;|im_start|&gt;&#x27;</span> + message[<span class="hljs-string">&#x27;role&#x27;</span>] + <span class="hljs-string">&#x27;</span><br><span class="hljs-string">&#x27;</span> + message[<span class="hljs-string">&#x27;content&#x27;</span>] + <span class="hljs-string">&#x27;&lt;|im_end|&gt;&#x27;</span> + <span class="hljs-string">&#x27;</span><br><span class="hljs-string">&#x27;</span>&#125;&#125;&#123;% endfor %&#125;&#123;% <span class="hljs-keyword">if</span> add_generation_prompt %&#125;&#123;&#123; <span class="hljs-string">&#x27;&lt;|im_start|&gt;assistant</span><br><span class="hljs-string">&#x27;</span> &#125;&#125;&#123;% endif %&#125;<br><span class="hljs-title class_">Exporting</span> model to <span class="hljs-string">&#x27;converted.bin&#x27;</span><br><span class="hljs-attr">gguf</span>: loading model part <span class="hljs-string">&#x27;model-00001-of-00005.safetensors&#x27;</span><br>token_embd.<span class="hljs-property">weight</span>, n_dims = <span class="hljs-number">2</span>, torch.<span class="hljs-property">float16</span> --&gt; float16<br>blk<span class="hljs-number">.0</span>.<span class="hljs-property">attn_norm</span>.<span class="hljs-property">weight</span>, n_dims = <span class="hljs-number">1</span>, torch.<span class="hljs-property">float16</span> --&gt; float32<br>blk<span class="hljs-number">.0</span>.<span class="hljs-property">ffn_down</span>.<span class="hljs-property">bias</span>, n_dims = <span class="hljs-number">1</span>, torch.<span class="hljs-property">float16</span> --&gt; float32<br><span class="hljs-title class_">Can</span> not map tensor <span class="hljs-string">&#x27;model.layers.0.mlp.down_proj.g_idx&#x27;</span><br></code></pre></td></tr></table></figure>
+
+<p>尝试使用无量化模型Qwen1.5-14B-Chat</p>
+<p>错误，这个原因是由于镜像内未安装git-lfs</p>
+<figure class="highlight jsx"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><code class="hljs jsx"><span class="hljs-attr">gguf</span>: loading model part <span class="hljs-string">&#x27;model-00001-of-00008.safetensors&#x27;</span><br><span class="hljs-title class_">Traceback</span> (most recent call last):<br>  <span class="hljs-title class_">File</span> <span class="hljs-string">&quot;/data/project/qwen-ollama/ollama/llm/llama.cpp/convert-hf-to-gguf.py&quot;</span>, line <span class="hljs-number">1937</span>, <span class="hljs-keyword">in</span> &lt;<span class="hljs-variable language_">module</span>&gt;<br>    <span class="hljs-title function_">main</span>()<br>  <span class="hljs-title class_">File</span> <span class="hljs-string">&quot;/data/project/qwen-ollama/ollama/llm/llama.cpp/convert-hf-to-gguf.py&quot;</span>, line <span class="hljs-number">1931</span>, <span class="hljs-keyword">in</span> main<br>    model_instance.<span class="hljs-title function_">write</span>()<br>  <span class="hljs-title class_">File</span> <span class="hljs-string">&quot;/data/project/qwen-ollama/ollama/llm/llama.cpp/convert-hf-to-gguf.py&quot;</span>, line <span class="hljs-number">152</span>, <span class="hljs-keyword">in</span> write<br>    self.<span class="hljs-title function_">write_tensors</span>()<br>  <span class="hljs-title class_">File</span> <span class="hljs-string">&quot;/data/project/qwen-ollama/ollama/llm/llama.cpp/convert-hf-to-gguf.py&quot;</span>, line <span class="hljs-number">113</span>, <span class="hljs-keyword">in</span> write_tensors<br>    <span class="hljs-keyword">for</span> name, data_torch <span class="hljs-keyword">in</span> self.<span class="hljs-title function_">get_tensors</span>():<br>  <span class="hljs-title class_">File</span> <span class="hljs-string">&quot;/data/project/qwen-ollama/ollama/llm/llama.cpp/convert-hf-to-gguf.py&quot;</span>, line <span class="hljs-number">71</span>, <span class="hljs-keyword">in</span> get_tensors<br>    ctx = <span class="hljs-title function_">cast</span>(<span class="hljs-title class_">ContextManager</span>[<span class="hljs-title class_">Any</span>], <span class="hljs-title function_">safe_open</span>(self.<span class="hljs-property">dir_model</span> / part_name, framework=<span class="hljs-string">&quot;pt&quot;</span>, device=<span class="hljs-string">&quot;cpu&quot;</span>))<br>safetensors_rust.<span class="hljs-property">SafetensorError</span>: <span class="hljs-title class_">Error</span> <span class="hljs-keyword">while</span> deserializing <span class="hljs-attr">header</span>: <span class="hljs-title class_">HeaderTooLarge</span><br></code></pre></td></tr></table></figure>
+
+<p>执行转换，占用的是CPU，无GPU占用</p>
+<p><img src="/img/20240227-04.png" srcset="/img/loading.gif" lazyload alt="cpu占用率"></p>
+<p>cover成功</p>
+<p><img src="/img/20240227-05.png" srcset="/img/loading.gif" lazyload alt="转换成功"></p>
+<p>7、量化模型</p>
+<figure class="highlight jsx"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs jsx">llm/llama.<span class="hljs-property">cpp</span>/quantize converted.<span class="hljs-property">bin</span> quantized.<span class="hljs-property">bin</span> q4_0<br></code></pre></td></tr></table></figure>
+
+<p>针对qwen特殊配置，这里是量化int8</p>
+<figure class="highlight jsx"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs jsx">llm/llama.<span class="hljs-property">cpp</span>/quantize converted.<span class="hljs-property">bin</span> qwen_v1.5_quantized_int8.<span class="hljs-property">bin</span> q8_0<br></code></pre></td></tr></table></figure>
+
+<p>成功</p>
+<p><img src="/img/20240227-06.png" srcset="/img/loading.gif" lazyload alt="量化成功"></p>
+<p>8、构造文件 <strong><code>Modelfile</code></strong></p>
+<figure class="highlight jsx"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><code class="hljs jsx"><span class="hljs-variable constant_">FROM</span> qwen_v1.5_quantized_int8.<span class="hljs-property">bin</span><br><span class="hljs-variable constant_">TEMPLATE</span> <span class="hljs-string">&quot;[INST] &#123;&#123; .Prompt &#125;&#125; [/INST]&quot;</span><br></code></pre></td></tr></table></figure>
+
+<p>9、创建一个 <strong>Ollama 模型</strong></p>
+<p>最终，从Modelfile创建一个模型</p>
+<figure class="highlight jsx"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs jsx">ollama create example -f <span class="hljs-title class_">Modelfile</span><br></code></pre></td></tr></table></figure>
+
+<p>针对qwen</p>
+<figure class="highlight jsx"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs jsx">ollama create qwen1<span class="hljs-number">.5</span>-int8 -f <span class="hljs-title class_">Modelfile</span><br></code></pre></td></tr></table></figure>
+
+<p><img src="/img/20240227-07.png" srcset="/img/loading.gif" lazyload alt="创建模型"></p>
+<p>10、运行你的模型</p>
+<figure class="highlight jsx"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs jsx">ollama run qwen1<span class="hljs-number">.5</span>-int8 <span class="hljs-string">&quot;who are you?&quot;</span><br></code></pre></td></tr></table></figure>
+
+<p><img src="/img/20240227-08.png" srcset="/img/loading.gif" lazyload alt="运行模型"></p>
+<p>接口测试</p>
+<figure class="highlight jsx"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><code class="hljs jsx">curl <span class="hljs-attr">http</span>:<span class="hljs-comment">//192.168.3.199:11434/api/generate -d &#x27;&#123;</span><br>  <span class="hljs-string">&quot;model&quot;</span>: <span class="hljs-string">&quot;qwen1.5-int8:latest&quot;</span>,<br>  <span class="hljs-string">&quot;prompt&quot;</span>: <span class="hljs-string">&quot;Why is the sky blue?&quot;</span><br>&#125;<span class="hljs-string">&#x27;</span><br></code></pre></td></tr></table></figure>
+
+<p><img src="/img/20240227-09.png" srcset="/img/loading.gif" lazyload alt="api测试结果"></p>
+<p>继续测试（No streaming）</p>
+<figure class="highlight jsx"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><code class="hljs jsx">curl <span class="hljs-attr">http</span>:<span class="hljs-comment">//192.168.3.199:11434/api/generate -d &#x27;&#123;</span><br>  <span class="hljs-string">&quot;model&quot;</span>: <span class="hljs-string">&quot;qwen1.5-int8:latest&quot;</span>,<br>  <span class="hljs-string">&quot;prompt&quot;</span>: <span class="hljs-string">&quot;Why is the sky blue?&quot;</span>,<br>  <span class="hljs-string">&quot;stream&quot;</span>: <span class="hljs-literal">false</span><br>&#125;<span class="hljs-string">&#x27;</span><br></code></pre></td></tr></table></figure>
+
+<p><img src="/img/20240227-10.png" srcset="/img/loading.gif" lazyload alt="api测试结果"></p>
+<p>消耗资源</p>
+<p><img src="/img/20240227-11.png" srcset="/img/loading.gif" lazyload alt="GPU占用资源"></p>
+<p>此处显存是同时加载：gemma:7b和Qwen1.5-14B-Chat-GPTQ-Int8</p>
+<p>更多接口格式，请参考ollama官方文档。</p>
+<h3 id="注意"><a href="#注意" class="headerlink" title="注意"></a>注意</h3><ol>
+<li>对于在docker内部运行来说，如果没有启动systemd，所以需要手动启动对应服务</li>
+<li>ollama会建立一个ollama账户，用户目录位于<code>/usr/share/ollama</code></li>
+<li>ollama默认绑定127.0.0.1 11434端口，目前可以修改host，但是无法修改port，等待社区解决或者手动映射端口</li>
+</ol>
+<h2 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h2><p><a target="_blank" rel="noopener" href="https://github.com/ollama/ollama">https://github.com/ollama/ollama</a></p>
+<p><a target="_blank" rel="noopener" href="https://ollama.com/download/linux">https://ollama.com/download/linux</a></p>
+<p><a target="_blank" rel="noopener" href="http://m.tnblog.net/hb/article/details/8200">http://m.tnblog.net/hb/article/details/8200</a></p>
+<p><a target="_blank" rel="noopener" href="https://zhuanlan.zhihu.com/p/671840823">https://zhuanlan.zhihu.com/p/671840823</a></p>
+<p><a target="_blank" rel="noopener" href="https://github.com/ollama/ollama/blob/main/docs/api.md">https://github.com/ollama/ollama/blob/main/docs/api.md</a></p>
+
+            </div>
+            <hr>
+            <div>
+              <div class="post-metas mb-3">
+                
+                  <div class="post-meta mr-3">
+                    <i class="iconfont icon-category"></i>
+                    
+                      <a class="hover-with-bg" href="/categories/Linux/">Linux</a>
+                    
+                  </div>
+                
+                
+                  <div class="post-meta">
+                    <i class="iconfont icon-tags"></i>
+                    
+                      <a class="hover-with-bg" href="/tags/ML/">ML</a>
+                    
+                  </div>
+                
+              </div>
+              
+                <p class="note note-warning">
+                  
+                    本博客所有文章除特别声明外，均采用 <a target="_blank" href="https://creativecommons.org/licenses/by-sa/4.0/deed.zh" rel="nofollow noopener noopener">CC BY-SA 4.0 协议</a> ，转载请注明出处！
+                  
+                </p>
+              
+              
+                <div class="post-prevnext">
+                  <article class="post-prev col-6">
+                    
+                    
+                      <a href="/2024/05/15/2024-05-15-terrible-life-and-work/">
+                        <i class="iconfont icon-arrowleft"></i>
+                        <span class="hidden-mobile">不吐不快</span>
+                        <span class="visible-mobile">上一篇</span>
+                      </a>
+                    
+                  </article>
+                  <article class="post-next col-6">
+                    
+                    
+                      <a href="/2024/01/27/2024-01-27-asoc-vs-aspm/">
+                        <span class="hidden-mobile">解锁应用安全的未来:从ASOC到ASPM的演进</span>
+                        <span class="visible-mobile">下一篇</span>
+                        <i class="iconfont icon-arrowright"></i>
+                      </a>
+                    
+                  </article>
+                </div>
+              
+            </div>
+
+            
+              <!-- Comments -->
+              <article class="comments" id="comments" lazyload>
+                
+                  
+                
+                
+  <script type="text/javascript">
+    Fluid.utils.loadComments('#comments', function() {
+      var light = 'github-light';
+      var dark = 'github-dark';
+      var schema = document.documentElement.getAttribute('data-user-color-scheme');
+      if (schema === 'dark') {
+        schema = dark;
+      } else {
+        schema = light;
+      }
+      window.UtterancesThemeLight = light;
+      window.UtterancesThemeDark = dark;
+      var s = document.createElement('script');
+      s.setAttribute('src', 'https://utteranc.es/client.js');
+      s.setAttribute('repo', 'hksanduo/commit-utterances');
+      s.setAttribute('issue-term', 'title');
+      
+      s.setAttribute('label', 'utterances');
+      
+      s.setAttribute('theme', schema);
+      s.setAttribute('crossorigin', 'anonymous');
+      document.getElementById('comments').appendChild(s);
+    })
+  </script>
+  <noscript>Please enable JavaScript to view the comments</noscript>
+
+
+              </article>
+            
+          </article>
+        </div>
+      </div>
+    </div>
+    
+      <div class="d-none d-lg-block col-lg-2 toc-container" id="toc-ctn">
+        <div id="toc">
+  <p class="toc-header"><i class="iconfont icon-list"></i>&nbsp;目录</p>
+  <div class="toc-body" id="toc-body"></div>
+</div>
+
+      </div>
+    
+  </div>
+</div>
+
+<!-- Custom -->
+
+
+    
+
+    
+      <a id="scroll-top-button" aria-label="TOP" href="#" role="button">
+        <i class="iconfont icon-arrowup" aria-hidden="true"></i>
+      </a>
+    
+
+    
+      <div class="modal fade" id="modalSearch" tabindex="-1" role="dialog" aria-labelledby="ModalLabel"
+     aria-hidden="true">
+  <div class="modal-dialog modal-dialog-scrollable modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header text-center">
+        <h4 class="modal-title w-100 font-weight-bold">搜索</h4>
+        <button type="button" id="local-search-close" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body mx-3">
+        <div class="md-form mb-5">
+          <input type="text" id="local-search-input" class="form-control validate">
+          <label data-error="x" data-success="v"
+                 for="local-search-input">关键词</label>
+        </div>
+        <div class="list-group" id="local-search-result"></div>
+      </div>
+    </div>
+  </div>
+</div>
+    
+
+    
+  </main>
+
+  <footer class="text-center mt-5 py-3">
+  <div class="footer-content">
+     <a href="https://hexo.io" target="_blank" rel="nofollow noopener"><span>Hexo</span></a> <i class="iconfont icon-love"></i> <a href="https://github.com/fluid-dev/hexo-theme-fluid" target="_blank" rel="nofollow noopener"><span>Fluid</span></a> 
+  </div>
+  
+  <div class="statistics">
+    
+    
+
+    
+      
+        <!-- 不蒜子统计PV -->
+        <span id="busuanzi_container_site_pv" style="display: none">
+            总访问量 
+            <span id="busuanzi_value_site_pv"></span>
+             次
+          </span>
+      
+      
+        <!-- 不蒜子统计UV -->
+        <span id="busuanzi_container_site_uv" style="display: none">
+            总访客数 
+            <span id="busuanzi_value_site_uv"></span>
+             人
+          </span>
+      
+    
+  </div>
+
+
+  
+
+  
+</footer>
+
+
+  <!-- SCRIPTS -->
+  
+  <script  src="https://cdn.jsdelivr.net/npm/nprogress@0/nprogress.min.js" ></script>
+  <link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/nprogress@0/nprogress.min.css" />
+
+  <script>
+    NProgress.configure({"showSpinner":false,"trickleSpeed":100})
+    NProgress.start()
+    window.addEventListener('load', function() {
+      NProgress.done();
+    })
+  </script>
+
+
+<script  src="https://cdn.jsdelivr.net/npm/jquery@3/dist/jquery.min.js" ></script>
+<script  src="https://cdn.jsdelivr.net/npm/bootstrap@4/dist/js/bootstrap.min.js" ></script>
+<script  src="/js/events.js" ></script>
+<script  src="/js/plugins.js" ></script>
+
+<!-- Plugins -->
+
+
+  <script  src="/js/local-search.js" ></script>
+
+
+
+  
+    <script  src="/js/img-lazyload.js" ></script>
+  
+
+
+
+  
+
+
+
+  
+    <script  src="https://cdn.jsdelivr.net/npm/tocbot@4/dist/tocbot.min.js" ></script>
+  
+  
+    <script  src="https://cdn.jsdelivr.net/npm/@fancyapps/fancybox@3/dist/jquery.fancybox.min.js" ></script>
+  
+  
+    <script  src="https://cdn.jsdelivr.net/npm/anchor-js@4/anchor.min.js" ></script>
+  
+  
+    <script defer src="https://cdn.jsdelivr.net/npm/clipboard@2/dist/clipboard.min.js" ></script>
+  
+
+
+
+  <script defer src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js" ></script>
+
+
+
+
+  <script  src="https://cdn.jsdelivr.net/npm/typed.js@2/lib/typed.min.js" ></script>
+  <script>
+    (function (window, document) {
+      var typing = Fluid.plugins.typing;
+      var title = document.getElementById('subtitle').title;
+      
+      typing(title)
+      
+    })(window, document);
+  </script>
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+    <!-- Google Analytics -->
+    <script defer>
+      window.ga = window.ga || function () { (ga.q = ga.q || []).push(arguments) };
+      ga.l = +new Date;
+      ga('create', 'UA-167858469-1', 'auto');
+      ga('send', 'pageview');
+    </script>
+    <script async src='https://www.google-analytics.com/analytics.js'></script>
+  
+
+  
+
+  
+
+  
+
+  
+
+
+
+
+
+<!-- 主题的启动项 保持在最底部 -->
+<script  src="/js/boot.js" ></script>
+
+
+</body>
+</html>

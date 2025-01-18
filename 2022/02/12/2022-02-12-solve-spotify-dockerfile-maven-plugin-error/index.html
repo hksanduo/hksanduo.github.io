@@ -1,0 +1,565 @@
+
+
+<!DOCTYPE html>
+<html lang="zh-CN" data-default-color-scheme=auto>
+
+
+
+<head>
+  <meta charset="UTF-8">
+  <link rel="apple-touch-icon" sizes="76x76" href="/img/favicon.png">
+  <link rel="icon" href="/img/favicon.png">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, shrink-to-fit=no">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  
+  <meta name="theme-color" content="#2f4154">
+  <meta name="description" content="">
+  <meta name="author" content="sanduo">
+  <meta name="keywords" content="">
+  <meta name="description" content="spotify dockerfile-maven-plugin ‘Could not acquire image ID or digest following build’错误解决  背景使用spotify dockerfile-maven-plugin 在使用maven编译项目的过程中自动构建docker镜像文件，在构建过程中遇到“Could not acquire image ID or di">
+<meta property="og:type" content="article">
+<meta property="og:title" content="spotify dockerfile-maven-plugin ‘Could not acquire image ID or digest following build’错误解决">
+<meta property="og:url" content="https://hksanduo.github.io/2022/02/12/2022-02-12-solve-spotify-dockerfile-maven-plugin-error/index.html">
+<meta property="og:site_name" content="sanduo blog">
+<meta property="og:description" content="spotify dockerfile-maven-plugin ‘Could not acquire image ID or digest following build’错误解决  背景使用spotify dockerfile-maven-plugin 在使用maven编译项目的过程中自动构建docker镜像文件，在构建过程中遇到“Could not acquire image ID or di">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://hksanduo.github.io/img/20220212-01.png">
+<meta property="og:image" content="https://hksanduo.github.io/img/20220212-02.png">
+<meta property="og:image" content="https://hksanduo.github.io/img/20220212-03.png">
+<meta property="article:published_time" content="2022-02-12T09:51:00.000Z">
+<meta property="article:modified_time" content="2025-01-18T14:54:10.081Z">
+<meta property="article:author" content="sanduo">
+<meta property="article:tag" content="Java">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:image" content="https://hksanduo.github.io/img/20220212-01.png">
+  
+  <title>spotify dockerfile-maven-plugin ‘Could not acquire image ID or digest following build’错误解决 - sanduo blog</title>
+
+  <link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4/dist/css/bootstrap.min.css" />
+
+
+  <link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/github-markdown-css@4/github-markdown.min.css" />
+  <link  rel="stylesheet" href="/lib/hint/hint.min.css" />
+
+  
+    
+    
+      
+      <link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/highlight.js@10/styles/github-gist.min.css" />
+    
+  
+
+  
+    <link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fancyapps/fancybox@3/dist/jquery.fancybox.min.css" />
+  
+
+
+<!-- 主题依赖的图标库，不要自行修改 -->
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1749284_ba1fz6golrf.css">
+
+
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1736178_kmeydafke9r.css">
+
+
+<link  rel="stylesheet" href="/css/main.css" />
+
+<!-- 自定义样式保持在最底部 -->
+
+
+  <script id="fluid-configs">
+    var Fluid = window.Fluid || {};
+    var CONFIG = {"hostname":"hksanduo.github.io","root":"/","version":"1.8.12","typing":{"enable":true,"typeSpeed":70,"cursorChar":"_","loop":false},"anchorjs":{"enable":true,"element":"h1,h2,h3,h4,h5,h6","placement":"right","visible":"hover","icon":""},"progressbar":{"enable":true,"height_px":3,"color":"#29d","options":{"showSpinner":false,"trickleSpeed":100}},"copy_btn":true,"image_zoom":{"enable":true,"img_url_replace":["",""]},"toc":{"enable":true,"headingSelector":"h1,h2,h3,h4,h5,h6","collapseDepth":0},"lazyload":{"enable":true,"loading_img":"/img/loading.gif","onlypost":false,"offset_factor":2},"web_analytics":{"enable":true,"baidu":null,"google":"UA-167858469-1","gtag":null,"tencent":{"sid":null,"cid":null},"woyaola":null,"cnzz":null,"leancloud":{"app_id":null,"app_key":null,"server_url":null,"path":"window.location.pathname"}},"search_path":"/local-search.xml"};
+  </script>
+  <script  src="/js/utils.js" ></script>
+  <script  src="/js/color-schema.js" ></script>
+<meta name="generator" content="Hexo 5.4.2"></head>
+
+
+<body>
+  <header style="height: 70vh;">
+    <nav id="navbar" class="navbar fixed-top  navbar-expand-lg navbar-dark scrolling-navbar">
+  <div class="container">
+    <a class="navbar-brand" href="/">
+      <strong>Welcome To Sanduo&#39;s Blog</strong>
+    </a>
+
+    <button id="navbar-toggler-btn" class="navbar-toggler" type="button" data-toggle="collapse"
+            data-target="#navbarSupportedContent"
+            aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+      <div class="animated-icon"><span></span><span></span><span></span></div>
+    </button>
+
+    <!-- Collapsible content -->
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+      <ul class="navbar-nav ml-auto text-center">
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/">
+                <i class="iconfont icon-home-fill"></i>
+                首页
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/archives/">
+                <i class="iconfont icon-archive-fill"></i>
+                归档
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/categories/">
+                <i class="iconfont icon-category-fill"></i>
+                分类
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/tags/">
+                <i class="iconfont icon-tags-fill"></i>
+                标签
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/about/">
+                <i class="iconfont icon-user-fill"></i>
+                关于
+              </a>
+            </li>
+          
+        
+        
+          <li class="nav-item" id="search-btn">
+            <a class="nav-link" target="_self" href="javascript:;" data-toggle="modal" data-target="#modalSearch" aria-label="Search">
+              &nbsp;<i class="iconfont icon-search"></i>&nbsp;
+            </a>
+          </li>
+        
+        
+          <li class="nav-item" id="color-toggle-btn">
+            <a class="nav-link" target="_self" href="javascript:;" aria-label="Color Toggle">&nbsp;<i
+                class="iconfont icon-dark" id="color-toggle-icon"></i>&nbsp;</a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+</nav>
+
+    <div class="banner" id="banner" parallax=true
+         style="background: url('/img/default.png') no-repeat center center;
+           background-size: cover;">
+      <div class="full-bg-img">
+        <div class="mask flex-center" style="background-color: rgba(0, 0, 0, 0.3)">
+          <div class="page-header text-center fade-in-up">
+            <span class="h2" id="subtitle" title="spotify dockerfile-maven-plugin ‘Could not acquire image ID or digest following build’错误解决">
+              
+            </span>
+
+            
+              <div class="mt-3">
+  
+  
+    <span class="post-meta">
+      <i class="iconfont icon-date-fill" aria-hidden="true"></i>
+      <time datetime="2022-02-12 09:51" pubdate>
+        2022年2月12日 上午
+      </time>
+    </span>
+  
+</div>
+
+<div class="mt-1">
+  
+    <span class="post-meta mr-2">
+      <i class="iconfont icon-chart"></i>
+      6.3k 字
+    </span>
+  
+
+  
+    <span class="post-meta mr-2">
+      <i class="iconfont icon-clock-fill"></i>
+      
+      
+      20 分钟
+    </span>
+  
+
+  
+  
+</div>
+
+            
+          </div>
+
+          
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <main>
+    
+      
+
+<div class="container-fluid nopadding-x">
+  <div class="row nomargin-x">
+    <div class="d-none d-lg-block col-lg-2"></div>
+    <div class="col-lg-8 nopadding-x-md">
+      <div class="container nopadding-x-md" id="board-ctn">
+        <div class="py-5" id="board">
+          <article class="post-content mx-auto">
+            <!-- SEO header -->
+            <h1 style="display: none">spotify dockerfile-maven-plugin ‘Could not acquire image ID or digest following build’错误解决</h1>
+            
+            <div class="markdown-body">
+              <p>spotify dockerfile-maven-plugin ‘Could not acquire image ID or digest following build’错误解决</p>
+<hr>
+<h2 id="背景"><a href="#背景" class="headerlink" title="背景"></a>背景</h2><p>使用spotify dockerfile-maven-plugin 在使用maven编译项目的过程中自动构建docker镜像文件，在构建过程中遇到“Could not acquire image ID or digest following build”错误，无法定位错误原因，全网检索以后，发现部分网友也遇到过，网友提出的错误原因有：</p>
+<ul>
+<li>Dockerfile配置错误，解决方法是检查dockerfile文件，或者单独调用docker构建命令进行测试</li>
+<li>.dockerignore配置错误，如果项目中需要配置.dockerignore,请认真检查，dockerfile-maven-plugin的<a target="_blank" rel="noopener" href="https://github.com/spotify/dockerfile-maven/issues/25">issues</a>中有提到</li>
+<li>dockerfile-maven-plugin版本较低，从1.3.×升级到1.4.×即可</li>
+</ul>
+<p>博主开发环境：<br>jdk:1.8.0_291<br>dockerfile-maven-plugin:1.4.12<br>docker：Docker version 20.10.12, build e91ed5707e</p>
+<p>博主的项目名为：engine,Dockerfile位于：engine&#x2F;src&#x2F;main&#x2F;docker，构建的命令为：<code>mvn clean package dockerfile:build -Dmaven.test.skip=true </code><br>pom.xml docker-maven-plugin配置如下：</p>
+<figure class="highlight dust"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></td><td class="code"><pre><code class="hljs dust"><span class="language-xml"><span class="hljs-tag">&lt;<span class="hljs-name">plugin</span>&gt;</span></span><br><span class="language-xml">    <span class="hljs-tag">&lt;<span class="hljs-name">groupId</span>&gt;</span>com.spotify<span class="hljs-tag">&lt;/<span class="hljs-name">groupId</span>&gt;</span></span><br><span class="language-xml">    <span class="hljs-tag">&lt;<span class="hljs-name">artifactId</span>&gt;</span>dockerfile-maven-plugin<span class="hljs-tag">&lt;/<span class="hljs-name">artifactId</span>&gt;</span></span><br><span class="language-xml">    <span class="hljs-tag">&lt;<span class="hljs-name">version</span>&gt;</span>1.4.12<span class="hljs-tag">&lt;/<span class="hljs-name">version</span>&gt;</span></span><br><span class="language-xml">    <span class="hljs-tag">&lt;<span class="hljs-name">executions</span>&gt;</span></span><br><span class="language-xml">        <span class="hljs-tag">&lt;<span class="hljs-name">execution</span>&gt;</span></span><br><span class="language-xml">            <span class="hljs-tag">&lt;<span class="hljs-name">id</span>&gt;</span>default<span class="hljs-tag">&lt;/<span class="hljs-name">id</span>&gt;</span></span><br><span class="language-xml">            <span class="hljs-tag">&lt;<span class="hljs-name">phase</span>&gt;</span>package<span class="hljs-tag">&lt;/<span class="hljs-name">phase</span>&gt;</span></span><br><span class="language-xml">            <span class="hljs-tag">&lt;<span class="hljs-name">goals</span>&gt;</span></span><br><span class="language-xml">                <span class="hljs-tag">&lt;<span class="hljs-name">goal</span>&gt;</span>build<span class="hljs-tag">&lt;/<span class="hljs-name">goal</span>&gt;</span></span><br><span class="language-xml">            <span class="hljs-tag">&lt;/<span class="hljs-name">goals</span>&gt;</span></span><br><span class="language-xml">        <span class="hljs-tag">&lt;/<span class="hljs-name">execution</span>&gt;</span></span><br><span class="language-xml">    <span class="hljs-tag">&lt;/<span class="hljs-name">executions</span>&gt;</span></span><br><span class="language-xml">    <span class="hljs-tag">&lt;<span class="hljs-name">configuration</span>&gt;</span></span><br><span class="language-xml">        <span class="hljs-tag">&lt;<span class="hljs-name">repository</span>&gt;</span>blingsec/$</span><span class="hljs-template-variable">&#123;project.artifactId&#125;</span><span class="language-xml"><span class="hljs-tag">&lt;/<span class="hljs-name">repository</span>&gt;</span></span><br><span class="language-xml">        <span class="hljs-tag">&lt;<span class="hljs-name">tag</span>&gt;</span>$</span><span class="hljs-template-variable">&#123;project.version&#125;</span><span class="language-xml"><span class="hljs-tag">&lt;/<span class="hljs-name">tag</span>&gt;</span></span><br><span class="language-xml">        <span class="hljs-tag">&lt;<span class="hljs-name">dockerfile</span>&gt;</span>src/main/docker<span class="hljs-tag">&lt;/<span class="hljs-name">dockerfile</span>&gt;</span></span><br><span class="language-xml">        <span class="hljs-tag">&lt;<span class="hljs-name">buildArgs</span>&gt;</span></span><br><span class="language-xml">            <span class="hljs-tag">&lt;<span class="hljs-name">JAR_FILE</span>&gt;</span>target/$</span><span class="hljs-template-variable">&#123;project.build.finalName&#125;</span><span class="language-xml">.jar<span class="hljs-tag">&lt;/<span class="hljs-name">JAR_FILE</span>&gt;</span></span><br><span class="language-xml">            <span class="hljs-tag">&lt;<span class="hljs-name">SCA_CLIENT</span>&gt;</span>client/sca-client<span class="hljs-tag">&lt;/<span class="hljs-name">SCA_CLIENT</span>&gt;</span></span><br><span class="language-xml">        <span class="hljs-tag">&lt;/<span class="hljs-name">buildArgs</span>&gt;</span></span><br><span class="language-xml">    <span class="hljs-tag">&lt;/<span class="hljs-name">configuration</span>&gt;</span></span><br><span class="language-xml"><span class="hljs-tag">&lt;/<span class="hljs-name">plugin</span>&gt;</span></span><br></code></pre></td></tr></table></figure>
+
+<p>错误如下：</p>
+<figure class="highlight smali"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs smali">[ERROR] Failed to<span class="hljs-built_in"> execute </span>goal com.spotify:dockerfile-maven-plugin:1.4.12:build (default) on project engine: Execution default of goal com.spotify:dockerfile-maven-plugin:1.4.12:build failed: Could<span class="hljs-built_in"> not </span>acquire image ID<span class="hljs-built_in"> or </span>digest following build -&gt; [Help 1]<br></code></pre></td></tr></table></figure>
+<p><img src="/img/20220212-01.png" srcset="/img/loading.gif" lazyload alt="maven build error"></p>
+<p>mvn调试输出内容：<br><img src="/img/20220212-02.png" srcset="/img/loading.gif" lazyload alt="maven build debug error"></p>
+<h2 id="解决方案"><a href="#解决方案" class="headerlink" title="解决方案"></a>解决方案</h2><p>解决方案仅限于我这种情况，dockerfile-maven-plugin配置如上所示。我进过多次尝试并翻了翻代码，发现dockerfile-maven-plugin  dockerfile参数如果没有指定默认是当前项目目录，我的Dockerfile文件位于engine&#x2F;src&#x2F;main&#x2F;docker目录下，由于pom.xml配置是参考了docker-maven-plugin，dockerfile参数内容发生了变化,docker-maven-plugin中dockerfile参数是Dockerfile所在的目录，dockerfile-maven-plugin中dockerfile参数是Dockerfile文件的相对路径，对于我这种情况，一种就是把Dockerfile移动到项目根目录下，或者将dockerfile更改成src&#x2F;main&#x2F;docker&#x2F;Dockerfile即可</p>
+<p>执行以下命令进行构建：</p>
+<figure class="highlight actionscript"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs actionscript">mvn clean <span class="hljs-keyword">package</span> <span class="hljs-title class_">dockerfile</span>:build -Dmaven.test.skip=<span class="hljs-literal">true</span> <br></code></pre></td></tr></table></figure>
+
+<p><img src="/img/20220212-03.png" srcset="/img/loading.gif" lazyload alt="maven build success">        </p>
+<h2 id="更新"><a href="#更新" class="headerlink" title="更新"></a>更新</h2><h3 id="repository-does-not-exist-or-may-require-‘docker-login’-denied-requested-access-to-the-resource-is-denied"><a href="#repository-does-not-exist-or-may-require-‘docker-login’-denied-requested-access-to-the-resource-is-denied" class="headerlink" title="repository does not exist or may require ‘docker login’: denied: requested access to the resource is denied"></a>repository does not exist or may require ‘docker login’: denied: requested access to the resource is denied</h3><p>之前使用的镜像文件一直是dockerhub上的，最近需要使用自行构建的镜像，重新编辑dockerfile，使用mvn命令编译项目，打包镜像过程中遇到了以下问题：</p>
+<figure class="highlight stylus"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br></pre></td><td class="code"><pre><code class="hljs stylus"><span class="hljs-selector-attr">[ERROR]</span> pull access denied <span class="hljs-keyword">for</span> hksanduo/oracle-jdk-<span class="hljs-number">8</span>, repository does not exist or may require <span class="hljs-string">&#x27;docker login&#x27;</span>: denied: requested access to the resource is denied<br><span class="hljs-selector-attr">[WARNING]</span> An attempt failed, will retry <span class="hljs-number">1</span> more times<br>org<span class="hljs-selector-class">.apache</span><span class="hljs-selector-class">.maven</span><span class="hljs-selector-class">.plugin</span><span class="hljs-selector-class">.MojoExecutionException</span>: Could not build <span class="hljs-selector-tag">image</span><br>    at com<span class="hljs-selector-class">.spotify</span><span class="hljs-selector-class">.plugin</span><span class="hljs-selector-class">.dockerfile</span><span class="hljs-selector-class">.BuildMojo</span><span class="hljs-selector-class">.buildImage</span> (BuildMojo<span class="hljs-selector-class">.java</span>:<span class="hljs-number">247</span>)<br>    at com<span class="hljs-selector-class">.spotify</span><span class="hljs-selector-class">.plugin</span><span class="hljs-selector-class">.dockerfile</span><span class="hljs-selector-class">.BuildMojo</span><span class="hljs-selector-class">.execute</span> (BuildMojo<span class="hljs-selector-class">.java</span>:<span class="hljs-number">135</span>)<br>    at com<span class="hljs-selector-class">.spotify</span><span class="hljs-selector-class">.plugin</span><span class="hljs-selector-class">.dockerfile</span><span class="hljs-selector-class">.AbstractDockerMojo</span><span class="hljs-selector-class">.tryExecute</span> (AbstractDockerMojo<span class="hljs-selector-class">.java</span>:<span class="hljs-number">265</span>)<br>    at com<span class="hljs-selector-class">.spotify</span><span class="hljs-selector-class">.plugin</span><span class="hljs-selector-class">.dockerfile</span><span class="hljs-selector-class">.AbstractDockerMojo</span><span class="hljs-selector-class">.execute</span> (AbstractDockerMojo<span class="hljs-selector-class">.java</span>:<span class="hljs-number">254</span>)<br>    at org<span class="hljs-selector-class">.apache</span><span class="hljs-selector-class">.maven</span><span class="hljs-selector-class">.plugin</span><span class="hljs-selector-class">.DefaultBuildPluginManager</span><span class="hljs-selector-class">.executeMojo</span> (DefaultBuildPluginManager<span class="hljs-selector-class">.java</span>:<span class="hljs-number">137</span>)<br>    at org<span class="hljs-selector-class">.apache</span><span class="hljs-selector-class">.maven</span><span class="hljs-selector-class">.lifecycle</span><span class="hljs-selector-class">.internal</span><span class="hljs-selector-class">.MojoExecutor</span><span class="hljs-selector-class">.execute</span> (MojoExecutor<span class="hljs-selector-class">.java</span>:<span class="hljs-number">210</span>)<br>    at org<span class="hljs-selector-class">.apache</span><span class="hljs-selector-class">.maven</span><span class="hljs-selector-class">.lifecycle</span><span class="hljs-selector-class">.internal</span><span class="hljs-selector-class">.MojoExecutor</span><span class="hljs-selector-class">.execute</span> (MojoExecutor<span class="hljs-selector-class">.java</span>:<span class="hljs-number">156</span>)<br>    at org<span class="hljs-selector-class">.apache</span><span class="hljs-selector-class">.maven</span><span class="hljs-selector-class">.lifecycle</span><span class="hljs-selector-class">.internal</span><span class="hljs-selector-class">.MojoExecutor</span><span class="hljs-selector-class">.execute</span> (MojoExecutor<span class="hljs-selector-class">.java</span>:<span class="hljs-number">148</span>)<br>    at org<span class="hljs-selector-class">.apache</span><span class="hljs-selector-class">.maven</span><span class="hljs-selector-class">.lifecycle</span><span class="hljs-selector-class">.internal</span><span class="hljs-selector-class">.LifecycleModuleBuilder</span><span class="hljs-selector-class">.buildProject</span> (LifecycleModuleBuilder<span class="hljs-selector-class">.java</span>:<span class="hljs-number">117</span>)<br>    at org<span class="hljs-selector-class">.apache</span><span class="hljs-selector-class">.maven</span><span class="hljs-selector-class">.lifecycle</span><span class="hljs-selector-class">.internal</span><span class="hljs-selector-class">.LifecycleModuleBuilder</span><span class="hljs-selector-class">.buildProject</span> (LifecycleModuleBuilder<span class="hljs-selector-class">.java</span>:<span class="hljs-number">81</span>)<br>    at org<span class="hljs-selector-class">.apache</span><span class="hljs-selector-class">.maven</span><span class="hljs-selector-class">.lifecycle</span><span class="hljs-selector-class">.internal</span><span class="hljs-selector-class">.builder</span><span class="hljs-selector-class">.singlethreaded</span><span class="hljs-selector-class">.SingleThreadedBuilder</span><span class="hljs-selector-class">.build</span> (SingleThreadedBuilder<span class="hljs-selector-class">.java</span>:<span class="hljs-number">56</span>)<br>    at org<span class="hljs-selector-class">.apache</span><span class="hljs-selector-class">.maven</span><span class="hljs-selector-class">.lifecycle</span><span class="hljs-selector-class">.internal</span><span class="hljs-selector-class">.LifecycleStarter</span><span class="hljs-selector-class">.execute</span> (LifecycleStarter<span class="hljs-selector-class">.java</span>:<span class="hljs-number">128</span>)<br>    at org<span class="hljs-selector-class">.apache</span><span class="hljs-selector-class">.maven</span><span class="hljs-selector-class">.DefaultMaven</span><span class="hljs-selector-class">.doExecute</span> (DefaultMaven<span class="hljs-selector-class">.java</span>:<span class="hljs-number">305</span>)<br>    at org<span class="hljs-selector-class">.apache</span><span class="hljs-selector-class">.maven</span><span class="hljs-selector-class">.DefaultMaven</span><span class="hljs-selector-class">.doExecute</span> (DefaultMaven<span class="hljs-selector-class">.java</span>:<span class="hljs-number">192</span>)<br>    at org<span class="hljs-selector-class">.apache</span><span class="hljs-selector-class">.maven</span><span class="hljs-selector-class">.DefaultMaven</span><span class="hljs-selector-class">.execute</span> (DefaultMaven<span class="hljs-selector-class">.java</span>:<span class="hljs-number">105</span>)<br>    at org<span class="hljs-selector-class">.apache</span><span class="hljs-selector-class">.maven</span><span class="hljs-selector-class">.cli</span><span class="hljs-selector-class">.MavenCli</span><span class="hljs-selector-class">.execute</span> (MavenCli<span class="hljs-selector-class">.java</span>:<span class="hljs-number">972</span>)<br>    at org<span class="hljs-selector-class">.apache</span><span class="hljs-selector-class">.maven</span><span class="hljs-selector-class">.cli</span><span class="hljs-selector-class">.MavenCli</span><span class="hljs-selector-class">.doMain</span> (MavenCli<span class="hljs-selector-class">.java</span>:<span class="hljs-number">293</span>)<br>    at org<span class="hljs-selector-class">.apache</span><span class="hljs-selector-class">.maven</span><span class="hljs-selector-class">.cli</span><span class="hljs-selector-class">.MavenCli</span><span class="hljs-selector-class">.main</span> (MavenCli<span class="hljs-selector-class">.java</span>:<span class="hljs-number">196</span>)<br>    at jdk<span class="hljs-selector-class">.internal</span><span class="hljs-selector-class">.reflect</span><span class="hljs-selector-class">.NativeMethodAccessorImpl</span><span class="hljs-selector-class">.invoke0</span> (Native Method)<br>    at jdk<span class="hljs-selector-class">.internal</span><span class="hljs-selector-class">.reflect</span><span class="hljs-selector-class">.NativeMethodAccessorImpl</span><span class="hljs-selector-class">.invoke</span> (NativeMethodAccessorImpl<span class="hljs-selector-class">.java</span>:<span class="hljs-number">62</span>)<br>    at jdk<span class="hljs-selector-class">.internal</span><span class="hljs-selector-class">.reflect</span><span class="hljs-selector-class">.DelegatingMethodAccessorImpl</span><span class="hljs-selector-class">.invoke</span> (DelegatingMethodAccessorImpl<span class="hljs-selector-class">.java</span>:<span class="hljs-number">43</span>)<br>    at java<span class="hljs-selector-class">.lang</span><span class="hljs-selector-class">.reflect</span><span class="hljs-selector-class">.Method</span><span class="hljs-selector-class">.invoke</span> (Method<span class="hljs-selector-class">.java</span>:<span class="hljs-number">566</span>)<br>    at org<span class="hljs-selector-class">.codehaus</span><span class="hljs-selector-class">.plexus</span><span class="hljs-selector-class">.classworlds</span><span class="hljs-selector-class">.launcher</span><span class="hljs-selector-class">.Launcher</span><span class="hljs-selector-class">.launchEnhanced</span> (Launcher<span class="hljs-selector-class">.java</span>:<span class="hljs-number">282</span>)<br>    at org<span class="hljs-selector-class">.codehaus</span><span class="hljs-selector-class">.plexus</span><span class="hljs-selector-class">.classworlds</span><span class="hljs-selector-class">.launcher</span><span class="hljs-selector-class">.Launcher</span><span class="hljs-selector-class">.launch</span> (Launcher<span class="hljs-selector-class">.java</span>:<span class="hljs-number">225</span>)<br>    at org<span class="hljs-selector-class">.codehaus</span><span class="hljs-selector-class">.plexus</span><span class="hljs-selector-class">.classworlds</span><span class="hljs-selector-class">.launcher</span><span class="hljs-selector-class">.Launcher</span><span class="hljs-selector-class">.mainWithExitCode</span> (Launcher<span class="hljs-selector-class">.java</span>:<span class="hljs-number">406</span>)<br>    at org<span class="hljs-selector-class">.codehaus</span><span class="hljs-selector-class">.plexus</span><span class="hljs-selector-class">.classworlds</span><span class="hljs-selector-class">.launcher</span><span class="hljs-selector-class">.Launcher</span><span class="hljs-selector-class">.main</span> (Launcher<span class="hljs-selector-class">.java</span>:<span class="hljs-number">347</span>)<br>Caused by: com<span class="hljs-selector-class">.spotify</span><span class="hljs-selector-class">.docker</span><span class="hljs-selector-class">.client</span><span class="hljs-selector-class">.exceptions</span><span class="hljs-selector-class">.DockerException</span>: pull access denied <span class="hljs-keyword">for</span> hksanduo/oracle-jdk-<span class="hljs-number">8</span>, repository does not exist or may require <span class="hljs-string">&#x27;docker login&#x27;</span>: denied: requested access to the resource is denied<br></code></pre></td></tr></table></figure>
+<p>通过错误，可以看出，从公共镜像中找不到hksanduo&#x2F;oracle-jdk-8,登录失败，也无法获取私有镜像，直接抛出异常，博主本人本地镜像源中是有hksanduo&#x2F;oracle-jdk-8这个镜像的，这个镜像是博主自行打包的，但是尚未提交的dockerhub，相当于在当前情况下，使用spotify dockerfile maven plugin无法使用本地的镜像源，每次只获取最新的镜像源进行构建。<br>通过翻阅资料和代码，找到一个配置属性，可以跳过，在pom.xml中增加配置信息，具体配置属性名称为：<code>pullNewerImage</code>，将值设置成 <strong>false</strong> 即可，配置参考：</p>
+<figure class="highlight dust"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br></pre></td><td class="code"><pre><code class="hljs dust"><span class="language-xml"><span class="hljs-tag">&lt;<span class="hljs-name">plugin</span>&gt;</span></span><br><span class="language-xml">    <span class="hljs-tag">&lt;<span class="hljs-name">groupId</span>&gt;</span>com.spotify<span class="hljs-tag">&lt;/<span class="hljs-name">groupId</span>&gt;</span></span><br><span class="language-xml">    <span class="hljs-tag">&lt;<span class="hljs-name">artifactId</span>&gt;</span>dockerfile-maven-plugin<span class="hljs-tag">&lt;/<span class="hljs-name">artifactId</span>&gt;</span></span><br><span class="language-xml">    <span class="hljs-tag">&lt;<span class="hljs-name">version</span>&gt;</span>1.4.12<span class="hljs-tag">&lt;/<span class="hljs-name">version</span>&gt;</span></span><br><span class="language-xml">    <span class="hljs-tag">&lt;<span class="hljs-name">executions</span>&gt;</span></span><br><span class="language-xml">        <span class="hljs-tag">&lt;<span class="hljs-name">execution</span>&gt;</span></span><br><span class="language-xml">            <span class="hljs-tag">&lt;<span class="hljs-name">id</span>&gt;</span>default<span class="hljs-tag">&lt;/<span class="hljs-name">id</span>&gt;</span></span><br><span class="language-xml">            <span class="hljs-tag">&lt;<span class="hljs-name">phase</span>&gt;</span>package<span class="hljs-tag">&lt;/<span class="hljs-name">phase</span>&gt;</span></span><br><span class="language-xml">            <span class="hljs-tag">&lt;<span class="hljs-name">goals</span>&gt;</span></span><br><span class="language-xml">                <span class="hljs-tag">&lt;<span class="hljs-name">goal</span>&gt;</span>build<span class="hljs-tag">&lt;/<span class="hljs-name">goal</span>&gt;</span></span><br><span class="language-xml">            <span class="hljs-tag">&lt;/<span class="hljs-name">goals</span>&gt;</span></span><br><span class="language-xml">        <span class="hljs-tag">&lt;/<span class="hljs-name">execution</span>&gt;</span></span><br><span class="language-xml">    <span class="hljs-tag">&lt;/<span class="hljs-name">executions</span>&gt;</span></span><br><span class="language-xml">    <span class="hljs-tag">&lt;<span class="hljs-name">configuration</span>&gt;</span></span><br><span class="language-xml">        <span class="hljs-tag">&lt;<span class="hljs-name">repository</span>&gt;</span>hksanduo/$</span><span class="hljs-template-variable">&#123;project.artifactId&#125;</span><span class="language-xml"><span class="hljs-tag">&lt;/<span class="hljs-name">repository</span>&gt;</span></span><br><span class="language-xml">        <span class="hljs-tag">&lt;<span class="hljs-name">tag</span>&gt;</span>$</span><span class="hljs-template-variable">&#123;project.version&#125;</span><span class="language-xml"><span class="hljs-tag">&lt;/<span class="hljs-name">tag</span>&gt;</span></span><br><span class="language-xml">        <span class="hljs-tag">&lt;<span class="hljs-name">dockerfile</span>&gt;</span>src/main/docker/Dockerfile<span class="hljs-tag">&lt;/<span class="hljs-name">dockerfile</span>&gt;</span></span><br><span class="language-xml">        <span class="hljs-tag">&lt;<span class="hljs-name">buildArgs</span>&gt;</span></span><br><span class="language-xml">            <span class="hljs-tag">&lt;<span class="hljs-name">JAR_FILE</span>&gt;</span>target/$</span><span class="hljs-template-variable">&#123;project.build.finalName&#125;</span><span class="language-xml">.jar<span class="hljs-tag">&lt;/<span class="hljs-name">JAR_FILE</span>&gt;</span></span><br><span class="language-xml">            <span class="hljs-tag">&lt;<span class="hljs-name">SCA_CLIENT</span>&gt;</span>client/sca-client<span class="hljs-tag">&lt;/<span class="hljs-name">SCA_CLIENT</span>&gt;</span></span><br><span class="language-xml">        <span class="hljs-tag">&lt;/<span class="hljs-name">buildArgs</span>&gt;</span></span><br><span class="language-xml">        <span class="hljs-tag">&lt;<span class="hljs-name">pullNewerImage</span>&gt;</span>false<span class="hljs-tag">&lt;/<span class="hljs-name">pullNewerImage</span>&gt;</span></span><br><span class="language-xml">    <span class="hljs-tag">&lt;/<span class="hljs-name">configuration</span>&gt;</span></span><br><span class="language-xml"><span class="hljs-tag">&lt;/<span class="hljs-name">plugin</span>&gt;</span></span><br></code></pre></td></tr></table></figure>
+
+<h2 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h2><ul>
+<li><a target="_blank" rel="noopener" href="https://github.com/spotify/dockerfile-maven">https://github.com/spotify/dockerfile-maven</a>【dockerfile-maven】</li>
+<li><a target="_blank" rel="noopener" href="https://hjwjw.github.io/posts/9d44b524/">https://hjwjw.github.io/posts/9d44b524/</a></li>
+<li><a target="_blank" rel="noopener" href="https://spring.io/blog/2020/01/27/creating-docker-images-with-spring-boot-2-3-0-m1">https://spring.io/blog/2020/01/27/creating-docker-images-with-spring-boot-2-3-0-m1</a></li>
+<li><a target="_blank" rel="noopener" href="https://www.baeldung.com/spring-boot-docker-images">https://www.baeldung.com/spring-boot-docker-images</a></li>
+</ul>
+
+            </div>
+            <hr>
+            <div>
+              <div class="post-metas mb-3">
+                
+                  <div class="post-meta mr-3">
+                    <i class="iconfont icon-category"></i>
+                    
+                      <a class="hover-with-bg" href="/categories/Code/">Code</a>
+                    
+                  </div>
+                
+                
+                  <div class="post-meta">
+                    <i class="iconfont icon-tags"></i>
+                    
+                      <a class="hover-with-bg" href="/tags/Java/">Java</a>
+                    
+                  </div>
+                
+              </div>
+              
+                <p class="note note-warning">
+                  
+                    本博客所有文章除特别声明外，均采用 <a target="_blank" href="https://creativecommons.org/licenses/by-sa/4.0/deed.zh" rel="nofollow noopener noopener">CC BY-SA 4.0 协议</a> ，转载请注明出处！
+                  
+                </p>
+              
+              
+                <div class="post-prevnext">
+                  <article class="post-prev col-6">
+                    
+                    
+                      <a href="/2022/02/23/2022-02-23-persional-journal/">
+                        <i class="iconfont icon-arrowleft"></i>
+                        <span class="hidden-mobile">生活杂记</span>
+                        <span class="visible-mobile">上一篇</span>
+                      </a>
+                    
+                  </article>
+                  <article class="post-next col-6">
+                    
+                    
+                      <a href="/2021/12/20/2021-12-20-insights-on-persional-life%20copy/">
+                        <span class="hidden-mobile">关于金融相关的一些感悟和观点</span>
+                        <span class="visible-mobile">下一篇</span>
+                        <i class="iconfont icon-arrowright"></i>
+                      </a>
+                    
+                  </article>
+                </div>
+              
+            </div>
+
+            
+              <!-- Comments -->
+              <article class="comments" id="comments" lazyload>
+                
+                  
+                
+                
+  <script type="text/javascript">
+    Fluid.utils.loadComments('#comments', function() {
+      var light = 'github-light';
+      var dark = 'github-dark';
+      var schema = document.documentElement.getAttribute('data-user-color-scheme');
+      if (schema === 'dark') {
+        schema = dark;
+      } else {
+        schema = light;
+      }
+      window.UtterancesThemeLight = light;
+      window.UtterancesThemeDark = dark;
+      var s = document.createElement('script');
+      s.setAttribute('src', 'https://utteranc.es/client.js');
+      s.setAttribute('repo', 'hksanduo/commit-utterances');
+      s.setAttribute('issue-term', 'title');
+      
+      s.setAttribute('label', 'utterances');
+      
+      s.setAttribute('theme', schema);
+      s.setAttribute('crossorigin', 'anonymous');
+      document.getElementById('comments').appendChild(s);
+    })
+  </script>
+  <noscript>Please enable JavaScript to view the comments</noscript>
+
+
+              </article>
+            
+          </article>
+        </div>
+      </div>
+    </div>
+    
+      <div class="d-none d-lg-block col-lg-2 toc-container" id="toc-ctn">
+        <div id="toc">
+  <p class="toc-header"><i class="iconfont icon-list"></i>&nbsp;目录</p>
+  <div class="toc-body" id="toc-body"></div>
+</div>
+
+      </div>
+    
+  </div>
+</div>
+
+<!-- Custom -->
+
+
+    
+
+    
+      <a id="scroll-top-button" aria-label="TOP" href="#" role="button">
+        <i class="iconfont icon-arrowup" aria-hidden="true"></i>
+      </a>
+    
+
+    
+      <div class="modal fade" id="modalSearch" tabindex="-1" role="dialog" aria-labelledby="ModalLabel"
+     aria-hidden="true">
+  <div class="modal-dialog modal-dialog-scrollable modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header text-center">
+        <h4 class="modal-title w-100 font-weight-bold">搜索</h4>
+        <button type="button" id="local-search-close" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body mx-3">
+        <div class="md-form mb-5">
+          <input type="text" id="local-search-input" class="form-control validate">
+          <label data-error="x" data-success="v"
+                 for="local-search-input">关键词</label>
+        </div>
+        <div class="list-group" id="local-search-result"></div>
+      </div>
+    </div>
+  </div>
+</div>
+    
+
+    
+  </main>
+
+  <footer class="text-center mt-5 py-3">
+  <div class="footer-content">
+     <a href="https://hexo.io" target="_blank" rel="nofollow noopener"><span>Hexo</span></a> <i class="iconfont icon-love"></i> <a href="https://github.com/fluid-dev/hexo-theme-fluid" target="_blank" rel="nofollow noopener"><span>Fluid</span></a> 
+  </div>
+  
+  <div class="statistics">
+    
+    
+
+    
+      
+        <!-- 不蒜子统计PV -->
+        <span id="busuanzi_container_site_pv" style="display: none">
+            总访问量 
+            <span id="busuanzi_value_site_pv"></span>
+             次
+          </span>
+      
+      
+        <!-- 不蒜子统计UV -->
+        <span id="busuanzi_container_site_uv" style="display: none">
+            总访客数 
+            <span id="busuanzi_value_site_uv"></span>
+             人
+          </span>
+      
+    
+  </div>
+
+
+  
+
+  
+</footer>
+
+
+  <!-- SCRIPTS -->
+  
+  <script  src="https://cdn.jsdelivr.net/npm/nprogress@0/nprogress.min.js" ></script>
+  <link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/nprogress@0/nprogress.min.css" />
+
+  <script>
+    NProgress.configure({"showSpinner":false,"trickleSpeed":100})
+    NProgress.start()
+    window.addEventListener('load', function() {
+      NProgress.done();
+    })
+  </script>
+
+
+<script  src="https://cdn.jsdelivr.net/npm/jquery@3/dist/jquery.min.js" ></script>
+<script  src="https://cdn.jsdelivr.net/npm/bootstrap@4/dist/js/bootstrap.min.js" ></script>
+<script  src="/js/events.js" ></script>
+<script  src="/js/plugins.js" ></script>
+
+<!-- Plugins -->
+
+
+  <script  src="/js/local-search.js" ></script>
+
+
+
+  
+    <script  src="/js/img-lazyload.js" ></script>
+  
+
+
+
+  
+
+
+
+  
+    <script  src="https://cdn.jsdelivr.net/npm/tocbot@4/dist/tocbot.min.js" ></script>
+  
+  
+    <script  src="https://cdn.jsdelivr.net/npm/@fancyapps/fancybox@3/dist/jquery.fancybox.min.js" ></script>
+  
+  
+    <script  src="https://cdn.jsdelivr.net/npm/anchor-js@4/anchor.min.js" ></script>
+  
+  
+    <script defer src="https://cdn.jsdelivr.net/npm/clipboard@2/dist/clipboard.min.js" ></script>
+  
+
+
+
+  <script defer src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js" ></script>
+
+
+
+
+  <script  src="https://cdn.jsdelivr.net/npm/typed.js@2/lib/typed.min.js" ></script>
+  <script>
+    (function (window, document) {
+      var typing = Fluid.plugins.typing;
+      var title = document.getElementById('subtitle').title;
+      
+      typing(title)
+      
+    })(window, document);
+  </script>
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+    <!-- Google Analytics -->
+    <script defer>
+      window.ga = window.ga || function () { (ga.q = ga.q || []).push(arguments) };
+      ga.l = +new Date;
+      ga('create', 'UA-167858469-1', 'auto');
+      ga('send', 'pageview');
+    </script>
+    <script async src='https://www.google-analytics.com/analytics.js'></script>
+  
+
+  
+
+  
+
+  
+
+  
+
+
+
+
+
+<!-- 主题的启动项 保持在最底部 -->
+<script  src="/js/boot.js" ></script>
+
+
+</body>
+</html>

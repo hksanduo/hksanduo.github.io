@@ -1,0 +1,601 @@
+
+
+<!DOCTYPE html>
+<html lang="zh-CN" data-default-color-scheme=auto>
+
+
+
+<head>
+  <meta charset="UTF-8">
+  <link rel="apple-touch-icon" sizes="76x76" href="/img/favicon.png">
+  <link rel="icon" href="/img/favicon.png">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, shrink-to-fit=no">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  
+  <meta name="theme-color" content="#2f4154">
+  <meta name="description" content="">
+  <meta name="author" content="sanduo">
+  <meta name="keywords" content="">
+  <meta name="description" content="代码审计复测代码对比技巧  简述在甲方审计现场遇到一个傻叉的需求，要求对审计的源代码做一个全量的复测，提出这个需求的目的主要是对客户目前修复的内容全量做检测，这部分修复的内容包括对我们审计发现问题的修复和渗透测试发现的问题修复的代码及业务迭代的代码。正常源代码复测，只是对代码审计发现的问题进行复测，主要的目的是由于审计的效率和乙方项目成本考虑。针对客户这种需求，也得做，不然会被(没)投(饭)诉(吃">
+<meta property="og:type" content="article">
+<meta property="og:title" content="代码审计复测代码对比技巧">
+<meta property="og:url" content="https://hksanduo.github.io/2021/01/20/2021-01-20-code-diff/index.html">
+<meta property="og:site_name" content="sanduo blog">
+<meta property="og:description" content="代码审计复测代码对比技巧  简述在甲方审计现场遇到一个傻叉的需求，要求对审计的源代码做一个全量的复测，提出这个需求的目的主要是对客户目前修复的内容全量做检测，这部分修复的内容包括对我们审计发现问题的修复和渗透测试发现的问题修复的代码及业务迭代的代码。正常源代码复测，只是对代码审计发现的问题进行复测，主要的目的是由于审计的效率和乙方项目成本考虑。针对客户这种需求，也得做，不然会被(没)投(饭)诉(吃">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://hksanduo.github.io/img/20210120-01.png">
+<meta property="og:image" content="https://hksanduo.github.io/img/20210120-02.png">
+<meta property="og:image" content="https://hksanduo.github.io/img/20210120-03.png">
+<meta property="og:image" content="https://hksanduo.github.io/img/20210120-04.png">
+<meta property="og:image" content="https://hksanduo.github.io/img/20210120-05.png">
+<meta property="og:image" content="https://hksanduo.github.io/img/20210120-06.png">
+<meta property="og:image" content="https://hksanduo.github.io/img/20210120-07.png">
+<meta property="og:image" content="https://hksanduo.github.io/img/20210120-08.png">
+<meta property="og:image" content="https://hksanduo.github.io/img/20210120-09.png">
+<meta property="article:published_time" content="2021-01-20T08:08:00.000Z">
+<meta property="article:modified_time" content="2025-01-18T14:54:10.079Z">
+<meta property="article:author" content="sanduo">
+<meta property="article:tag" content="Code">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:image" content="https://hksanduo.github.io/img/20210120-01.png">
+  
+  <title>代码审计复测代码对比技巧 - sanduo blog</title>
+
+  <link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4/dist/css/bootstrap.min.css" />
+
+
+  <link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/github-markdown-css@4/github-markdown.min.css" />
+  <link  rel="stylesheet" href="/lib/hint/hint.min.css" />
+
+  
+    
+    
+      
+      <link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/highlight.js@10/styles/github-gist.min.css" />
+    
+  
+
+  
+    <link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fancyapps/fancybox@3/dist/jquery.fancybox.min.css" />
+  
+
+
+<!-- 主题依赖的图标库，不要自行修改 -->
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1749284_ba1fz6golrf.css">
+
+
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1736178_kmeydafke9r.css">
+
+
+<link  rel="stylesheet" href="/css/main.css" />
+
+<!-- 自定义样式保持在最底部 -->
+
+
+  <script id="fluid-configs">
+    var Fluid = window.Fluid || {};
+    var CONFIG = {"hostname":"hksanduo.github.io","root":"/","version":"1.8.12","typing":{"enable":true,"typeSpeed":70,"cursorChar":"_","loop":false},"anchorjs":{"enable":true,"element":"h1,h2,h3,h4,h5,h6","placement":"right","visible":"hover","icon":""},"progressbar":{"enable":true,"height_px":3,"color":"#29d","options":{"showSpinner":false,"trickleSpeed":100}},"copy_btn":true,"image_zoom":{"enable":true,"img_url_replace":["",""]},"toc":{"enable":true,"headingSelector":"h1,h2,h3,h4,h5,h6","collapseDepth":0},"lazyload":{"enable":true,"loading_img":"/img/loading.gif","onlypost":false,"offset_factor":2},"web_analytics":{"enable":true,"baidu":null,"google":"UA-167858469-1","gtag":null,"tencent":{"sid":null,"cid":null},"woyaola":null,"cnzz":null,"leancloud":{"app_id":null,"app_key":null,"server_url":null,"path":"window.location.pathname"}},"search_path":"/local-search.xml"};
+  </script>
+  <script  src="/js/utils.js" ></script>
+  <script  src="/js/color-schema.js" ></script>
+<meta name="generator" content="Hexo 5.4.2"></head>
+
+
+<body>
+  <header style="height: 70vh;">
+    <nav id="navbar" class="navbar fixed-top  navbar-expand-lg navbar-dark scrolling-navbar">
+  <div class="container">
+    <a class="navbar-brand" href="/">
+      <strong>Welcome To Sanduo&#39;s Blog</strong>
+    </a>
+
+    <button id="navbar-toggler-btn" class="navbar-toggler" type="button" data-toggle="collapse"
+            data-target="#navbarSupportedContent"
+            aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+      <div class="animated-icon"><span></span><span></span><span></span></div>
+    </button>
+
+    <!-- Collapsible content -->
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+      <ul class="navbar-nav ml-auto text-center">
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/">
+                <i class="iconfont icon-home-fill"></i>
+                首页
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/archives/">
+                <i class="iconfont icon-archive-fill"></i>
+                归档
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/categories/">
+                <i class="iconfont icon-category-fill"></i>
+                分类
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/tags/">
+                <i class="iconfont icon-tags-fill"></i>
+                标签
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/about/">
+                <i class="iconfont icon-user-fill"></i>
+                关于
+              </a>
+            </li>
+          
+        
+        
+          <li class="nav-item" id="search-btn">
+            <a class="nav-link" target="_self" href="javascript:;" data-toggle="modal" data-target="#modalSearch" aria-label="Search">
+              &nbsp;<i class="iconfont icon-search"></i>&nbsp;
+            </a>
+          </li>
+        
+        
+          <li class="nav-item" id="color-toggle-btn">
+            <a class="nav-link" target="_self" href="javascript:;" aria-label="Color Toggle">&nbsp;<i
+                class="iconfont icon-dark" id="color-toggle-icon"></i>&nbsp;</a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+</nav>
+
+    <div class="banner" id="banner" parallax=true
+         style="background: url('/img/default.png') no-repeat center center;
+           background-size: cover;">
+      <div class="full-bg-img">
+        <div class="mask flex-center" style="background-color: rgba(0, 0, 0, 0.3)">
+          <div class="page-header text-center fade-in-up">
+            <span class="h2" id="subtitle" title="代码审计复测代码对比技巧">
+              
+            </span>
+
+            
+              <div class="mt-3">
+  
+  
+    <span class="post-meta">
+      <i class="iconfont icon-date-fill" aria-hidden="true"></i>
+      <time datetime="2021-01-20 08:08" pubdate>
+        2021年1月20日 早上
+      </time>
+    </span>
+  
+</div>
+
+<div class="mt-1">
+  
+    <span class="post-meta mr-2">
+      <i class="iconfont icon-chart"></i>
+      2.7k 字
+    </span>
+  
+
+  
+    <span class="post-meta mr-2">
+      <i class="iconfont icon-clock-fill"></i>
+      
+      
+      8 分钟
+    </span>
+  
+
+  
+  
+</div>
+
+            
+          </div>
+
+          
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <main>
+    
+      
+
+<div class="container-fluid nopadding-x">
+  <div class="row nomargin-x">
+    <div class="d-none d-lg-block col-lg-2"></div>
+    <div class="col-lg-8 nopadding-x-md">
+      <div class="container nopadding-x-md" id="board-ctn">
+        <div class="py-5" id="board">
+          <article class="post-content mx-auto">
+            <!-- SEO header -->
+            <h1 style="display: none">代码审计复测代码对比技巧</h1>
+            
+            <div class="markdown-body">
+              <p>代码审计复测代码对比技巧</p>
+<hr>
+<h2 id="简述"><a href="#简述" class="headerlink" title="简述"></a>简述</h2><p>在甲方审计现场遇到一个傻叉的需求，要求对审计的源代码做一个全量的复测，提出这个需求的目的主要是对客户目前修复的内容全量做检测，这部分修复的内容包括对我们审计发现问题的修复和渗透测试发现的问题修复的代码及业务迭代的代码。正常源代码复测，只是对代码审计发现的问题进行复测，主要的目的是由于审计的效率和乙方项目成本考虑。针对客户这种需求，也得做，不然会被(没)投(饭)诉(吃)。</p>
+<h2 id="方案一"><a href="#方案一" class="headerlink" title="方案一"></a>方案一</h2><p>从客户的svn或者git工程上导出截止上次审计到现在改动的文件列表，如果直接导出所有的日志，审计人员一个一个对比，估计会疯掉，这里只导出变更文件即可。</p>
+<h3 id="svn"><a href="#svn" class="headerlink" title="svn"></a>svn</h3><p>通过 svn 命令行(TortoiseSVN不行, 需要先安装 svn 命令行工具)是可以获得这个列表的.<br>命令格式如下:</p>
+<figure class="highlight jboss-cli"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs jboss-cli">svn diff -r REVNO<span class="hljs-function">:HEAD</span> <span class="hljs-params">--summarize</span> http:<span class="hljs-string">//svn-url</span><br></code></pre></td></tr></table></figure>
+<p>例如<br>想检查从 530版本 开始到目前所有改动文件的列表</p>
+<figure class="highlight ruby"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs ruby">svn diff -r <span class="hljs-number">530</span><span class="hljs-symbol">:HEAD</span> --summarize <span class="hljs-symbol">https:</span>/<span class="hljs-regexp">/svnserver/project</span> &gt; changedfiles.txt<br></code></pre></td></tr></table></figure>
+<p>可以简写成这样</p>
+<figure class="highlight css"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs css">svn diff -<span class="hljs-attribute">r</span> <span class="hljs-number">530</span> <span class="hljs-attr">--summarize</span> https://svnserver/project &gt; changedfiles.txt<br></code></pre></td></tr></table></figure>
+
+<p>或者你只知道需要检查版本的日期, 这就相当于检查从 2020-06-06(上次发版日期) 开始到目前(此次发版日期)所有的文件改动</p>
+<figure class="highlight apache"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs apache"><span class="hljs-attribute">svn</span> diff -r &#123;<span class="hljs-number">2020</span>-<span class="hljs-number">06</span>-<span class="hljs-number">06</span>&#125; --summarize https://svnserver/project &gt; changedfiles.txt<br></code></pre></td></tr></table></figure>
+<p>或者日期区间</p>
+<figure class="highlight apache"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs apache"><span class="hljs-attribute">svn</span> diff -r &#123;<span class="hljs-number">2020</span>-<span class="hljs-number">06</span>-<span class="hljs-number">04</span>&#125;:&#123;<span class="hljs-number">2020</span>-<span class="hljs-number">01</span>-<span class="hljs-number">20</span>&#125; --summarize https://svnserver/project &gt; changedfiles.txt<br></code></pre></td></tr></table></figure>
+<h3 id="git"><a href="#git" class="headerlink" title="git"></a>git</h3><p>git和svn略有区别，git通过diff命令来获取版本之间的变动文件列表</p>
+<figure class="highlight jboss-cli"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><code class="hljs jboss-cli"><span class="hljs-string">//git</span> diff <span class="hljs-params">--stat</span> 版本号1 版本号2<br><span class="hljs-string">//</span>对比两个版本 两个版本号位置不影响（建议版本号1为当前版本号  方便下次上线直接使用）<br></code></pre></td></tr></table></figure>
+<p>版本号可以通过 <code>git log</code> 命令来获取，如果导出一段时间内的文件变动，建议通过查找log中的对应时间关联的版本号使用以上命令来导出。<br>例如：</p>
+<figure class="highlight llvm"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs llvm">git diff --stat  <span class="hljs-number">4</span>ac<span class="hljs-number">2</span>f<span class="hljs-number">071</span>cb<span class="hljs-number">5</span><span class="hljs-keyword">c</span><span class="hljs-number">0</span>d<span class="hljs-number">1e5</span>a<span class="hljs-number">87</span>a<span class="hljs-number">7692</span>b<span class="hljs-number">5e61</span>fcc<span class="hljs-number">2</span><span class="hljs-keyword">c</span><span class="hljs-number">5</span>aa<span class="hljs-number">24</span> <span class="hljs-keyword">c</span><span class="hljs-number">6e8</span>a<span class="hljs-number">140</span>bcae<span class="hljs-number">3647807</span><span class="hljs-keyword">c</span><span class="hljs-number">6</span>af<span class="hljs-number">95e13</span>fb<span class="hljs-number">3076001</span>f<span class="hljs-number">7</span>e &gt; changedfiles.txt<br></code></pre></td></tr></table></figure>
+
+<h2 id="使用代码对比工具"><a href="#使用代码对比工具" class="headerlink" title="使用代码对比工具"></a>使用代码对比工具</h2><p>一般客户提供的文件都是不全的，客户不会提供完整的项目文件，这里吐槽一下，这就是对乙方人员的不尊重，东西都不准备好，还一个劲的催项目进度，要求高质量审计，这就是在公开耍流氓，说多了都是泪，还得干活，钱难挣，奥里给难吃。<br>这里博主尝试了几款代码比较工具，推荐给各位审计的小伙伴。</p>
+<h3 id="Winmerge"><a href="#Winmerge" class="headerlink" title="Winmerge"></a>Winmerge</h3><p>是一款运行于Windows系统下的免费的文件比较合并工具，非常适用于确定不同版本的文件间的改变以及合并这些改变，尤其是在有多人编辑同一文件的情况下。<br><img src="/img/20210120-01.png" srcset="/img/loading.gif" lazyload alt="20210120-01"><br><img src="/img/20210120-02.png" srcset="/img/loading.gif" lazyload alt="20210120-02"></p>
+<blockquote>
+<p>特性：</p>
+</blockquote>
+<pre><code>*   对文本文档的可视化编辑以及合并
+*   语法高亮功能
+*   可以处理DOS、UNIX和MAC中的文本文件
+*   支持Unicode
+*   在不同的栏中显示当前文件的差异
+*   高亮差异
+*   在目录比较中使用文件过滤器
+*   在文件比较中检测移动过的段落
+*   在外壳扩展中集成
+*   通过7-Zip支持压缩文件
+*   支持插件功能
+*   通过DLL支持本地化界面
+*   支持手动对齐文本 (Syncronization points])
+*   可将比较画面结果产生HTML报告(Create HTML reports from file compare)
+*   支持三方比较(3-Way Compare)
+*   支持图片比较(Image compare), 文件夹比较(Folder compare) 文件比较(File compare)
+</code></pre>
+<p>下载地址：<a target="_blank" rel="noopener" href="https://winmerge.org/">https://winmerge.org/</a></p>
+<h3 id="Diffuse"><a href="#Diffuse" class="headerlink" title="Diffuse"></a>Diffuse</h3><p>在命令行中，Diffuse 的速度很快，支持像 C++、Python、Java、XML 等语言的语法高亮显示。可视化比较，非常直观，支持两相比较和三相比较。小工具还得安装，这点就有点儿恶心。最要命的是只能对比文件，不能对比目录，这点儿对审计人员不友好，不推荐使用。<br><img src="/img/20210120-03.png" srcset="/img/loading.gif" lazyload alt="20210120-03"></p>
+<p>下载地址：<a target="_blank" rel="noopener" href="https://sourceforge.net/projects/diffuse/">https://sourceforge.net/projects/diffuse/</a></p>
+<h3 id="Beyond-Compare"><a href="#Beyond-Compare" class="headerlink" title="Beyond Compare"></a>Beyond Compare</h3><p>Beyond Compare是一套由Scooter Software推出的内容比较工具软件。除了可以作文件比较以外，还可以比对文件目录、FTP目录及压缩包的内容等。因为这些功能，Beyond Compare被应用于版本控制及资料同步的工作上，该工具支持windows、Linux、Mac，跨平台做的不错，对比功能挺挺强大，需要安装，有些强迫症。</p>
+<p><img src="/img/20210120-04.png" srcset="/img/loading.gif" lazyload alt="20210120-04"></p>
+<p>通过颜色区别文件异同：</p>
+<p><img src="/img/20210120-05.png" srcset="/img/loading.gif" lazyload alt="20210120-05"></p>
+<p><img src="/img/20210120-06.png" srcset="/img/loading.gif" lazyload alt="20210120-06"></p>
+<p>下载地址：<a target="_blank" rel="noopener" href="https://www.scootersoftware.com/download.php">https://www.scootersoftware.com/download.php</a></p>
+<h3 id="Code-Compare"><a href="#Code-Compare" class="headerlink" title="Code Compare"></a>Code Compare</h3><p>Code Compare是一个免费的代码对比工具，旨在比较和合并不同的文件和文件夹。Code Compare与所有流行的源代码托管系统集成：TFS，SVN，Git，Mercurial和Perforce。Code Compare既作为独立文件差异工具提供，又可以为Visual Studio、IDEA等提供扩展组件，同样也需要安装，不说什么了。<br><img src="/img/20210120-07.png" srcset="/img/loading.gif" lazyload alt="20210120-07"></p>
+<p>特点：<br>    * 先进的差异目录比较实用程序<br>    * 对添加，删除和修改的文件进行颜色编码<br>    * 排除或包括某些文件类型的过滤选项<br>    * 即时打开单个文件比较文件<br>    * 显示选项，以更好地比较结果分析<br>    * 批处理文件从窗格复制到窗格或复制到选定的文件夹<br><img src="/img/20210120-08.png" srcset="/img/loading.gif" lazyload alt="20210120-08"></p>
+<p>对于展示代码的异同和语义分析，博主还是很喜欢的，推荐给代码审计的小朋友使用<br><img src="/img/20210120-09.png" srcset="/img/loading.gif" lazyload alt="20210120-09"></p>
+<p>下载地址：<a target="_blank" rel="noopener" href="https://www.devart.com/codecompare/download.html#anchorDowload">https://www.devart.com/codecompare/download.html#anchorDowload</a></p>
+<h2 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h2><p>还有不少文件对比工具，这里我就详细介绍以上这几款，总有一款适合你，主要目的还是应付客户奇葩需求，提高审计效率混口饭吃。</p>
+<h2 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h2><ul>
+<li><a target="_blank" rel="noopener" href="https://zh.wikipedia.org/wiki/WinMerge">https://zh.wikipedia.org/wiki/WinMerge</a>【WinMerge wikipedia】</li>
+<li><a target="_blank" rel="noopener" href="https://blog.csdn.net/xishining/article/details/106204776">https://blog.csdn.net/xishining/article/details/106204776</a></li>
+</ul>
+
+            </div>
+            <hr>
+            <div>
+              <div class="post-metas mb-3">
+                
+                  <div class="post-meta mr-3">
+                    <i class="iconfont icon-category"></i>
+                    
+                      <a class="hover-with-bg" href="/categories/Security/">Security</a>
+                    
+                      <a class="hover-with-bg" href="/categories/Security/Code-Audit/">Code Audit</a>
+                    
+                  </div>
+                
+                
+                  <div class="post-meta">
+                    <i class="iconfont icon-tags"></i>
+                    
+                      <a class="hover-with-bg" href="/tags/Code/">Code</a>
+                    
+                  </div>
+                
+              </div>
+              
+                <p class="note note-warning">
+                  
+                    本博客所有文章除特别声明外，均采用 <a target="_blank" href="https://creativecommons.org/licenses/by-sa/4.0/deed.zh" rel="nofollow noopener noopener">CC BY-SA 4.0 协议</a> ，转载请注明出处！
+                  
+                </p>
+              
+              
+                <div class="post-prevnext">
+                  <article class="post-prev col-6">
+                    
+                    
+                      <a href="/2021/03/01/2021-03-01-dwr-code-audit/">
+                        <i class="iconfont icon-arrowleft"></i>
+                        <span class="hidden-mobile">dwr框架代码审计</span>
+                        <span class="visible-mobile">上一篇</span>
+                      </a>
+                    
+                  </article>
+                  <article class="post-next col-6">
+                    
+                    
+                      <a href="/2020/12/15/2020-12-15-personal-life/">
+                        <span class="hidden-mobile">这大概就是生活</span>
+                        <span class="visible-mobile">下一篇</span>
+                        <i class="iconfont icon-arrowright"></i>
+                      </a>
+                    
+                  </article>
+                </div>
+              
+            </div>
+
+            
+              <!-- Comments -->
+              <article class="comments" id="comments" lazyload>
+                
+                  
+                
+                
+  <script type="text/javascript">
+    Fluid.utils.loadComments('#comments', function() {
+      var light = 'github-light';
+      var dark = 'github-dark';
+      var schema = document.documentElement.getAttribute('data-user-color-scheme');
+      if (schema === 'dark') {
+        schema = dark;
+      } else {
+        schema = light;
+      }
+      window.UtterancesThemeLight = light;
+      window.UtterancesThemeDark = dark;
+      var s = document.createElement('script');
+      s.setAttribute('src', 'https://utteranc.es/client.js');
+      s.setAttribute('repo', 'hksanduo/commit-utterances');
+      s.setAttribute('issue-term', 'title');
+      
+      s.setAttribute('label', 'utterances');
+      
+      s.setAttribute('theme', schema);
+      s.setAttribute('crossorigin', 'anonymous');
+      document.getElementById('comments').appendChild(s);
+    })
+  </script>
+  <noscript>Please enable JavaScript to view the comments</noscript>
+
+
+              </article>
+            
+          </article>
+        </div>
+      </div>
+    </div>
+    
+      <div class="d-none d-lg-block col-lg-2 toc-container" id="toc-ctn">
+        <div id="toc">
+  <p class="toc-header"><i class="iconfont icon-list"></i>&nbsp;目录</p>
+  <div class="toc-body" id="toc-body"></div>
+</div>
+
+      </div>
+    
+  </div>
+</div>
+
+<!-- Custom -->
+
+
+    
+
+    
+      <a id="scroll-top-button" aria-label="TOP" href="#" role="button">
+        <i class="iconfont icon-arrowup" aria-hidden="true"></i>
+      </a>
+    
+
+    
+      <div class="modal fade" id="modalSearch" tabindex="-1" role="dialog" aria-labelledby="ModalLabel"
+     aria-hidden="true">
+  <div class="modal-dialog modal-dialog-scrollable modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header text-center">
+        <h4 class="modal-title w-100 font-weight-bold">搜索</h4>
+        <button type="button" id="local-search-close" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body mx-3">
+        <div class="md-form mb-5">
+          <input type="text" id="local-search-input" class="form-control validate">
+          <label data-error="x" data-success="v"
+                 for="local-search-input">关键词</label>
+        </div>
+        <div class="list-group" id="local-search-result"></div>
+      </div>
+    </div>
+  </div>
+</div>
+    
+
+    
+  </main>
+
+  <footer class="text-center mt-5 py-3">
+  <div class="footer-content">
+     <a href="https://hexo.io" target="_blank" rel="nofollow noopener"><span>Hexo</span></a> <i class="iconfont icon-love"></i> <a href="https://github.com/fluid-dev/hexo-theme-fluid" target="_blank" rel="nofollow noopener"><span>Fluid</span></a> 
+  </div>
+  
+  <div class="statistics">
+    
+    
+
+    
+      
+        <!-- 不蒜子统计PV -->
+        <span id="busuanzi_container_site_pv" style="display: none">
+            总访问量 
+            <span id="busuanzi_value_site_pv"></span>
+             次
+          </span>
+      
+      
+        <!-- 不蒜子统计UV -->
+        <span id="busuanzi_container_site_uv" style="display: none">
+            总访客数 
+            <span id="busuanzi_value_site_uv"></span>
+             人
+          </span>
+      
+    
+  </div>
+
+
+  
+
+  
+</footer>
+
+
+  <!-- SCRIPTS -->
+  
+  <script  src="https://cdn.jsdelivr.net/npm/nprogress@0/nprogress.min.js" ></script>
+  <link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/nprogress@0/nprogress.min.css" />
+
+  <script>
+    NProgress.configure({"showSpinner":false,"trickleSpeed":100})
+    NProgress.start()
+    window.addEventListener('load', function() {
+      NProgress.done();
+    })
+  </script>
+
+
+<script  src="https://cdn.jsdelivr.net/npm/jquery@3/dist/jquery.min.js" ></script>
+<script  src="https://cdn.jsdelivr.net/npm/bootstrap@4/dist/js/bootstrap.min.js" ></script>
+<script  src="/js/events.js" ></script>
+<script  src="/js/plugins.js" ></script>
+
+<!-- Plugins -->
+
+
+  <script  src="/js/local-search.js" ></script>
+
+
+
+  
+    <script  src="/js/img-lazyload.js" ></script>
+  
+
+
+
+  
+
+
+
+  
+    <script  src="https://cdn.jsdelivr.net/npm/tocbot@4/dist/tocbot.min.js" ></script>
+  
+  
+    <script  src="https://cdn.jsdelivr.net/npm/@fancyapps/fancybox@3/dist/jquery.fancybox.min.js" ></script>
+  
+  
+    <script  src="https://cdn.jsdelivr.net/npm/anchor-js@4/anchor.min.js" ></script>
+  
+  
+    <script defer src="https://cdn.jsdelivr.net/npm/clipboard@2/dist/clipboard.min.js" ></script>
+  
+
+
+
+  <script defer src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js" ></script>
+
+
+
+
+  <script  src="https://cdn.jsdelivr.net/npm/typed.js@2/lib/typed.min.js" ></script>
+  <script>
+    (function (window, document) {
+      var typing = Fluid.plugins.typing;
+      var title = document.getElementById('subtitle').title;
+      
+      typing(title)
+      
+    })(window, document);
+  </script>
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+    <!-- Google Analytics -->
+    <script defer>
+      window.ga = window.ga || function () { (ga.q = ga.q || []).push(arguments) };
+      ga.l = +new Date;
+      ga('create', 'UA-167858469-1', 'auto');
+      ga('send', 'pageview');
+    </script>
+    <script async src='https://www.google-analytics.com/analytics.js'></script>
+  
+
+  
+
+  
+
+  
+
+  
+
+
+
+
+
+<!-- 主题的启动项 保持在最底部 -->
+<script  src="/js/boot.js" ></script>
+
+
+</body>
+</html>

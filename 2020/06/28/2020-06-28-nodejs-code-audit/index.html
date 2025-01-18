@@ -1,0 +1,726 @@
+
+
+<!DOCTYPE html>
+<html lang="zh-CN" data-default-color-scheme=auto>
+
+
+
+<head>
+  <meta charset="UTF-8">
+  <link rel="apple-touch-icon" sizes="76x76" href="/img/favicon.png">
+  <link rel="icon" href="/img/favicon.png">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, shrink-to-fit=no">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  
+  <meta name="theme-color" content="#2f4154">
+  <meta name="description" content="">
+  <meta name="author" content="sanduo">
+  <meta name="keywords" content="">
+  <meta name="description" content="nodejs 源代码安全审计  背景最近碰到几个nodejs的代码审计项目，看来nodejs在企业内部还是有一定的用户群体，之前翻译过国外的一篇nodejs安全清单的文章，但是文章并未阐述如何审计一个nodejs项目，这次借审计的机会，把个人对于nodejs项目审计的经验积累一下，欢迎来喷。 准备1、ide(atom、sublime、vscode、nodepad++等等)，根据个人爱好选择2、被审">
+<meta property="og:type" content="article">
+<meta property="og:title" content="nodejs code audit">
+<meta property="og:url" content="https://hksanduo.github.io/2020/06/28/2020-06-28-nodejs-code-audit/index.html">
+<meta property="og:site_name" content="sanduo blog">
+<meta property="og:description" content="nodejs 源代码安全审计  背景最近碰到几个nodejs的代码审计项目，看来nodejs在企业内部还是有一定的用户群体，之前翻译过国外的一篇nodejs安全清单的文章，但是文章并未阐述如何审计一个nodejs项目，这次借审计的机会，把个人对于nodejs项目审计的经验积累一下，欢迎来喷。 准备1、ide(atom、sublime、vscode、nodepad++等等)，根据个人爱好选择2、被审">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://hksanduo.github.io/img/20200624-nodejs-code-review-02.png">
+<meta property="og:image" content="https://hksanduo.github.io/img/20200624-nodejs-code-review-03.png">
+<meta property="og:image" content="https://hksanduo.github.io/img/20200624-nodejs-code-review-04.png">
+<meta property="og:image" content="https://hksanduo.github.io/img/20200624-nodejs-code-review-01.png">
+<meta property="og:image" content="https://hksanduo.github.io/img/20200624-nodejs-code-review-05.png">
+<meta property="og:image" content="https://hksanduo.github.io/img/20200624-nodejs-code-review-06.png">
+<meta property="og:image" content="https://hksanduo.github.io/img/20200624-nodejs-code-review-07.png">
+<meta property="og:image" content="https://hksanduo.github.io/img/20200624-nodejs-code-review-08.png">
+<meta property="og:image" content="https://hksanduo.github.io/img/20200624-nodejs-code-review-09.png">
+<meta property="og:image" content="https://hksanduo.github.io/img/20200624-nodejs-code-review-10.png">
+<meta property="article:published_time" content="2020-06-28T06:39:00.000Z">
+<meta property="article:modified_time" content="2025-01-18T14:54:10.079Z">
+<meta property="article:author" content="sanduo">
+<meta property="article:tag" content="Nodejs">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:image" content="https://hksanduo.github.io/img/20200624-nodejs-code-review-02.png">
+  
+  <title>nodejs code audit - sanduo blog</title>
+
+  <link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4/dist/css/bootstrap.min.css" />
+
+
+  <link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/github-markdown-css@4/github-markdown.min.css" />
+  <link  rel="stylesheet" href="/lib/hint/hint.min.css" />
+
+  
+    
+    
+      
+      <link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/highlight.js@10/styles/github-gist.min.css" />
+    
+  
+
+  
+    <link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fancyapps/fancybox@3/dist/jquery.fancybox.min.css" />
+  
+
+
+<!-- 主题依赖的图标库，不要自行修改 -->
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1749284_ba1fz6golrf.css">
+
+
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1736178_kmeydafke9r.css">
+
+
+<link  rel="stylesheet" href="/css/main.css" />
+
+<!-- 自定义样式保持在最底部 -->
+
+
+  <script id="fluid-configs">
+    var Fluid = window.Fluid || {};
+    var CONFIG = {"hostname":"hksanduo.github.io","root":"/","version":"1.8.12","typing":{"enable":true,"typeSpeed":70,"cursorChar":"_","loop":false},"anchorjs":{"enable":true,"element":"h1,h2,h3,h4,h5,h6","placement":"right","visible":"hover","icon":""},"progressbar":{"enable":true,"height_px":3,"color":"#29d","options":{"showSpinner":false,"trickleSpeed":100}},"copy_btn":true,"image_zoom":{"enable":true,"img_url_replace":["",""]},"toc":{"enable":true,"headingSelector":"h1,h2,h3,h4,h5,h6","collapseDepth":0},"lazyload":{"enable":true,"loading_img":"/img/loading.gif","onlypost":false,"offset_factor":2},"web_analytics":{"enable":true,"baidu":null,"google":"UA-167858469-1","gtag":null,"tencent":{"sid":null,"cid":null},"woyaola":null,"cnzz":null,"leancloud":{"app_id":null,"app_key":null,"server_url":null,"path":"window.location.pathname"}},"search_path":"/local-search.xml"};
+  </script>
+  <script  src="/js/utils.js" ></script>
+  <script  src="/js/color-schema.js" ></script>
+<meta name="generator" content="Hexo 5.4.2"></head>
+
+
+<body>
+  <header style="height: 70vh;">
+    <nav id="navbar" class="navbar fixed-top  navbar-expand-lg navbar-dark scrolling-navbar">
+  <div class="container">
+    <a class="navbar-brand" href="/">
+      <strong>Welcome To Sanduo&#39;s Blog</strong>
+    </a>
+
+    <button id="navbar-toggler-btn" class="navbar-toggler" type="button" data-toggle="collapse"
+            data-target="#navbarSupportedContent"
+            aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+      <div class="animated-icon"><span></span><span></span><span></span></div>
+    </button>
+
+    <!-- Collapsible content -->
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+      <ul class="navbar-nav ml-auto text-center">
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/">
+                <i class="iconfont icon-home-fill"></i>
+                首页
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/archives/">
+                <i class="iconfont icon-archive-fill"></i>
+                归档
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/categories/">
+                <i class="iconfont icon-category-fill"></i>
+                分类
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/tags/">
+                <i class="iconfont icon-tags-fill"></i>
+                标签
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/about/">
+                <i class="iconfont icon-user-fill"></i>
+                关于
+              </a>
+            </li>
+          
+        
+        
+          <li class="nav-item" id="search-btn">
+            <a class="nav-link" target="_self" href="javascript:;" data-toggle="modal" data-target="#modalSearch" aria-label="Search">
+              &nbsp;<i class="iconfont icon-search"></i>&nbsp;
+            </a>
+          </li>
+        
+        
+          <li class="nav-item" id="color-toggle-btn">
+            <a class="nav-link" target="_self" href="javascript:;" aria-label="Color Toggle">&nbsp;<i
+                class="iconfont icon-dark" id="color-toggle-icon"></i>&nbsp;</a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+</nav>
+
+    <div class="banner" id="banner" parallax=true
+         style="background: url('/img/default.png') no-repeat center center;
+           background-size: cover;">
+      <div class="full-bg-img">
+        <div class="mask flex-center" style="background-color: rgba(0, 0, 0, 0.3)">
+          <div class="page-header text-center fade-in-up">
+            <span class="h2" id="subtitle" title="nodejs code audit">
+              
+            </span>
+
+            
+              <div class="mt-3">
+  
+  
+    <span class="post-meta">
+      <i class="iconfont icon-date-fill" aria-hidden="true"></i>
+      <time datetime="2020-06-28 06:39" pubdate>
+        2020年6月28日 早上
+      </time>
+    </span>
+  
+</div>
+
+<div class="mt-1">
+  
+    <span class="post-meta mr-2">
+      <i class="iconfont icon-chart"></i>
+      13k 字
+    </span>
+  
+
+  
+    <span class="post-meta mr-2">
+      <i class="iconfont icon-clock-fill"></i>
+      
+      
+      41 分钟
+    </span>
+  
+
+  
+  
+</div>
+
+            
+          </div>
+
+          
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <main>
+    
+      
+
+<div class="container-fluid nopadding-x">
+  <div class="row nomargin-x">
+    <div class="d-none d-lg-block col-lg-2"></div>
+    <div class="col-lg-8 nopadding-x-md">
+      <div class="container nopadding-x-md" id="board-ctn">
+        <div class="py-5" id="board">
+          <article class="post-content mx-auto">
+            <!-- SEO header -->
+            <h1 style="display: none">nodejs code audit</h1>
+            
+            <div class="markdown-body">
+              <p>nodejs 源代码安全审计</p>
+<hr>
+<h2 id="背景"><a href="#背景" class="headerlink" title="背景"></a>背景</h2><p>最近碰到几个nodejs的代码审计项目，看来nodejs在企业内部还是有一定的用户群体，之前翻译过国外的一篇nodejs安全清单的文章，但是文章并未阐述如何审计一个nodejs项目，这次借审计的机会，把个人对于nodejs项目审计的经验积累一下，欢迎来喷。</p>
+<h2 id="准备"><a href="#准备" class="headerlink" title="准备"></a>准备</h2><p>1、ide(atom、sublime、vscode、nodepad++等等)，根据个人爱好选择<br>2、被审计的源代码<br>3、nodejs环境<br>4、静态分析工具(dependency check、fortify sca、npm、nodejsscan、Retire.js等)</p>
+<h2 id="nodejs源代码审计思路"><a href="#nodejs源代码审计思路" class="headerlink" title="nodejs源代码审计思路"></a>nodejs源代码审计思路</h2><p>代码审计通常采用人工审查+SCA工具扫描的的方式进行审计，人工审计的方法有以下四种：</p>
+<ul>
+<li>正向数据流分析</li>
+<li>逆向数据流分析</li>
+<li>根据功能点定向分析</li>
+<li>通读全文</li>
+</ul>
+<h3 id="正向数据流分析"><a href="#正向数据流分析" class="headerlink" title="正向数据流分析"></a>正向数据流分析</h3><h4 id="确定获取数据方法"><a href="#确定获取数据方法" class="headerlink" title="确定获取数据方法"></a>确定获取数据方法</h4><p>1、获取GET请求内容</p>
+<p>由于GET请求直接被嵌入在路径中，URL是完整的请求路径，包括了?后面的部分，因此你可以手动解析后面的内容作为GET请求的参数。node.js 中url模块中的 <em>parse</em> 函数提供了这个功能，我们可以使用 <em>url.parse</em> 方法来解析URL中的参数。<br>实例：</p>
+<figure class="highlight qml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><code class="hljs qml"><span class="hljs-keyword">var</span> http = <span class="hljs-built_in">require</span>(<span class="hljs-string">&#x27;http&#x27;</span>);<br><span class="hljs-keyword">var</span> <span class="hljs-built_in">url</span> = <span class="hljs-built_in">require</span>(<span class="hljs-string">&#x27;url&#x27;</span>);<br><span class="hljs-keyword">var</span> util = <span class="hljs-built_in">require</span>(<span class="hljs-string">&#x27;util&#x27;</span>);<br><br>http.createServer(<span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params">req, res</span>)</span>&#123;<br>    res.writeHead(<span class="hljs-number">200</span>, &#123;<span class="hljs-string">&#x27;Content-Type&#x27;</span>: <span class="hljs-string">&#x27;text/plain; charset=utf-8&#x27;</span>&#125;);<br>    res.end(util.inspect(<span class="hljs-built_in">url</span>.parse(req.url, <span class="hljs-literal">true</span>)));<br>&#125;).listen(<span class="hljs-number">3000</span>);<br></code></pre></td></tr></table></figure>
+
+<p>2、获取POST请求内容</p>
+<p>POST 请求的内容全部的都在请求体中，http.ServerRequest 并没有一个属性内容为请求体，原因是等待请求体传输可能是一件耗时的工作。比如上传文件，而很多时候我们可能并不需要理会请求体的内容，恶意的POST请求会大大消耗服务器的资源，所以node.js默认是不会解析请求体的，当你需要的时候，需要手动来做。<br>实例：</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><code class="hljs javascript"><span class="hljs-keyword">var</span> http = <span class="hljs-built_in">require</span>(<span class="hljs-string">&#x27;http&#x27;</span>);<br><span class="hljs-keyword">var</span> querystring = <span class="hljs-built_in">require</span>(<span class="hljs-string">&#x27;querystring&#x27;</span>);<br><span class="hljs-keyword">var</span> util = <span class="hljs-built_in">require</span>(<span class="hljs-string">&#x27;util&#x27;</span>);<br><br>http.<span class="hljs-title function_">createServer</span>(<span class="hljs-keyword">function</span>(<span class="hljs-params">req, res</span>)&#123;<br>    <span class="hljs-comment">// 定义了一个post变量，用于暂存请求体的信息</span><br>    <span class="hljs-keyword">var</span> post = <span class="hljs-string">&#x27;&#x27;</span>;<br><br>    <span class="hljs-comment">// 通过req的data事件监听函数，每当接受到请求体的数据，就累加到post变量中</span><br>    req.<span class="hljs-title function_">on</span>(<span class="hljs-string">&#x27;data&#x27;</span>, <span class="hljs-keyword">function</span>(<span class="hljs-params">chunk</span>)&#123;<br>        post += chunk;<br>    &#125;);<br><br>    <span class="hljs-comment">// 在end事件触发后，通过querystring.parse将post解析为真正的POST请求格式，然后向客户端返回。</span><br>    req.<span class="hljs-title function_">on</span>(<span class="hljs-string">&#x27;end&#x27;</span>, <span class="hljs-keyword">function</span>(<span class="hljs-params"></span>)&#123;<br>        post = querystring.<span class="hljs-title function_">parse</span>(post);<br>        res.<span class="hljs-title function_">end</span>(util.<span class="hljs-title function_">inspect</span>(post));<br>    &#125;);<br>&#125;).<span class="hljs-title function_">listen</span>(<span class="hljs-number">3000</span>);<br></code></pre></td></tr></table></figure>
+<p>后端系统通过GET或者POST获取提交的参数，进行逻辑处理，我们按照正向数据流，分析数据是否进行安全处理，逻辑流程是否合理，是否可以导致敏感信息泄露。</p>
+<h4 id="查询api-list"><a href="#查询api-list" class="headerlink" title="查询api list"></a>查询api list</h4><p>通过查看系统对外提供的api接口，确定以下几点：</p>
+<ul>
+<li>接口权限校验<ul>
+<li>审计对外提供服务的接口是否存在权限缺陷，接口如果对互联网开放则需要对接口的使用进行权限验证，如在内部则需要在网络层面对接口服务进行控制。</li>
+</ul>
+</li>
+<li>接口请求频率校验<ul>
+<li>审计对外提供服务接口是否有防滥用机制，例如查询相关信息接口，一方面如果未对接口进行查询次数控制，则会导致大量信息泄露，另一方面，频繁的查询会对服务器性能造成影响如对方频繁恶意进行接口调用，则会导致接口性能下降，影响业务（基于业务的DDOS攻击）。建议进行接口设计时设计接口阈值，对接口访问频率设置阈值，超出设定的访问频率时返回错误码，对超过阈值的请求进行屏蔽及预警，可以一定程度上防止CC攻击。</li>
+</ul>
+</li>
+<li>接口数据格式校验<ul>
+<li>审计对外提供服务接口是否接口数据校验机制，安全的接口应该有数据白名单校验机制，对数据的数据类型，格式，长度、合法性进行校验。白名单校验机制验证数据确保不出现异常数据和注入攻击。</li>
+</ul>
+</li>
+<li>接口防重放<ul>
+<li>审计对外提供服务接口进行交易时，是否防具备防重放措施，防止关键交易被重放，导致业务风险。</li>
+</ul>
+</li>
+<li>接口完整性校验（以系统安全级别及客户需求为准）<ul>
+<li>对外提供服务接口时，是否具备报文签名机制（将时间戳加上报文其他参数再用MD5或SHA-1算法计算哈希值，这个哈希值就是本次请求的签名sign，服务端接收到请求后以同样的算法得到签名，并跟当前的签名进行比对，如果不一样，说明参数被更改过，直接返回错误标识）。签名机制保证了数据不会被篡改。</li>
+</ul>
+</li>
+<li>接口保密性校验（判断传输过程是否进行安全防护）<ul>
+<li>对外提供服务接口时，如在互联网提供接口服务，则应该具备SSL加密保护或者通过VPN通道进行数据传输。如暂时未实现SSL以及VPN，则需要对敏感数据采用秘钥进行加密。</li>
+</ul>
+</li>
+<li>接口数据防泄漏<ul>
+<li>检查对外提供服务接口是否有报错信息隐藏提示，安全的接口，当出现交易报错或者其他异常报错时系统返回报错信息的返回码，避免堆栈信息泄露（包括框架信息、中间件信息）。</li>
+</ul>
+</li>
+</ul>
+<h3 id="逆向数据流分析"><a href="#逆向数据流分析" class="headerlink" title="逆向数据流分析"></a>逆向数据流分析</h3><p>根据敏感函数，逆向追踪参数的传递过程，是代码审计最常用的方法，通过全局检索关键字，关键函数，如：</p>
+<ul>
+<li>sql查询关键字(select、insert、update)</li>
+<li>文件上传下载关键字（upload、download）</li>
+<li>执行系统命令关键字（exec、execSyn、execFile、execFileSync、spawn、spawnSync）</li>
+<li>解析js,导致执行任意命令(eval、setInteval、setTimeout、Function)</li>
+</ul>
+<p>这种方式的有点是只需要检索相应的关键字，即可快熟的挖掘想要的漏洞，具有可定向挖掘、高效、高质量的特点；缺点也很明显，对于系统框架整体把握不准确，对系统了解薄弱，在挖掘系统逻辑漏洞可能存在覆盖不全等问题。</p>
+<h3 id="根据功能点定向分析"><a href="#根据功能点定向分析" class="headerlink" title="根据功能点定向分析"></a>根据功能点定向分析</h3><p>通过特定功能点，分析系统，可能是文件上传、文件下载、富文本编辑、交易、找回密码（密码重置）等功能进行定向分析。</p>
+<ul>
+<li>文件上传：是否限制文件上传的大小，类型，如果未限制，可能存在任意文件上传，如果上传的文件可以被执行，可获取远程服务器权限。</li>
+<li>文件下载：如果系统文件下载功能设计不完善，存在通过拼接路径进行文件下载，可能存在任意文件下载漏洞</li>
+<li>富文本编辑：富文本编辑框可能是审计人员容易忽略的地方，由于富文本编辑框的特性，无法使用全局过滤器进行处理，可能会存在跨站脚本编制漏洞</li>
+<li>交易：对交易的数据未做非负处理，可能存在负值反冲，正负值对冲等风险</li>
+<li>找回密码(密码重置)：找回密码功能可能存在敏感信息泄露，流程跳跃，短信或邮件轰炸，用户名枚举，重置任意账户密码等问题</li>
+<li>…..</li>
+</ul>
+<h3 id="通读全文"><a href="#通读全文" class="headerlink" title="通读全文"></a>通读全文</h3><p>通读全文主要是为了保证审计范围全部被覆盖到，另一点是发现定点分析发现不了的逻辑漏洞。在企业中对自身系统做安全审计，需要了解真个系统的业务逻辑，这样才能挖掘到更多有价值的漏洞。</p>
+<p>通读全文也有一定的技巧，首先需要查看系统的代码架构，比如系统的目录结构，确定系统的架构，判断那些是框架的程序文件，那些是业务的程序文件，那些配置文件。查看是否安全组件，比如：xss等；其次确定系统入口文件，判断数据的正向流向，通过分析系统的业务，查看可导致安全风险的功能点、结合业务导致的逻辑漏洞、研发人员遗漏的功能点等。</p>
+<p>通读全文的好处仙儿意见，可以更好的了解程序的架构以及业务逻辑，能够挖掘到更多高质量的漏洞，缺点也很明显，耗费的时间过长，如果代码编写不规范，对于审计人员来说也是一种折磨。通常甲方会采用这种方式，乙方由于工时任务等因素，在实施的过程中很少采用这种方式，主要还得看项目经理安排，说到这里，得批评某些行业搅屎棍，低价抢代码项目，本来一周的任务，压缩到2天，几十万行的代码两天看完，还得写报告，几十万行小说也得看几天，这种项目个人看法就是昧着良心干活，纯属耍流氓。喷子勿扰，这只是个人观点，不要和我说全部依赖静态代码扫描工具，如果你真做过代码审计，你就会清楚SCA工具的误报有多高，发现漏洞的数量有多低，复核这些漏洞都是需要花费时间的。</p>
+<h2 id="nodejs常见安全控制措施识别"><a href="#nodejs常见安全控制措施识别" class="headerlink" title="nodejs常见安全控制措施识别"></a>nodejs常见安全控制措施识别</h2><h3 id="sql注入"><a href="#sql注入" class="headerlink" title="sql注入"></a>sql注入</h3><p>为了防止SQL注入，可以将SQL中传入参数进行过滤或预编译，而不是直接进行字符串拼接。</p>
+<p>1、使用escape()对查询参数进行转义<br>参数编码方法有如下三个：</p>
+<ul>
+<li>mysql.escape(param)</li>
+<li>connection.escape(param)</li>
+<li>pool.escape(param)</li>
+</ul>
+<p>例如：</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><code class="hljs javascript"><span class="hljs-keyword">var</span> userId = <span class="hljs-string">&#x27;some user provided value&#x27;</span>;<span class="hljs-comment">//前端传入的userid参数</span><br><span class="hljs-keyword">var</span> sql = <span class="hljs-string">&#x27;SELECT * FROM users WHERE id = &#x27;</span> + connection.<span class="hljs-built_in">escape</span>(userId);<br>connection.<span class="hljs-title function_">query</span>(sql, <span class="hljs-keyword">function</span> (<span class="hljs-params">error, results, fields</span>) &#123;<br>  <span class="hljs-keyword">if</span> (error) <span class="hljs-keyword">throw</span> error;<br>  <span class="hljs-comment">// ...</span><br>&#125;);<br></code></pre></td></tr></table></figure>
+<p>escape()方法转义规则如下：</p>
+<ul>
+<li>Numbers不进行转换；</li>
+<li>Booleans转换为true&#x2F;false；</li>
+<li>Date对象转换为’YYYY-mm-dd HH:ii:ss’字符串；</li>
+<li>Buffers转换为hex字符串，如X’0fa5’；</li>
+<li>Strings进行安全转义；</li>
+<li>Arrays转换为列表，如[‘a’, ‘b’]会转换为’a’, ‘b’；</li>
+<li>多维数组转换为组列表，如[[‘a’, ‘b’], [‘c’, ‘d’]]会转换为’a’, ‘b’), (‘c’, ‘d’)；</li>
+<li>Objects会转换为key&#x3D;value键值对的形式。</li>
+<li>嵌套的对象转换为字符串；</li>
+<li>undefined&#x2F;null会转换为NULL；</li>
+<li>MySQL不支持NaN&#x2F;Infinity，并且会触发MySQL错误。</li>
+</ul>
+<p>2、使用escapeId()对查询标识符进行转义：<br>如果系统不信任用户传入的SQL标识符（数据库、表、字段名），可以使用escapeId()方法进行转义，最常用于排序等场景。escapeId()有如下三种使用方法：</p>
+<ul>
+<li>mysql.escapeId(identifier)</li>
+<li>connection.escapeId(identifier)</li>
+<li>pool.escapeId(identifier)</li>
+</ul>
+<p>例如：</p>
+<figure class="highlight actionscript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><code class="hljs actionscript"><span class="hljs-keyword">var</span> sorter = <span class="hljs-string">&#x27;date&#x27;</span>;<br><span class="hljs-keyword">var</span> sql    = <span class="hljs-string">&#x27;SELECT * FROM posts ORDER BY &#x27;</span> + connection.escapeId(sorter);<br>connection.query(sql, <span class="hljs-keyword">function</span><span class="hljs-params">(err, results)</span> &#123;<br>  <span class="hljs-comment">// ...</span><br>&#125;);<br></code></pre></td></tr></table></figure>
+<p>3、使用占位符进行预编译<br>可使用 ? 做为查询参数占位符。在使用查询参数占位符时，在其内部自动调用 connection.escape() 方法对传入参数进行预编译。</p>
+<p>如：</p>
+<figure class="highlight aspectj"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><code class="hljs aspectj">connection.query(<span class="hljs-string">&#x27;SELECT * FROM users WHERE id = ?&#x27;</span>, [userId], function (<span class="hljs-keyword">error</span>, results, fields) &#123;<br>  <span class="hljs-keyword">if</span> (<span class="hljs-keyword">error</span>) <span class="hljs-keyword">throw</span> <span class="hljs-keyword">error</span>;<br>  <span class="hljs-comment">// ...</span><br>&#125;);<br></code></pre></td></tr></table></figure>
+<p>也可以是以下这种查询方式，其中foo值映射为a，bar映射为b,baz映射为c,id映射为userId</p>
+<figure class="highlight aspectj"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><code class="hljs aspectj">connection.query(<span class="hljs-string">&#x27;UPDATE users SET foo = ?, bar = ?, baz = ? WHERE id = ?&#x27;</span>, [<span class="hljs-string">&#x27;a&#x27;</span>, <span class="hljs-string">&#x27;b&#x27;</span>, <span class="hljs-string">&#x27;c&#x27;</span>, userId], function (<span class="hljs-keyword">error</span>, results, fields) &#123;<br>  <span class="hljs-keyword">if</span> (<span class="hljs-keyword">error</span>) <span class="hljs-keyword">throw</span> <span class="hljs-keyword">error</span>;<br>  <span class="hljs-comment">// ...</span><br>&#125;);<br></code></pre></td></tr></table></figure>
+<p>这个查询方式看起来和mysql的预编译相似，但是只在connection.escape()方法的内部实现类似预编译机制，需要注意的是，与mysql预编译不同的是，所有“？”号均被替换，甚至在注释和参数中的问号也不例外。</p>
+<p>4、预查询<br>使用mysql.format()转义参数，该函数会选择合适的转义方法转义参数 mysql.format()用于准备查询语句。</p>
+<p>例如：</p>
+<figure class="highlight pgsql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><code class="hljs pgsql">var userId = <span class="hljs-number">1</span>;<br>var <span class="hljs-keyword">sql</span> = &quot;SELECT * FROM ?? WHERE ?? = ?&quot;;<br>var inserts = [<span class="hljs-string">&#x27;users&#x27;</span>, <span class="hljs-string">&#x27;id&#x27;</span>, userId];<br><span class="hljs-keyword">sql</span> = mysql.format(<span class="hljs-keyword">sql</span>, inserts); // <span class="hljs-keyword">SELECT</span> * <span class="hljs-keyword">FROM</span> users <span class="hljs-keyword">WHERE</span> id = <span class="hljs-number">1</span><br></code></pre></td></tr></table></figure>
+<h3 id="XSS"><a href="#XSS" class="headerlink" title="XSS"></a>XSS</h3><p>Node环境下，安装：</p>
+<figure class="highlight cmake"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs cmake">$ npm <span class="hljs-keyword">install</span> xss<br></code></pre></td></tr></table></figure>
+<p>然后修改：</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><code class="hljs javascript"><span class="hljs-keyword">const</span> xss = <span class="hljs-built_in">require</span>(<span class="hljs-string">&#x27;xss&#x27;</span>)<br><span class="hljs-keyword">const</span> inputValue = content  <span class="hljs-comment">// 未进行 xss 防御</span><br><span class="hljs-keyword">const</span> inputValue = <span class="hljs-title function_">xss</span>(content)  <span class="hljs-comment">// 已进行 xss 防御</span><br></code></pre></td></tr></table></figure>
+<p>通过全局检索，是否安装xss依赖库。</p>
+<h3 id="express过滤器"><a href="#express过滤器" class="headerlink" title="express过滤器"></a>express过滤器</h3><p>Express 是一个简洁而灵活的 node.js Web应用框架, 提供了一系列强大特性帮助你创建各种 Web 应用，和丰富的 HTTP 工具，使用 Express 可以快速地搭建一个完整功能的网站。</p>
+<p>Express 框架核心特性：</p>
+<ul>
+<li>可以设置中间件来响应 HTTP 请求。</li>
+<li>定义了路由表用于执行不同的 HTTP 请求动作。</li>
+<li>可以通过向模板传递参数来动态渲染 HTML 页面。</li>
+</ul>
+<p>简单过滤器</p>
+<figure class="highlight moonscript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><code class="hljs moonscript">const express = <span class="hljs-built_in">require</span>(<span class="hljs-string">&#x27;express&#x27;</span>)<br>const app = express();<br><br>let filter = <span class="hljs-function"><span class="hljs-params">(req, res, <span class="hljs-built_in">next</span>)</span> =&gt;</span> &#123;<br>    <span class="hljs-keyword">if</span>(req.params.name == <span class="hljs-string">&#x27;admin&#x27;</span> &amp;&amp; req.params.pwd == <span class="hljs-string">&#x27;admin&#x27;</span>)&#123;<br>        <span class="hljs-built_in">next</span>()<br>    &#125; <span class="hljs-keyword">else</span> &#123;<br>        <span class="hljs-built_in">next</span>(<span class="hljs-string">&#x27;用户名密码不正确&#x27;</span>)<br>    &#125;<br>&#125;<br><br>app.get(<span class="hljs-string">&#x27;/:name/:pwd&#x27;</span>, filter, <span class="hljs-function"><span class="hljs-params">(req, res)</span> =&gt;</span> &#123;<br>    res.send(<span class="hljs-string">&#x27;ok&#x27;</span>)<br>&#125;).listen(<span class="hljs-number">88</span>)<br></code></pre></td></tr></table></figure>
+<p>运行规则</p>
+<ul>
+<li>访问 <a target="_blank" rel="noopener" href="http://localhost:4000/admin/admin">http://localhost:4000/admin/admin</a></li>
+<li>首先会进入过滤器方法 filter</li>
+<li>next()，不带任选参数，表示会直接进入目标路由，执行路由逻辑</li>
+<li>next(‘’)，带参数，表示不会进入目标路由，并抛出错误。</li>
+</ul>
+<h2 id="常见nodejs-SCA工具"><a href="#常见nodejs-SCA工具" class="headerlink" title="常见nodejs SCA工具"></a>常见nodejs SCA工具</h2><h3 id="NPM-Audit"><a href="#NPM-Audit" class="headerlink" title="NPM Audit"></a>NPM Audit</h3><h4 id="介绍"><a href="#介绍" class="headerlink" title="介绍"></a>介绍</h4><p><code>npm audit</code>命令NPM工具提供的用于审计当前依赖组件是否存在安全风险，使用<code>npm install</code>安装依赖库，也会触发安全扫描，会返回当前依赖库存在的安全风险，提示用户进行升级。我们审计不会修改用户的项目数据，但是对于组件的问题，需要提出来，方便研发人员或者其他运维支持部对系统依赖组件进行升级。</p>
+<h4 id="使用"><a href="#使用" class="headerlink" title="使用"></a>使用</h4><p>检查依赖组件安全风险</p>
+<figure class="highlight coffeescript"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs coffeescript">$ <span class="hljs-built_in">npm</span> audit<br></code></pre></td></tr></table></figure>
+<p><img src="/img/20200624-nodejs-code-review-02.png" srcset="/img/loading.gif" lazyload alt="20200624-nodejs-code-review-02.png"></p>
+<p>修复组件安全风险</p>
+<figure class="highlight coffeescript"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs coffeescript">$ <span class="hljs-built_in">npm</span> audit fix<br></code></pre></td></tr></table></figure>
+<h4 id="分析扫描结果"><a href="#分析扫描结果" class="headerlink" title="分析扫描结果"></a>分析扫描结果</h4><pre><code>1、如果组件不依赖应用系统，判断当前组件的安全风险及漏洞利用方式，确定漏洞等级
+2、如果组件安全风险必须依赖应用系统，判断是否影响应用系统。
+</code></pre>
+<h3 id="owasp-dependency-check"><a href="#owasp-dependency-check" class="headerlink" title="owasp dependency check"></a>owasp dependency check</h3><h4 id="介绍-1"><a href="#介绍-1" class="headerlink" title="介绍"></a>介绍</h4><p>Dependency-Check是OWASP（Open Web Application Security Project）的一个实用开源程序，用于识别项目依赖项并检查是否存在任何已知的，公开披露的漏洞。目前，已支持Java、.NET、Ruby、Node.js、Python等语言编写的程序，并为C&#x2F;C++构建系统（autoconf和cmake）提供了有限的支持。<br>Dependency-Check支持面广（支持多种语言）、可集成性强，作为一款开源工具，在多年来的发展中已经支持和许多主流的软件进行集成，比如：命令行、Ant、Maven、Gradle、Jenkins、Sonar等；具备使用方便，落地简单等优势。</p>
+<h4 id="使用-1"><a href="#使用-1" class="headerlink" title="使用"></a>使用</h4><p>dependency check提供windows和linux两种运行方式，用户可以自行下载编译文成的二进制包，也可以下载源代码自行进行编译，方式不固定。</p>
+<p>github地址：<a target="_blank" rel="noopener" href="https://github.com/jeremylong/DependencyCheck">https://github.com/jeremylong/DependencyCheck</a><br>dependency 5.3.2下载地址:<a target="_blank" rel="noopener" href="https://dl.bintray.com/jeremy-long/owasp/dependency-check-5.3.2-release.zip">https://dl.bintray.com/jeremy-long/owasp/dependency-check-5.3.2-release.zip</a><br>使用方式：<br>在bin目录下面有bat和shell两个脚本，根据操作系统运行对应的脚本</p>
+<p><img src="/img/20200624-nodejs-code-review-03.png" srcset="/img/loading.gif" lazyload alt="20200624-nodejs-code-review-03.png"></p>
+<figure class="highlight pgsql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br></pre></td><td class="code"><pre><code class="hljs pgsql">$ .\dependency-<span class="hljs-keyword">check</span>.bat <span class="hljs-comment">--help</span><br><span class="hljs-keyword">usage</span>: Dependency-<span class="hljs-keyword">Check</span> Core [<span class="hljs-comment">--advancedHelp] [--enableExperimental]</span><br>       [<span class="hljs-comment">--exclude &lt;pattern&gt;] [-f &lt;format&gt;] [--failOnCVSS &lt;score&gt;] [-h]</span><br>       [<span class="hljs-comment">--junitFailOnCVSS &lt;score&gt;] [-l &lt;file&gt;] [-n] [-o &lt;path&gt;]</span><br>       [<span class="hljs-comment">--prettyPrint] [--project &lt;name&gt;] [-s &lt;path&gt;] [--suppression</span><br>       &lt;file&gt;] [-v]<br><br>Dependency-<span class="hljs-keyword">Check</span> Core can be used <span class="hljs-keyword">to</span> identify <span class="hljs-keyword">if</span> there are <span class="hljs-keyword">any</span> known CVE<br>vulnerabilities <span class="hljs-keyword">in</span> libraries utilized <span class="hljs-keyword">by</span> an application. Dependency-<span class="hljs-keyword">Check</span><br>Core will automatically <span class="hljs-keyword">update</span> required data <span class="hljs-keyword">from</span> the Internet, such <span class="hljs-keyword">as</span><br>the CVE <span class="hljs-keyword">and</span> CPE data files <span class="hljs-keyword">from</span> nvd.nist.gov.<br><br>    <span class="hljs-comment">--advancedHelp              Print the advanced help message.</span><br>    <span class="hljs-comment">--enableExperimental        Enables the experimental analyzers.</span><br>    <span class="hljs-comment">--exclude &lt;pattern&gt;         Specify an exclusion pattern. This option</span><br>                                can be specified multiple times <span class="hljs-keyword">and</span> it<br>                                accepts Ant style exclusions.<br> -f,<span class="hljs-comment">--format &lt;format&gt;           The report format (HTML, XML, CSV, JSON,</span><br>                                JUNIT, <span class="hljs-keyword">or</span> <span class="hljs-keyword">ALL</span>). The <span class="hljs-keyword">default</span> <span class="hljs-keyword">is</span> HTML.<br>                                Multiple <span class="hljs-keyword">format</span> parameters can be<br>                                specified.<br>    <span class="hljs-comment">--failOnCVSS &lt;score&gt;        Specifies if the build should be failed if</span><br>                                a CVSS score above a specified <span class="hljs-keyword">level</span> <span class="hljs-keyword">is</span><br>                                identified. The <span class="hljs-keyword">default</span> <span class="hljs-keyword">is</span> <span class="hljs-number">11</span>; since the<br>                                CVSS scores are <span class="hljs-number">0</span><span class="hljs-number">-10</span>, <span class="hljs-keyword">by</span> <span class="hljs-keyword">default</span> the build<br>                                will never fail.<br> -h,<span class="hljs-comment">--help                      Print this message.</span><br>    <span class="hljs-comment">--junitFailOnCVSS &lt;score&gt;   Specifies the CVSS score that is</span><br>                                considered a failure <span class="hljs-keyword">when</span> generating the<br>                                junit report. The <span class="hljs-keyword">default</span> <span class="hljs-keyword">is</span> <span class="hljs-number">0.</span><br> -l,<span class="hljs-comment">--log &lt;file&gt;                The file path to write verbose logging</span><br>                                information.<br> -n,<span class="hljs-comment">--noupdate                  Disables the automatic updating of the CPE</span><br>                                data.<br> -o,<span class="hljs-comment">--out &lt;path&gt;                The folder to write reports to. This</span><br>                                defaults <span class="hljs-keyword">to</span> the <span class="hljs-keyword">current</span> directory. It <span class="hljs-keyword">is</span><br>                                possible <span class="hljs-keyword">to</span> <span class="hljs-keyword">set</span> this <span class="hljs-keyword">to</span> a specific file<br>                                <span class="hljs-type">name</span> <span class="hljs-keyword">if</span> the <span class="hljs-keyword">format</span> argument <span class="hljs-keyword">is</span> <span class="hljs-keyword">not</span> <span class="hljs-keyword">set</span> <span class="hljs-keyword">to</span><br>                                <span class="hljs-keyword">ALL</span>.<br>    <span class="hljs-comment">--prettyPrint               When specified the JSON and XML report</span><br>                                formats will be pretty printed.<br>    <span class="hljs-comment">--project &lt;name&gt;            The name of the project being scanned.</span><br> -s,<span class="hljs-comment">--scan &lt;path&gt;               The path to scan - this option can be</span><br>                                specified multiple times. Ant style paths<br>                                are supported (e.g. <span class="hljs-string">&#x27;path/**/*.jar&#x27;</span>); <span class="hljs-keyword">if</span><br>                                <span class="hljs-keyword">using</span> Ant style paths it <span class="hljs-keyword">is</span> highly<br>                                recommended <span class="hljs-keyword">to</span> <span class="hljs-keyword">quote</span> the argument <span class="hljs-keyword">value</span>.<br>    <span class="hljs-comment">--suppression &lt;file&gt;        The file path to the suppression XML file.</span><br>                                This can be specified more <span class="hljs-keyword">then</span> once <span class="hljs-keyword">to</span><br>                                utilize multiple suppression files<br> -v,<span class="hljs-comment">--version                   Print the version information.</span><br></code></pre></td></tr></table></figure>
+<p>可根据实际情况，自行构建命令进行扫描,如下:</p>
+<figure class="highlight stylus"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs stylus">.\bin\dependency-check<span class="hljs-selector-class">.bat</span> <span class="hljs-attr">--project</span> Testing <span class="hljs-attr">--out</span> . <span class="hljs-attr">--scan</span> <span class="hljs-selector-attr">[path to  files to be scanned]</span><br></code></pre></td></tr></table></figure>
+<p>注意一点，dependency check扫描nodejs，需要使用<code>node install</code>命令先安装相关依赖包，然后才可以使用dependency check进行扫描</p>
+<h4 id="分析扫描结果-1"><a href="#分析扫描结果-1" class="headerlink" title="分析扫描结果"></a>分析扫描结果</h4><p>dependency check会匹配当前依赖对应的CVE及CWE漏洞，分析这些风险问题，会花费很长时间，建议对高风险以上问题进行分析，确定漏洞是否存在。<br><img src="/img/20200624-nodejs-code-review-04.png" srcset="/img/loading.gif" lazyload alt="20200624-nodejs-code-review-04.png"></p>
+<h3 id="fortify-sca"><a href="#fortify-sca" class="headerlink" title="fortify sca"></a>fortify sca</h3><h4 id="介绍-2"><a href="#介绍-2" class="headerlink" title="介绍"></a>介绍</h4><p>Fortify SCA 是一个静态的、白盒的源代码安全测试工具。它通过内置的五大主要分析引擎对源代码进行静态的分析和检测，分析的过程中与其特有的软件安全漏洞规则集进行全面地匹配、查找，从而将源代码中存在的安全漏洞扫描出来，并整理生成完整的报告。扫描的结果中不但包括详细的安全漏洞的信息，还会有相关的安全知识的说明，并提供相应的修复建议。</p>
+<p>支持常见开发语言的检测和测试，扫描和分析出有安全漏洞和隐患的源代码。支持C&#x2F;C++&#x2F;C#，Java，VB，数据库开发语言Transact-SQL，PL&#x2F;SQL，大型项目和管理平台开发语言COBOL，ColdFusion，ABAP，Flex，脚本语言 JSP，JavaScript&#x2F;Ajax，VBScript，Python，网络和网页开发语言 ASP.NET，VB.NET，ASP，PHP，HTML，以及移动应用开发语言 Android，Objective-C等。</p>
+<h4 id="使用-2"><a href="#使用-2" class="headerlink" title="使用"></a>使用</h4><p>fortify sca 扫描nodejs项目，使用以下命令进行构建和扫描，个人感觉对js扫描效果一般</p>
+<figure class="highlight stylus"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><code class="hljs stylus">sourceanalyzer -<span class="hljs-selector-tag">b</span> nodejs -clean<br>sourceanalyzer -<span class="hljs-selector-tag">b</span> nodejs <span class="hljs-selector-attr">[扫描目录]</span> -Dcom<span class="hljs-selector-class">.fortify</span><span class="hljs-selector-class">.sca</span>.EnableDOMModeling=true  -Dcom<span class="hljs-selector-class">.fortify</span><span class="hljs-selector-class">.sca</span><span class="hljs-selector-class">.hoa</span>.Enable=true<br>sourceanalyzer -<span class="hljs-selector-tag">b</span> nodejs -scan -Dcom<span class="hljs-selector-class">.fortify</span><span class="hljs-selector-class">.sca</span><span class="hljs-selector-class">.Phase0HigherOrder</span>.Languages=javascript,typescript -f results.fpr<br></code></pre></td></tr></table></figure>
+<h4 id="分析扫描结果-2"><a href="#分析扫描结果-2" class="headerlink" title="分析扫描结果"></a>分析扫描结果</h4><p>和其他SCA工具分析的思路一样，按照漏洞风险，从高到低，逐条分析。<br><img src="/img/20200624-nodejs-code-review-01.png" srcset="/img/loading.gif" lazyload alt="fortify scan result analysis"></p>
+<h3 id="nodejsscan"><a href="#nodejsscan" class="headerlink" title="nodejsscan"></a>nodejsscan</h3><h4 id="介绍-3"><a href="#介绍-3" class="headerlink" title="介绍"></a>介绍</h4><p>NodeJsScan是专门针对Nodejs应用程序静态代码扫描工具。</p>
+<h4 id="使用-3"><a href="#使用-3" class="headerlink" title="使用"></a>使用</h4><p>该工具安装的方式有多种，推荐使用容器的方式运行此工具,docker使用方法这里不做阐述。</p>
+<figure class="highlight apache"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><code class="hljs apache"><span class="hljs-attribute">docker</span> pull opensecurity/nodejsscan:latest<br><span class="hljs-attribute">docker</span> run -it -p <span class="hljs-number">9090</span>:<span class="hljs-number">9090</span> opensecurity/nodejsscan:latest<br></code></pre></td></tr></table></figure>
+<p>访问对应站点，上传被扫描程序</p>
+<p><img src="/img/20200624-nodejs-code-review-05.png" srcset="/img/loading.gif" lazyload alt="nodejsscan upload file"></p>
+<p>等待片刻，获取扫描结果，进行分析</p>
+<p><img src="/img/20200624-nodejs-code-review-06.png" srcset="/img/loading.gif" lazyload alt="nodejsscan result"><br><img src="/img/20200624-nodejs-code-review-07.png" srcset="/img/loading.gif" lazyload alt="nodejsscan result"><br><img src="/img/20200624-nodejs-code-review-08.png" srcset="/img/loading.gif" lazyload alt="nodejsscan result"><br><img src="/img/20200624-nodejs-code-review-09.png" srcset="/img/loading.gif" lazyload alt="nodejsscan result"></p>
+<h4 id="分析扫描结果-3"><a href="#分析扫描结果-3" class="headerlink" title="分析扫描结果"></a>分析扫描结果</h4><p>个人感觉nodejsscan对于漏洞识别能力一般，但是还是可以辅助安全人员发现漏洞，毕竟没多少可以用的，有就不错了。</p>
+<h3 id="Retire-js"><a href="#Retire-js" class="headerlink" title="Retire.js"></a>Retire.js</h3><h4 id="介绍-4"><a href="#介绍-4" class="headerlink" title="介绍"></a>介绍</h4><p>Retire.js通过扫描Web应用程序判断是否使用易受攻击的JavaScript库，可以帮助检测已知漏洞的版本的使用情况。</p>
+<h4 id="使用-4"><a href="#使用-4" class="headerlink" title="使用"></a>使用</h4><p>安装：</p>
+<figure class="highlight cmake"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs cmake">$ npm <span class="hljs-keyword">install</span> -g retire<br></code></pre></td></tr></table></figure>
+<p><img src="/img/20200624-nodejs-code-review-10.png" srcset="/img/loading.gif" lazyload alt="retire install"><br>使用：<br>在项目的目录下执行以下指令，即可扫描。</p>
+<figure class="highlight crystal"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs crystal"><span class="hljs-variable">$ </span>retire<br></code></pre></td></tr></table></figure>
+<p>具体参数如下：</p>
+<figure class="highlight ada"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br></pre></td><td class="code"><pre><code class="hljs ada">λ  npx retire <span class="hljs-comment">--help</span><br><br>  Usage: retire [options]<br><br>  Options:<br><br>    -h, <span class="hljs-comment">--help               output usage information</span><br>    -V, <span class="hljs-comment">--version            output the version number</span><br><br>    -p, <span class="hljs-comment">--package            limit node scan to packages where parent is mentioned in package.json (ignore node_modules)</span><br>    -n, <span class="hljs-comment">--node               Run node dependency scan only</span><br>    -j, <span class="hljs-comment">--js                 Run scan of JavaScript files only</span><br>    -v, <span class="hljs-comment">--verbose            Show identified files (by default only vulnerable files are shown)</span><br>    -x, <span class="hljs-comment">--dropexternal       Don&#x27;t include project provided vulnerability repository</span><br>    -c, <span class="hljs-comment">--nocache            Don&#x27;t use local cache</span><br><br>    <span class="hljs-comment">--jspath &lt;path&gt;          Folder to scan for javascript files</span><br>    <span class="hljs-comment">--nodepath &lt;path&gt;        Folder to scan for node files</span><br>    <span class="hljs-comment">--path &lt;path&gt;            Folder to scan for both</span><br>    <span class="hljs-comment">--jsrepo &lt;path|url&gt;      Local or internal version of repo</span><br>    <span class="hljs-comment">--noderepo &lt;path|url&gt;    Local or internal version of repo</span><br>    <span class="hljs-comment">--cachedir &lt;path&gt;        Path to use for local cache instead of /tmp/.retire-cache</span><br>    <span class="hljs-comment">--proxy &lt;url&gt;            Proxy url (http://some.sever:8080)</span><br>    <span class="hljs-comment">--outputformat &lt;format&gt;  Valid formats: text, json, jsonsimple, depcheck (experimental) and cyclonedx</span><br>    <span class="hljs-comment">--outputpath &lt;path&gt;      File to which output should be written</span><br>    <span class="hljs-comment">--ignore &lt;paths&gt;         Comma delimited list of paths to ignore</span><br>    <span class="hljs-comment">--ignorefile &lt;path&gt;      Custom ignore file, defaults to .retireignore / .retireignore.json</span><br>    <span class="hljs-comment">--severity &lt;level&gt;       Specify the bug severity level from which the process fails. Allowed levels none, low, medium, high, critical. Default: none</span><br>    <span class="hljs-comment">--exitwith &lt;code&gt;        Custom exit code (default: 13) when vulnerabilities are found</span><br>    <span class="hljs-comment">--colors                 Enable color output (console output only)</span><br>    <span class="hljs-comment">--insecure               Enable fetching remote jsrepo/noderepo files from hosts using an insecure or self-signed SSL (TLS) certificate</span><br>    <span class="hljs-comment">--cacert &lt;path&gt;          Use the specified certificate file to verify the peer used for fetching remote jsrepo/noderepo files</span><br></code></pre></td></tr></table></figure>
+<h4 id="分析扫描结果-4"><a href="#分析扫描结果-4" class="headerlink" title="分析扫描结果"></a>分析扫描结果</h4><p>和npm扫描结果分析方式相同，基本上大同小异</p>
+<h2 id="nodejs-修复措施"><a href="#nodejs-修复措施" class="headerlink" title="nodejs 修复措施"></a>nodejs 修复措施</h2><p>  1、调用安全组件，如：xss，防止跨站脚本编制<br><br>  2、对于sql注入问题，按照编码要求进行编码<br><br>  3、部分无法使用安全组件进行修复的场景，可以自行构建过滤器进行处理<br><br>  4、对于逻辑漏洞，只能根据实际情况进行处理。</p>
+<h2 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h2><ul>
+<li>[<a href="https://hksanduo.github.io/2019/06/11/2019-06-11-Node-js-security-checklist/">https://hksanduo.github.io/2019/06/11/2019-06-11-Node-js-security-checklist/</a>) 【nodejs安全清单】</li>
+<li>[<a target="_blank" rel="noopener" href="https://github.com/analysis-tools-dev/static-analysis]">https://github.com/analysis-tools-dev/static-analysis]</a> 【static analysis tools list】</li>
+<li>[<a target="_blank" rel="noopener" href="https://www.microfocus.com/documentation/fortify-static-code-analyzer-and-tools/1910/SCA_Guide_19.1.0.pdf]">https://www.microfocus.com/documentation/fortify-static-code-analyzer-and-tools/1910/SCA_Guide_19.1.0.pdf]</a> 【fortify sca 19.0.1用户手册】</li>
+<li>[<a target="_blank" rel="noopener" href="https://medium.com/@manjula.aw/nodejs-security-tools-de0d0c937ec0]">https://medium.com/@manjula.aw/nodejs-security-tools-de0d0c937ec0]</a> 【nodejs security tools】</li>
+<li>[<a target="_blank" rel="noopener" href="https://medium.com/ngconf/how-to-analyze-an-angular-project-with-fortify-a3abc729e8d1]">https://medium.com/ngconf/how-to-analyze-an-angular-project-with-fortify-a3abc729e8d1]</a></li>
+<li>[<a target="_blank" rel="noopener" href="https://github.com/mysqljs/mysql#escaping-query-values]">https://github.com/mysqljs/mysql#escaping-query-values]</a> 【node-mysql】</li>
+<li>[<a target="_blank" rel="noopener" href="https://juejin.im/post/5b07eb1c5188254e28710d80]">https://juejin.im/post/5b07eb1c5188254e28710d80]</a> 【Node.js执行系统命令】</li>
+<li>[<a target="_blank" rel="noopener" href="https://xz.aliyun.com/t/7184#toc-0]">https://xz.aliyun.com/t/7184#toc-0]</a> 【Node.js 常见漏洞学习与总结】</li>
+<li>[<a target="_blank" rel="noopener" href="https://docs.npmjs.com/cli/audit]">https://docs.npmjs.com/cli/audit]</a> 【npm audit介绍】</li>
+<li>[<a target="_blank" rel="noopener" href="https://github.com/OpenSecurityIN/nodejsscan]">https://github.com/OpenSecurityIN/nodejsscan]</a> 【nodejsscan github地址】</li>
+<li>[<a target="_blank" rel="noopener" href="https://retirejs.github.io/retire.js/]">https://retirejs.github.io/retire.js/]</a> 【Retire.js】</li>
+</ul>
+
+            </div>
+            <hr>
+            <div>
+              <div class="post-metas mb-3">
+                
+                  <div class="post-meta mr-3">
+                    <i class="iconfont icon-category"></i>
+                    
+                      <a class="hover-with-bg" href="/categories/Security/">Security</a>
+                    
+                      <a class="hover-with-bg" href="/categories/Security/Code-Audit/">Code Audit</a>
+                    
+                  </div>
+                
+                
+                  <div class="post-meta">
+                    <i class="iconfont icon-tags"></i>
+                    
+                      <a class="hover-with-bg" href="/tags/Nodejs/">Nodejs</a>
+                    
+                  </div>
+                
+              </div>
+              
+                <p class="note note-warning">
+                  
+                    本博客所有文章除特别声明外，均采用 <a target="_blank" href="https://creativecommons.org/licenses/by-sa/4.0/deed.zh" rel="nofollow noopener noopener">CC BY-SA 4.0 协议</a> ，转载请注明出处！
+                  
+                </p>
+              
+              
+                <div class="post-prevnext">
+                  <article class="post-prev col-6">
+                    
+                    
+                      <a href="/2020/08/24/2020-08-04-install-and-config-openRASP-with-docker/">
+                        <i class="iconfont icon-arrowleft"></i>
+                        <span class="hidden-mobile">使用docker安装配置openRASP</span>
+                        <span class="visible-mobile">上一篇</span>
+                      </a>
+                    
+                  </article>
+                  <article class="post-next col-6">
+                    
+                    
+                      <a href="/2020/06/28/2020-06-28-install-and-config-nodejs/">
+                        <span class="hidden-mobile">windows安装配置nodejs</span>
+                        <span class="visible-mobile">下一篇</span>
+                        <i class="iconfont icon-arrowright"></i>
+                      </a>
+                    
+                  </article>
+                </div>
+              
+            </div>
+
+            
+              <!-- Comments -->
+              <article class="comments" id="comments" lazyload>
+                
+                  
+                
+                
+  <script type="text/javascript">
+    Fluid.utils.loadComments('#comments', function() {
+      var light = 'github-light';
+      var dark = 'github-dark';
+      var schema = document.documentElement.getAttribute('data-user-color-scheme');
+      if (schema === 'dark') {
+        schema = dark;
+      } else {
+        schema = light;
+      }
+      window.UtterancesThemeLight = light;
+      window.UtterancesThemeDark = dark;
+      var s = document.createElement('script');
+      s.setAttribute('src', 'https://utteranc.es/client.js');
+      s.setAttribute('repo', 'hksanduo/commit-utterances');
+      s.setAttribute('issue-term', 'title');
+      
+      s.setAttribute('label', 'utterances');
+      
+      s.setAttribute('theme', schema);
+      s.setAttribute('crossorigin', 'anonymous');
+      document.getElementById('comments').appendChild(s);
+    })
+  </script>
+  <noscript>Please enable JavaScript to view the comments</noscript>
+
+
+              </article>
+            
+          </article>
+        </div>
+      </div>
+    </div>
+    
+      <div class="d-none d-lg-block col-lg-2 toc-container" id="toc-ctn">
+        <div id="toc">
+  <p class="toc-header"><i class="iconfont icon-list"></i>&nbsp;目录</p>
+  <div class="toc-body" id="toc-body"></div>
+</div>
+
+      </div>
+    
+  </div>
+</div>
+
+<!-- Custom -->
+
+
+    
+
+    
+      <a id="scroll-top-button" aria-label="TOP" href="#" role="button">
+        <i class="iconfont icon-arrowup" aria-hidden="true"></i>
+      </a>
+    
+
+    
+      <div class="modal fade" id="modalSearch" tabindex="-1" role="dialog" aria-labelledby="ModalLabel"
+     aria-hidden="true">
+  <div class="modal-dialog modal-dialog-scrollable modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header text-center">
+        <h4 class="modal-title w-100 font-weight-bold">搜索</h4>
+        <button type="button" id="local-search-close" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body mx-3">
+        <div class="md-form mb-5">
+          <input type="text" id="local-search-input" class="form-control validate">
+          <label data-error="x" data-success="v"
+                 for="local-search-input">关键词</label>
+        </div>
+        <div class="list-group" id="local-search-result"></div>
+      </div>
+    </div>
+  </div>
+</div>
+    
+
+    
+  </main>
+
+  <footer class="text-center mt-5 py-3">
+  <div class="footer-content">
+     <a href="https://hexo.io" target="_blank" rel="nofollow noopener"><span>Hexo</span></a> <i class="iconfont icon-love"></i> <a href="https://github.com/fluid-dev/hexo-theme-fluid" target="_blank" rel="nofollow noopener"><span>Fluid</span></a> 
+  </div>
+  
+  <div class="statistics">
+    
+    
+
+    
+      
+        <!-- 不蒜子统计PV -->
+        <span id="busuanzi_container_site_pv" style="display: none">
+            总访问量 
+            <span id="busuanzi_value_site_pv"></span>
+             次
+          </span>
+      
+      
+        <!-- 不蒜子统计UV -->
+        <span id="busuanzi_container_site_uv" style="display: none">
+            总访客数 
+            <span id="busuanzi_value_site_uv"></span>
+             人
+          </span>
+      
+    
+  </div>
+
+
+  
+
+  
+</footer>
+
+
+  <!-- SCRIPTS -->
+  
+  <script  src="https://cdn.jsdelivr.net/npm/nprogress@0/nprogress.min.js" ></script>
+  <link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/nprogress@0/nprogress.min.css" />
+
+  <script>
+    NProgress.configure({"showSpinner":false,"trickleSpeed":100})
+    NProgress.start()
+    window.addEventListener('load', function() {
+      NProgress.done();
+    })
+  </script>
+
+
+<script  src="https://cdn.jsdelivr.net/npm/jquery@3/dist/jquery.min.js" ></script>
+<script  src="https://cdn.jsdelivr.net/npm/bootstrap@4/dist/js/bootstrap.min.js" ></script>
+<script  src="/js/events.js" ></script>
+<script  src="/js/plugins.js" ></script>
+
+<!-- Plugins -->
+
+
+  <script  src="/js/local-search.js" ></script>
+
+
+
+  
+    <script  src="/js/img-lazyload.js" ></script>
+  
+
+
+
+  
+
+
+
+  
+    <script  src="https://cdn.jsdelivr.net/npm/tocbot@4/dist/tocbot.min.js" ></script>
+  
+  
+    <script  src="https://cdn.jsdelivr.net/npm/@fancyapps/fancybox@3/dist/jquery.fancybox.min.js" ></script>
+  
+  
+    <script  src="https://cdn.jsdelivr.net/npm/anchor-js@4/anchor.min.js" ></script>
+  
+  
+    <script defer src="https://cdn.jsdelivr.net/npm/clipboard@2/dist/clipboard.min.js" ></script>
+  
+
+
+
+  <script defer src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js" ></script>
+
+
+
+
+  <script  src="https://cdn.jsdelivr.net/npm/typed.js@2/lib/typed.min.js" ></script>
+  <script>
+    (function (window, document) {
+      var typing = Fluid.plugins.typing;
+      var title = document.getElementById('subtitle').title;
+      
+      typing(title)
+      
+    })(window, document);
+  </script>
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+    <!-- Google Analytics -->
+    <script defer>
+      window.ga = window.ga || function () { (ga.q = ga.q || []).push(arguments) };
+      ga.l = +new Date;
+      ga('create', 'UA-167858469-1', 'auto');
+      ga('send', 'pageview');
+    </script>
+    <script async src='https://www.google-analytics.com/analytics.js'></script>
+  
+
+  
+
+  
+
+  
+
+  
+
+
+
+
+
+<!-- 主题的启动项 保持在最底部 -->
+<script  src="/js/boot.js" ></script>
+
+
+</body>
+</html>

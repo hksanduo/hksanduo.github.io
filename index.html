@@ -1,0 +1,901 @@
+
+
+<!DOCTYPE html>
+<html lang="zh-CN" data-default-color-scheme=auto>
+
+
+
+<head>
+  <meta charset="UTF-8">
+  <link rel="apple-touch-icon" sizes="76x76" href="/img/favicon.png">
+  <link rel="icon" href="/img/favicon.png">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, shrink-to-fit=no">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  
+  <meta name="theme-color" content="#2f4154">
+  <meta name="description" content="">
+  <meta name="author" content="sanduo">
+  <meta name="keywords" content="">
+  <meta property="og:type" content="website">
+<meta property="og:title" content="sanduo blog">
+<meta property="og:url" content="https://hksanduo.github.io/index.html">
+<meta property="og:site_name" content="sanduo blog">
+<meta property="og:locale" content="zh_CN">
+<meta property="article:author" content="sanduo">
+<meta name="twitter:card" content="summary_large_image">
+  
+  <title>sanduo blog</title>
+
+  <link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4/dist/css/bootstrap.min.css" />
+
+
+
+<!-- 主题依赖的图标库，不要自行修改 -->
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1749284_ba1fz6golrf.css">
+
+
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1736178_kmeydafke9r.css">
+
+
+<link  rel="stylesheet" href="/css/main.css" />
+
+<!-- 自定义样式保持在最底部 -->
+
+
+  <script id="fluid-configs">
+    var Fluid = window.Fluid || {};
+    var CONFIG = {"hostname":"hksanduo.github.io","root":"/","version":"1.8.12","typing":{"enable":true,"typeSpeed":70,"cursorChar":"_","loop":false},"anchorjs":{"enable":true,"element":"h1,h2,h3,h4,h5,h6","placement":"right","visible":"hover","icon":""},"progressbar":{"enable":true,"height_px":3,"color":"#29d","options":{"showSpinner":false,"trickleSpeed":100}},"copy_btn":true,"image_zoom":{"enable":true,"img_url_replace":["",""]},"toc":{"enable":true,"headingSelector":"h1,h2,h3,h4,h5,h6","collapseDepth":0},"lazyload":{"enable":true,"loading_img":"/img/loading.gif","onlypost":false,"offset_factor":2},"web_analytics":{"enable":true,"baidu":null,"google":"UA-167858469-1","gtag":null,"tencent":{"sid":null,"cid":null},"woyaola":null,"cnzz":null,"leancloud":{"app_id":null,"app_key":null,"server_url":null,"path":"window.location.pathname"}},"search_path":"/local-search.xml"};
+  </script>
+  <script  src="/js/utils.js" ></script>
+  <script  src="/js/color-schema.js" ></script>
+<meta name="generator" content="Hexo 5.4.2"></head>
+
+
+<body>
+  <header style="height: 100vh;">
+    <nav id="navbar" class="navbar fixed-top  navbar-expand-lg navbar-dark scrolling-navbar">
+  <div class="container">
+    <a class="navbar-brand" href="/">
+      <strong>Welcome To Sanduo&#39;s Blog</strong>
+    </a>
+
+    <button id="navbar-toggler-btn" class="navbar-toggler" type="button" data-toggle="collapse"
+            data-target="#navbarSupportedContent"
+            aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+      <div class="animated-icon"><span></span><span></span><span></span></div>
+    </button>
+
+    <!-- Collapsible content -->
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+      <ul class="navbar-nav ml-auto text-center">
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/">
+                <i class="iconfont icon-home-fill"></i>
+                首页
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/archives/">
+                <i class="iconfont icon-archive-fill"></i>
+                归档
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/categories/">
+                <i class="iconfont icon-category-fill"></i>
+                分类
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/tags/">
+                <i class="iconfont icon-tags-fill"></i>
+                标签
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/about/">
+                <i class="iconfont icon-user-fill"></i>
+                关于
+              </a>
+            </li>
+          
+        
+        
+          <li class="nav-item" id="search-btn">
+            <a class="nav-link" target="_self" href="javascript:;" data-toggle="modal" data-target="#modalSearch" aria-label="Search">
+              &nbsp;<i class="iconfont icon-search"></i>&nbsp;
+            </a>
+          </li>
+        
+        
+          <li class="nav-item" id="color-toggle-btn">
+            <a class="nav-link" target="_self" href="javascript:;" aria-label="Color Toggle">&nbsp;<i
+                class="iconfont icon-dark" id="color-toggle-icon"></i>&nbsp;</a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+</nav>
+
+    <div class="banner" id="banner" parallax=true
+         style="background: url('/img/default.png') no-repeat center center;
+           background-size: cover;">
+      <div class="full-bg-img">
+        <div class="mask flex-center" style="background-color: rgba(0, 0, 0, 0.3)">
+          <div class="page-header text-center fade-in-up">
+            <span class="h2" id="subtitle" title="Hack for fun !!!">
+              
+            </span>
+
+            
+          </div>
+
+          
+            <div class="scroll-down-bar">
+              <i class="iconfont icon-arrowdown"></i>
+            </div>
+          
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <main>
+    
+      <div class="container nopadding-x-md">
+        <div class="py-5" id="board"
+          style=margin-top:0>
+          
+          <div class="container">
+            <div class="row">
+              <div class="col-12 col-md-10 m-auto">
+                
+
+
+  <div class="row mx-auto index-card">
+    
+    
+    <article class="col-12 col-md-12 mx-auto index-info">
+      <h1 class="index-header">
+        
+        <a href="/2025/01/12/2025-01-12-api-bom/" target="_self">
+          API BOM - ASPM数据关联分析纽带 
+        </a>
+      </h1>
+
+      <p class="index-excerpt">
+        <a href="/2025/01/12/2025-01-12-api-bom/" target="_self">
+          
+          
+            
+          
+          API BOM - ASPM数据关联分析纽带API BOMAPI物料清单(API BOM)，这个概念是之前调研ASPM厂商OX Security提出的一个概念，目前没有统一的定义，可以参考软件物料清单(SBOM)。笔者在做ASPM数据分析调研的时候，主要的目的是需要寻求一种合理的方式对多个安全平台收集的数据进行去重分析，早期可以通过制定统一的漏洞分类分级标准，使用CWE编号或者支持统一的漏洞编号，
+        </a>
+      </p>
+
+      <div class="index-btm post-metas">
+        
+          <div class="post-meta mr-3">
+            <i class="iconfont icon-date"></i>
+            <time datetime="2025-01-12 08:05" pubdate>
+              2025-01-12
+            </time>
+          </div>
+        
+        
+          <div class="post-meta mr-3">
+            <i class="iconfont icon-category"></i>
+            
+              <a href="/categories/Security/">Security</a>
+            
+          </div>
+        
+        
+          <div class="post-meta">
+            <i class="iconfont icon-tags"></i>
+            
+              <a href="/tags/SDL/">SDL</a>
+            
+          </div>
+        
+      </div>
+    </article>
+  </div>
+
+  <div class="row mx-auto index-card">
+    
+    
+    <article class="col-12 col-md-12 mx-auto index-info">
+      <h1 class="index-header">
+        
+        <a href="/2024/11/27/2024-12-27-unemployment/" target="_self">
+          今年的冬天真冷
+        </a>
+      </h1>
+
+      <p class="index-excerpt">
+        <a href="/2024/11/27/2024-12-27-unemployment/" target="_self">
+          
+          
+            
+          
+          今年的冬天真冷
+真心不清楚这篇博文该以什么样的形式开头，写了删，删了写，也无法抒发内心种种不甘，直到今天拿到离职证明，一切尘埃落定，四年时光如白驹过隙，一晃而过，百感交集。
+21年从nsfocus离职的时候，当时也是受了委屈，看着前辈们意气风发，指点江山，激昂澎湃，自己却被蛀虫掣肘，由于直系领导都离职了，蛀虫看人下菜碟，欺负年轻人没背景，好好的项目拱手让人，当时还被蛀虫倒打一耙，说我这边项目报价有
+        </a>
+      </p>
+
+      <div class="index-btm post-metas">
+        
+          <div class="post-meta mr-3">
+            <i class="iconfont icon-date"></i>
+            <time datetime="2024-11-27 08:05" pubdate>
+              2024-11-27
+            </time>
+          </div>
+        
+        
+          <div class="post-meta mr-3">
+            <i class="iconfont icon-category"></i>
+            
+              <a href="/categories/Diary/">Diary</a>
+            
+          </div>
+        
+        
+          <div class="post-meta">
+            <i class="iconfont icon-tags"></i>
+            
+              <a href="/tags/Life/">Life</a>
+            
+          </div>
+        
+      </div>
+    </article>
+  </div>
+
+  <div class="row mx-auto index-card">
+    
+    
+    <article class="col-12 col-md-12 mx-auto index-info">
+      <h1 class="index-header">
+        
+        <a href="/2024/11/08/2024-11-08-fortify-sca-rules-introduce/" target="_self">
+          fortify sca rules 标签介绍
+        </a>
+      </h1>
+
+      <p class="index-excerpt">
+        <a href="/2024/11/08/2024-11-08-fortify-sca-rules-introduce/" target="_self">
+          
+          
+            
+          
+          fortify sca rules 标签介绍
+RulePack标签分析123456789101112131415161718192021222324&lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot;?&gt;&lt;RulePack xmlns:mask=&quot;xmlns://www.fortifysoftware.com/
+        </a>
+      </p>
+
+      <div class="index-btm post-metas">
+        
+          <div class="post-meta mr-3">
+            <i class="iconfont icon-date"></i>
+            <time datetime="2024-11-08 02:05" pubdate>
+              2024-11-08
+            </time>
+          </div>
+        
+        
+          <div class="post-meta mr-3">
+            <i class="iconfont icon-category"></i>
+            
+              <a href="/categories/Security/">Security</a>
+            
+          </div>
+        
+        
+          <div class="post-meta">
+            <i class="iconfont icon-tags"></i>
+            
+              <a href="/tags/CodeAudit/">CodeAudit</a>
+            
+          </div>
+        
+      </div>
+    </article>
+  </div>
+
+  <div class="row mx-auto index-card">
+    
+    
+    <article class="col-12 col-md-12 mx-auto index-info">
+      <h1 class="index-header">
+        
+        <a href="/2024/10/31/2024-10-31-aigc-security-check/" target="_self">
+          AIGC安全评估
+        </a>
+      </h1>
+
+      <p class="index-excerpt">
+        <a href="/2024/10/31/2024-10-31-aigc-security-check/" target="_self">
+          
+          
+            
+          
+          AIGC安全评估
+背景介绍最近有朋友问到AIGC安全评估的一些问题，最近做了一些调研，因为博主视野有限，文章不足之处请谅解。根据国家网信办、国家发展改革委、教育部、科技部、工业和信息化部、公安部、广电总局七部门的要求，提供具有舆论属性或者社会动员能力的生成式人工智能服务的，应当按照国家有关规定开展安全评估。
+评估政策依据基本法规
+《中华人民共和国网络安全法》
+《中华人民共和国科学技术进步法》
+《中
+        </a>
+      </p>
+
+      <div class="index-btm post-metas">
+        
+          <div class="post-meta mr-3">
+            <i class="iconfont icon-date"></i>
+            <time datetime="2024-10-31 02:05" pubdate>
+              2024-10-31
+            </time>
+          </div>
+        
+        
+          <div class="post-meta mr-3">
+            <i class="iconfont icon-category"></i>
+            
+              <a href="/categories/Security/">Security</a>
+            
+          </div>
+        
+        
+          <div class="post-meta">
+            <i class="iconfont icon-tags"></i>
+            
+              <a href="/tags/ML/">ML</a>
+            
+          </div>
+        
+      </div>
+    </article>
+  </div>
+
+  <div class="row mx-auto index-card">
+    
+    
+    <article class="col-12 col-md-12 mx-auto index-info">
+      <h1 class="index-header">
+        
+        <a href="/2024/08/06/2024-08-06-openssf-scorecard/" target="_self">
+          软件供应链健康度评估之scorecard
+        </a>
+      </h1>
+
+      <p class="index-excerpt">
+        <a href="/2024/08/06/2024-08-06-openssf-scorecard/" target="_self">
+          
+          
+            
+          
+          软件供应链健康度评估之scorecard
+Scorecard介绍Scorecard是一个自动化工具，评估开源项目的健康度。Scorecard通过评估与开源项目安全性相关的一系列指标项，每项10分。可以使用这些评分来了解需要改进的具体领域，以增强项目的安全性。同时，还可以评估依赖项带来的安全风险，如接受这些风险、评估替代方案或与维护者合作进行改进。
+注意：由于scorecard项目不断迭代更新，检测
+        </a>
+      </p>
+
+      <div class="index-btm post-metas">
+        
+          <div class="post-meta mr-3">
+            <i class="iconfont icon-date"></i>
+            <time datetime="2024-08-06 06:36" pubdate>
+              2024-08-06
+            </time>
+          </div>
+        
+        
+          <div class="post-meta mr-3">
+            <i class="iconfont icon-category"></i>
+            
+              <a href="/categories/Security/">Security</a>
+            
+          </div>
+        
+        
+          <div class="post-meta">
+            <i class="iconfont icon-tags"></i>
+            
+              <a href="/tags/Software-Supply-Chain/">Software Supply Chain</a>
+            
+          </div>
+        
+      </div>
+    </article>
+  </div>
+
+  <div class="row mx-auto index-card">
+    
+    
+    <article class="col-12 col-md-12 mx-auto index-info">
+      <h1 class="index-header">
+        
+        <a href="/2024/08/05/2024-08-05-MinerU/" target="_self">
+          MinerU 介绍
+        </a>
+      </h1>
+
+      <p class="index-excerpt">
+        <a href="/2024/08/05/2024-08-05-MinerU/" target="_self">
+          
+          
+            
+          
+          MinerU 介绍
+背景介绍处理监管文档会遇到一个比较操蛋的问题就是部分文档只有pdf格式的，并且pdf是扫描版本的，无法直接读取pdf，利用多模态进行处理，目前口袋有比较紧张，最近发现一个宝藏项目，MinerU，子项目(PDF-Extract-Kit)，可以识别pdf，将pdf转成md，方便数据处理和LLM进行对话。
+介绍MinerU 是一款一站式、开源、高质量的数据提取工具，主要包含以下功能:
+        </a>
+      </p>
+
+      <div class="index-btm post-metas">
+        
+          <div class="post-meta mr-3">
+            <i class="iconfont icon-date"></i>
+            <time datetime="2024-08-05 06:36" pubdate>
+              2024-08-05
+            </time>
+          </div>
+        
+        
+          <div class="post-meta mr-3">
+            <i class="iconfont icon-category"></i>
+            
+              <a href="/categories/RAG/">RAG</a>
+            
+          </div>
+        
+        
+          <div class="post-meta">
+            <i class="iconfont icon-tags"></i>
+            
+              <a href="/tags/ML/">ML</a>
+            
+          </div>
+        
+      </div>
+    </article>
+  </div>
+
+  <div class="row mx-auto index-card">
+    
+    
+    <article class="col-12 col-md-12 mx-auto index-info">
+      <h1 class="index-header">
+        
+        <a href="/2024/07/18/2024-07-18-commemorate-the-past-three-years-of-work/" target="_self">
+          纪念与W工作的三年
+        </a>
+      </h1>
+
+      <p class="index-excerpt">
+        <a href="/2024/07/18/2024-07-18-commemorate-the-past-three-years-of-work/" target="_self">
+          
+          
+            
+          
+          纪念与W工作的三年
+背景介绍三年前与W先后加入当前公司，一起研发打磨产品，从概念到demo再到客户侧落地，一起经历疫情。有空喝酒吹牛皮，没事角落一起吸二手烟，纵使工作压力山大，但是大家热情高涨，三年虽然不长，但是大家欢乐不少。其中有争执，有协作，总之磕磕绊绊，愉快度过三年。
+24年Q2，大家忙着新产品的迭代更新，公司引入新的研发领导，技术能力未知，但是拉帮结派、向上汇报、PUA下属的能力没谁了，以
+        </a>
+      </p>
+
+      <div class="index-btm post-metas">
+        
+          <div class="post-meta mr-3">
+            <i class="iconfont icon-date"></i>
+            <time datetime="2024-07-18 06:36" pubdate>
+              2024-07-18
+            </time>
+          </div>
+        
+        
+          <div class="post-meta mr-3">
+            <i class="iconfont icon-category"></i>
+            
+              <a href="/categories/Diary/">Diary</a>
+            
+          </div>
+        
+        
+          <div class="post-meta">
+            <i class="iconfont icon-tags"></i>
+            
+              <a href="/tags/Work/">Work</a>
+            
+          </div>
+        
+      </div>
+    </article>
+  </div>
+
+  <div class="row mx-auto index-card">
+    
+    
+    <article class="col-12 col-md-12 mx-auto index-info">
+      <h1 class="index-header">
+        
+        <a href="/2024/07/09/2024-07-09-introduce-mqtt-pwn/" target="_self">
+          mqtt-pwn 介绍
+        </a>
+      </h1>
+
+      <p class="index-excerpt">
+        <a href="/2024/07/09/2024-07-09-introduce-mqtt-pwn/" target="_self">
+          
+          
+            
+          
+          mqtt-pwn 介绍
+背景介绍最近在学习车联网相关知识，碰巧媳妇公司CTF题目中有一道车联网的题目，题目方向是MQTT，发现一个mqtt测试工具：mqtt-pwn，这里做记录和学习一下。
+mqtt 安全风险相关
+授权：匿名连接问题，匿名访问则代表任何人都可以发布或订阅消息。如果存在敏感数据或指令，将导致信息泄漏或者被恶意攻击者发起恶意指令；
+传输：默认未加密，则可被中间人攻击。可获取其验证的用户
+        </a>
+      </p>
+
+      <div class="index-btm post-metas">
+        
+          <div class="post-meta mr-3">
+            <i class="iconfont icon-date"></i>
+            <time datetime="2024-07-09 06:36" pubdate>
+              2024-07-09
+            </time>
+          </div>
+        
+        
+          <div class="post-meta mr-3">
+            <i class="iconfont icon-category"></i>
+            
+              <a href="/categories/Security/">Security</a>
+            
+          </div>
+        
+        
+          <div class="post-meta">
+            <i class="iconfont icon-tags"></i>
+            
+              <a href="/tags/Car/">Car</a>
+            
+          </div>
+        
+      </div>
+    </article>
+  </div>
+
+  <div class="row mx-auto index-card">
+    
+    
+    <article class="col-12 col-md-12 mx-auto index-info">
+      <h1 class="index-header">
+        
+        <a href="/2024/06/24/2024-06-24-introduce-mqtts/" target="_self">
+          mqtts 介绍
+        </a>
+      </h1>
+
+      <p class="index-excerpt">
+        <a href="/2024/06/24/2024-06-24-introduce-mqtts/" target="_self">
+          
+          
+            
+          
+          mqtts 介绍
+背景介绍最近在学习车联网相关知识，碰巧媳妇公司CTF题目中有一道车联网的题目，题目方向是MQTT，正好可以深入研究一下。
+mqtts介绍mqtts是一款mqtt安全测试工具，github地址：https://github.com/SPuerBRead/mqtts
+主要功能包括如下：
+
+匿名登陆 (批量)
+emqx embox_plugin_template
+任意用户名密码登陆 (
+        </a>
+      </p>
+
+      <div class="index-btm post-metas">
+        
+          <div class="post-meta mr-3">
+            <i class="iconfont icon-date"></i>
+            <time datetime="2024-06-24 06:36" pubdate>
+              2024-06-24
+            </time>
+          </div>
+        
+        
+          <div class="post-meta mr-3">
+            <i class="iconfont icon-category"></i>
+            
+              <a href="/categories/Security/">Security</a>
+            
+          </div>
+        
+        
+          <div class="post-meta">
+            <i class="iconfont icon-tags"></i>
+            
+              <a href="/tags/Car/">Car</a>
+            
+          </div>
+        
+      </div>
+    </article>
+  </div>
+
+  <div class="row mx-auto index-card">
+    
+    
+    <article class="col-12 col-md-12 mx-auto index-info">
+      <h1 class="index-header">
+        
+        <a href="/2024/05/15/2024-05-15-terrible-life-and-work/" target="_self">
+          不吐不快
+        </a>
+      </h1>
+
+      <p class="index-excerpt">
+        <a href="/2024/05/15/2024-05-15-terrible-life-and-work/" target="_self">
+          
+          
+            
+          
+          不吐不快
+背景Feeling terrible, need to vent.
+不吐不快最近工作生活一团糟，具体就不详细描述了，总之，就是你让我不爽，你也别好过。分享几条至理名言(毒鸡汤)与各位共勉。
+
+忍一时乳腺增生，退一步子宫肌瘤，让一下甲状腺结节，憋一下卵巢囊肿，骂一顿海阔天空。
+有仇当日报，不隔夜最牛逼。
+别人沾沾自喜的时候，直接把他当空气。
+要有看小丑一样的态度，对待仇人。
+仇人越是重视什
+        </a>
+      </p>
+
+      <div class="index-btm post-metas">
+        
+          <div class="post-meta mr-3">
+            <i class="iconfont icon-date"></i>
+            <time datetime="2024-05-15 10:36" pubdate>
+              2024-05-15
+            </time>
+          </div>
+        
+        
+          <div class="post-meta mr-3">
+            <i class="iconfont icon-category"></i>
+            
+              <a href="/categories/Diary/">Diary</a>
+            
+          </div>
+        
+        
+          <div class="post-meta">
+            <i class="iconfont icon-tags"></i>
+            
+              <a href="/tags/Work/">Work</a>
+            
+          </div>
+        
+      </div>
+    </article>
+  </div>
+
+
+
+  <nav aria-label="navigation">
+    <span class="pagination" id="pagination">
+      <span class="page-number current">1</span><a class="page-number" href="/page/2/#board">2</a><a class="page-number" href="/page/3/#board">3</a><span class="space">&hellip;</span><a class="page-number" href="/page/11/#board">11</a><a class="extend next" rel="next" href="/page/2/#board"><i class="iconfont icon-arrowright"></i></a>
+    </span>
+  </nav>
+
+
+
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    
+
+    
+      <a id="scroll-top-button" aria-label="TOP" href="#" role="button">
+        <i class="iconfont icon-arrowup" aria-hidden="true"></i>
+      </a>
+    
+
+    
+      <div class="modal fade" id="modalSearch" tabindex="-1" role="dialog" aria-labelledby="ModalLabel"
+     aria-hidden="true">
+  <div class="modal-dialog modal-dialog-scrollable modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header text-center">
+        <h4 class="modal-title w-100 font-weight-bold">搜索</h4>
+        <button type="button" id="local-search-close" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body mx-3">
+        <div class="md-form mb-5">
+          <input type="text" id="local-search-input" class="form-control validate">
+          <label data-error="x" data-success="v"
+                 for="local-search-input">关键词</label>
+        </div>
+        <div class="list-group" id="local-search-result"></div>
+      </div>
+    </div>
+  </div>
+</div>
+    
+
+    
+  </main>
+
+  <footer class="text-center mt-5 py-3">
+  <div class="footer-content">
+     <a href="https://hexo.io" target="_blank" rel="nofollow noopener"><span>Hexo</span></a> <i class="iconfont icon-love"></i> <a href="https://github.com/fluid-dev/hexo-theme-fluid" target="_blank" rel="nofollow noopener"><span>Fluid</span></a> 
+  </div>
+  
+  <div class="statistics">
+    
+    
+
+    
+      
+        <!-- 不蒜子统计PV -->
+        <span id="busuanzi_container_site_pv" style="display: none">
+            总访问量 
+            <span id="busuanzi_value_site_pv"></span>
+             次
+          </span>
+      
+      
+        <!-- 不蒜子统计UV -->
+        <span id="busuanzi_container_site_uv" style="display: none">
+            总访客数 
+            <span id="busuanzi_value_site_uv"></span>
+             人
+          </span>
+      
+    
+  </div>
+
+
+  
+
+  
+</footer>
+
+
+  <!-- SCRIPTS -->
+  
+  <script  src="https://cdn.jsdelivr.net/npm/nprogress@0/nprogress.min.js" ></script>
+  <link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/nprogress@0/nprogress.min.css" />
+
+  <script>
+    NProgress.configure({"showSpinner":false,"trickleSpeed":100})
+    NProgress.start()
+    window.addEventListener('load', function() {
+      NProgress.done();
+    })
+  </script>
+
+
+<script  src="https://cdn.jsdelivr.net/npm/jquery@3/dist/jquery.min.js" ></script>
+<script  src="https://cdn.jsdelivr.net/npm/bootstrap@4/dist/js/bootstrap.min.js" ></script>
+<script  src="/js/events.js" ></script>
+<script  src="/js/plugins.js" ></script>
+
+<!-- Plugins -->
+
+
+  <script  src="/js/local-search.js" ></script>
+
+
+
+  
+    <script  src="/js/img-lazyload.js" ></script>
+  
+
+
+
+  
+
+
+
+
+
+  <script defer src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js" ></script>
+
+
+
+
+  <script  src="https://cdn.jsdelivr.net/npm/typed.js@2/lib/typed.min.js" ></script>
+  <script>
+    (function (window, document) {
+      var typing = Fluid.plugins.typing;
+      var title = document.getElementById('subtitle').title;
+      
+      typing(title)
+      
+    })(window, document);
+  </script>
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+    <!-- Google Analytics -->
+    <script defer>
+      window.ga = window.ga || function () { (ga.q = ga.q || []).push(arguments) };
+      ga.l = +new Date;
+      ga('create', 'UA-167858469-1', 'auto');
+      ga('send', 'pageview');
+    </script>
+    <script async src='https://www.google-analytics.com/analytics.js'></script>
+  
+
+  
+
+  
+
+  
+
+  
+
+
+
+
+
+<!-- 主题的启动项 保持在最底部 -->
+<script  src="/js/boot.js" ></script>
+
+
+</body>
+</html>

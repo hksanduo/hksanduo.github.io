@@ -1,0 +1,635 @@
+
+
+<!DOCTYPE html>
+<html lang="zh-CN" data-default-color-scheme=auto>
+
+
+
+<head>
+  <meta charset="UTF-8">
+  <link rel="apple-touch-icon" sizes="76x76" href="/img/favicon.png">
+  <link rel="icon" href="/img/favicon.png">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, shrink-to-fit=no">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  
+  <meta name="theme-color" content="#2f4154">
+  <meta name="description" content="">
+  <meta name="author" content="sanduo">
+  <meta name="keywords" content="">
+  <meta name="description" content="AIGC安全评估 背景介绍最近有朋友问到AIGC安全评估的一些问题，最近做了一些调研，因为博主视野有限，文章不足之处请谅解。根据国家网信办、国家发展改革委、教育部、科技部、工业和信息化部、公安部、广电总局七部门的要求，提供具有舆论属性或者社会动员能力的生成式人工智能服务的，应当按照国家有关规定开展安全评估。 评估政策依据基本法规 《中华人民共和国网络安全法》 《中华人民共和国科学技术进步法》 《中">
+<meta property="og:type" content="article">
+<meta property="og:title" content="AIGC安全评估">
+<meta property="og:url" content="https://hksanduo.github.io/2024/10/31/2024-10-31-aigc-security-check/index.html">
+<meta property="og:site_name" content="sanduo blog">
+<meta property="og:description" content="AIGC安全评估 背景介绍最近有朋友问到AIGC安全评估的一些问题，最近做了一些调研，因为博主视野有限，文章不足之处请谅解。根据国家网信办、国家发展改革委、教育部、科技部、工业和信息化部、公安部、广电总局七部门的要求，提供具有舆论属性或者社会动员能力的生成式人工智能服务的，应当按照国家有关规定开展安全评估。 评估政策依据基本法规 《中华人民共和国网络安全法》 《中华人民共和国科学技术进步法》 《中">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://hksanduo.github.io/img/20241031-02.png">
+<meta property="og:image" content="https://hksanduo.github.io/img/20241031-01.png">
+<meta property="og:image" content="https://hksanduo.github.io/img/20241031-03.png">
+<meta property="article:published_time" content="2024-10-31T02:05:00.000Z">
+<meta property="article:modified_time" content="2025-01-18T14:54:10.083Z">
+<meta property="article:author" content="sanduo">
+<meta property="article:tag" content="ML">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:image" content="https://hksanduo.github.io/img/20241031-02.png">
+  
+  <title>AIGC安全评估 - sanduo blog</title>
+
+  <link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4/dist/css/bootstrap.min.css" />
+
+
+  <link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/github-markdown-css@4/github-markdown.min.css" />
+  <link  rel="stylesheet" href="/lib/hint/hint.min.css" />
+
+  
+    
+    
+      
+      <link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/highlight.js@10/styles/github-gist.min.css" />
+    
+  
+
+  
+    <link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fancyapps/fancybox@3/dist/jquery.fancybox.min.css" />
+  
+
+
+<!-- 主题依赖的图标库，不要自行修改 -->
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1749284_ba1fz6golrf.css">
+
+
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1736178_kmeydafke9r.css">
+
+
+<link  rel="stylesheet" href="/css/main.css" />
+
+<!-- 自定义样式保持在最底部 -->
+
+
+  <script id="fluid-configs">
+    var Fluid = window.Fluid || {};
+    var CONFIG = {"hostname":"hksanduo.github.io","root":"/","version":"1.8.12","typing":{"enable":true,"typeSpeed":70,"cursorChar":"_","loop":false},"anchorjs":{"enable":true,"element":"h1,h2,h3,h4,h5,h6","placement":"right","visible":"hover","icon":""},"progressbar":{"enable":true,"height_px":3,"color":"#29d","options":{"showSpinner":false,"trickleSpeed":100}},"copy_btn":true,"image_zoom":{"enable":true,"img_url_replace":["",""]},"toc":{"enable":true,"headingSelector":"h1,h2,h3,h4,h5,h6","collapseDepth":0},"lazyload":{"enable":true,"loading_img":"/img/loading.gif","onlypost":false,"offset_factor":2},"web_analytics":{"enable":true,"baidu":null,"google":"UA-167858469-1","gtag":null,"tencent":{"sid":null,"cid":null},"woyaola":null,"cnzz":null,"leancloud":{"app_id":null,"app_key":null,"server_url":null,"path":"window.location.pathname"}},"search_path":"/local-search.xml"};
+  </script>
+  <script  src="/js/utils.js" ></script>
+  <script  src="/js/color-schema.js" ></script>
+<meta name="generator" content="Hexo 5.4.2"></head>
+
+
+<body>
+  <header style="height: 70vh;">
+    <nav id="navbar" class="navbar fixed-top  navbar-expand-lg navbar-dark scrolling-navbar">
+  <div class="container">
+    <a class="navbar-brand" href="/">
+      <strong>Welcome To Sanduo&#39;s Blog</strong>
+    </a>
+
+    <button id="navbar-toggler-btn" class="navbar-toggler" type="button" data-toggle="collapse"
+            data-target="#navbarSupportedContent"
+            aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+      <div class="animated-icon"><span></span><span></span><span></span></div>
+    </button>
+
+    <!-- Collapsible content -->
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+      <ul class="navbar-nav ml-auto text-center">
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/">
+                <i class="iconfont icon-home-fill"></i>
+                首页
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/archives/">
+                <i class="iconfont icon-archive-fill"></i>
+                归档
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/categories/">
+                <i class="iconfont icon-category-fill"></i>
+                分类
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/tags/">
+                <i class="iconfont icon-tags-fill"></i>
+                标签
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/about/">
+                <i class="iconfont icon-user-fill"></i>
+                关于
+              </a>
+            </li>
+          
+        
+        
+          <li class="nav-item" id="search-btn">
+            <a class="nav-link" target="_self" href="javascript:;" data-toggle="modal" data-target="#modalSearch" aria-label="Search">
+              &nbsp;<i class="iconfont icon-search"></i>&nbsp;
+            </a>
+          </li>
+        
+        
+          <li class="nav-item" id="color-toggle-btn">
+            <a class="nav-link" target="_self" href="javascript:;" aria-label="Color Toggle">&nbsp;<i
+                class="iconfont icon-dark" id="color-toggle-icon"></i>&nbsp;</a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+</nav>
+
+    <div class="banner" id="banner" parallax=true
+         style="background: url('/img/default.png') no-repeat center center;
+           background-size: cover;">
+      <div class="full-bg-img">
+        <div class="mask flex-center" style="background-color: rgba(0, 0, 0, 0.3)">
+          <div class="page-header text-center fade-in-up">
+            <span class="h2" id="subtitle" title="AIGC安全评估">
+              
+            </span>
+
+            
+              <div class="mt-3">
+  
+  
+    <span class="post-meta">
+      <i class="iconfont icon-date-fill" aria-hidden="true"></i>
+      <time datetime="2024-10-31 02:05" pubdate>
+        2024年10月31日 凌晨
+      </time>
+    </span>
+  
+</div>
+
+<div class="mt-1">
+  
+    <span class="post-meta mr-2">
+      <i class="iconfont icon-chart"></i>
+      1.6k 字
+    </span>
+  
+
+  
+    <span class="post-meta mr-2">
+      <i class="iconfont icon-clock-fill"></i>
+      
+      
+      5 分钟
+    </span>
+  
+
+  
+  
+</div>
+
+            
+          </div>
+
+          
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <main>
+    
+      
+
+<div class="container-fluid nopadding-x">
+  <div class="row nomargin-x">
+    <div class="d-none d-lg-block col-lg-2"></div>
+    <div class="col-lg-8 nopadding-x-md">
+      <div class="container nopadding-x-md" id="board-ctn">
+        <div class="py-5" id="board">
+          <article class="post-content mx-auto">
+            <!-- SEO header -->
+            <h1 style="display: none">AIGC安全评估</h1>
+            
+            <div class="markdown-body">
+              <h1 id="AIGC安全评估"><a href="#AIGC安全评估" class="headerlink" title="AIGC安全评估"></a>AIGC安全评估</h1><hr>
+<h2 id="背景介绍"><a href="#背景介绍" class="headerlink" title="背景介绍"></a>背景介绍</h2><p>最近有朋友问到AIGC安全评估的一些问题，最近做了一些调研，因为博主视野有限，文章不足之处请谅解。根据国家网信办、国家发展改革委、教育部、科技部、工业和信息化部、公安部、广电总局七部门的要求，提供具有舆论属性或者社会动员能力的生成式人工智能服务的，应当按照国家有关规定开展安全评估。</p>
+<h2 id="评估政策依据"><a href="#评估政策依据" class="headerlink" title="评估政策依据"></a>评估政策依据</h2><h3 id="基本法规"><a href="#基本法规" class="headerlink" title="基本法规"></a>基本法规</h3><ol>
+<li>《中华人民共和国网络安全法》</li>
+<li>《中华人民共和国科学技术进步法》</li>
+<li>《中华人民共和国数据安全法》</li>
+<li>《中华人民共和国个人信息保护法》</li>
+</ol>
+<h3 id="AIGC相关法规"><a href="#AIGC相关法规" class="headerlink" title="AIGC相关法规"></a>AIGC相关法规</h3><ol>
+<li>《互联网信息服务算法推荐管理规定》</li>
+<li>《互联网信息服务深度合成管理规定》</li>
+<li>《具有舆论属性或社会动员能力的互联网信息服务安全评估规定》</li>
+<li>《生成式人工智能服务安全基本要求》</li>
+<li>《信息安全技术 生成式人工智能人工标注安全规范》</li>
+<li>《信息安全技术 生成式人工智能预训练和优化训练数据安全规范》</li>
+<li>《生成式人工智能（大语言模型）上线备案表》</li>
+<li>《生成式人工智能服务管理暂行办法》</li>
+</ol>
+<h2 id="评估内容"><a href="#评估内容" class="headerlink" title="评估内容"></a>评估内容</h2><h3 id="语料安全"><a href="#语料安全" class="headerlink" title="语料安全"></a>语料安全</h3><h4 id="语料来源管理"><a href="#语料来源管理" class="headerlink" title="语料来源管理"></a>语料来源管理</h4><ul>
+<li>建立完整的语料获取审核机制</li>
+<li>确保语料来源合法合规</li>
+<li>实施多源语料协同管理</li>
+<li>建立语料溯源机制</li>
+</ul>
+<h4 id="语料安全-1"><a href="#语料安全-1" class="headerlink" title="语料安全"></a>语料安全</h4><ul>
+<li><p><strong>内容过滤机制</strong></p>
+<ul>
+<li>建立多层次过滤体系</li>
+<li>实时监控和更新过滤规则</li>
+<li>保留过滤记录</li>
+</ul>
+</li>
+<li><p><strong>知识产权保护</strong></p>
+<ul>
+<li>建立版权检测机制</li>
+<li>实施著作权审核</li>
+<li>建立授权使用追踪系统</li>
+</ul>
+</li>
+<li><p><strong>个人信息保护</strong></p>
+<ul>
+<li>实施个人信息脱敏</li>
+<li>建立隐私保护机制</li>
+<li>确保数据使用合规</li>
+</ul>
+</li>
+</ul>
+<h4 id="语料标注"><a href="#语料标注" class="headerlink" title="语料标注"></a>语料标注</h4><ul>
+<li><p><strong>标注人员要求</strong></p>
+<ul>
+<li>专业资质认证</li>
+<li>保密协议签署</li>
+<li>定期培训考核</li>
+</ul>
+</li>
+<li><p><strong>标注规则制定</strong></p>
+<ul>
+<li>建立统一标准</li>
+<li>实施质量控制</li>
+<li>定期更新优化</li>
+</ul>
+</li>
+<li><p><strong>标注准确性保障</strong></p>
+<ul>
+<li>多重交叉验证</li>
+<li>定期抽检复核</li>
+<li>建立纠错机制</li>
+</ul>
+</li>
+</ul>
+<h3 id="模型安全"><a href="#模型安全" class="headerlink" title="模型安全"></a>模型安全</h3><h4 id="模型生成内容安全"><a href="#模型生成内容安全" class="headerlink" title="模型生成内容安全"></a>模型生成内容安全</h4><p>在训练过程中，应将生成内容安全性作为评价生成结果优劣的主要考虑指标之一；</p>
+<ul>
+<li>在每次对话中，应对使用者输入信息进行安全性检测，引导模型生成积极正向内容；</li>
+<li>对提供服务过程中以及定期检测时发现的安全问题，应通过针对性的指令微调、强化学习等方式优化模<br>型。</li>
+</ul>
+<h4 id="服务透明度"><a href="#服务透明度" class="headerlink" title="服务透明度"></a>服务透明度</h4><p>以交互界面提供服务的，应在网站首页等显著位置向社会公开以下信息：服务适用的人群、场合、用途、服务的局限性等信息。</p>
+<h4 id="生成内容准确性"><a href="#生成内容准确性" class="headerlink" title="生成内容准确性"></a>生成内容准确性</h4><ul>
+<li>生成内容应准确响应使用者输入意图，所包含的数据及表述应符合科学常识或主流认知、不含错误内容。</li>
+</ul>
+<h4 id="生成内容可靠性"><a href="#生成内容可靠性" class="headerlink" title="生成内容可靠性"></a>生成内容可靠性</h4><ul>
+<li>服务按照使用者指令给出的回复，应格式框架合理、有效内容含量高，应能够有效帮助使用者解答问题。</li>
+</ul>
+<h3 id="安全措施"><a href="#安全措施" class="headerlink" title="安全措施"></a>安全措施</h3><ul>
+<li>明确适用范围限制,模型适用人群、场合、用途</li>
+<li>建立个人信息保护机制，完善个人信息处理</li>
+<li>实施数据使用管理，合法合规收集使用者输入信息用于训练</li>
+<li>建立内容标识系统，对图片、视频等内容标识</li>
+<li>接受公众或使用者投诉举报</li>
+<li>向使用者提供生成内容</li>
+<li>建立升级维护体系，方便模型更新、升级</li>
+</ul>
+<h3 id="安全评估"><a href="#安全评估" class="headerlink" title="安全评估"></a>安全评估</h3><h4 id="训练语料"><a href="#训练语料" class="headerlink" title="训练语料"></a>训练语料</h4><p><img src="/img/20241031-02.png" srcset="/img/loading.gif" lazyload alt="训练语料"></p>
+<p>首先，训练语料通过四个主要的关键词库进行筛选，这些关键词库分别涵盖了意识形态和国家主权、个人隐私及名誉权、知识产权和商业秘密、以及民族、信仰和性别等方面的关键概念。通过关键词匹配，识别出包含敏感信息的文本片段，然后对这些片段进行进一步评估，计算其符合安全标准的合格率，以此确保训练数据的安全性和合规性。</p>
+<h4 id="生成内容"><a href="#生成内容" class="headerlink" title="生成内容"></a>生成内容</h4><p><img src="/img/20241031-01.png" srcset="/img/loading.gif" lazyload alt="生成内容评估"></p>
+<p>首先，通过单一问题、诱导问题和伪装问题等方法生成内容，并通过AIGC API接口提交给系统。接着，系统会根据意识形态、国家主权、个人隐私、肖像权、名誉权、知识产权、商业秘密、民族、信仰、性别等相关关键词库进行内容审查。最后，系统将生成的内容与关键词进行比对，得出涉及关键词的生成内容，并计算合格率。这一流程旨在确保AIGC生成的内容符合安全标准，避免敏感信息的泄露和不当言论的传播。</p>
+<h4 id="问题拒答"><a href="#问题拒答" class="headerlink" title="问题拒答"></a>问题拒答</h4><p><img src="/img/20241031-03.png" srcset="/img/loading.gif" lazyload alt="问题拒答"></p>
+<p>应拒答测试题和非拒答测试题被输入到AIGC的API接口中。经过处理后，输出结果会被用来计算模型的拒答率。</p>
+<h2 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h2><ul>
+<li><a target="_blank" rel="noopener" href="https://www.lexology.com/library/detail.aspx?g=a54d9239-1c18-4416-a0be-fc0b77fd20e4">https://www.lexology.com/library/detail.aspx?g=a54d9239-1c18-4416-a0be-fc0b77fd20e4</a></li>
+<li><a target="_blank" rel="noopener" href="https://www.aliyun.com/activity/security/secAIGC">https://www.aliyun.com/activity/security/secAIGC</a></li>
+<li><a target="_blank" rel="noopener" href="https://www.aigclab.cn/algorithmEvaluation">https://www.aigclab.cn/algorithmEvaluation</a></li>
+</ul>
+
+            </div>
+            <hr>
+            <div>
+              <div class="post-metas mb-3">
+                
+                  <div class="post-meta mr-3">
+                    <i class="iconfont icon-category"></i>
+                    
+                      <a class="hover-with-bg" href="/categories/Security/">Security</a>
+                    
+                  </div>
+                
+                
+                  <div class="post-meta">
+                    <i class="iconfont icon-tags"></i>
+                    
+                      <a class="hover-with-bg" href="/tags/ML/">ML</a>
+                    
+                  </div>
+                
+              </div>
+              
+                <p class="note note-warning">
+                  
+                    本博客所有文章除特别声明外，均采用 <a target="_blank" href="https://creativecommons.org/licenses/by-sa/4.0/deed.zh" rel="nofollow noopener noopener">CC BY-SA 4.0 协议</a> ，转载请注明出处！
+                  
+                </p>
+              
+              
+                <div class="post-prevnext">
+                  <article class="post-prev col-6">
+                    
+                    
+                      <a href="/2024/11/08/2024-11-08-fortify-sca-rules-introduce/">
+                        <i class="iconfont icon-arrowleft"></i>
+                        <span class="hidden-mobile">fortify sca rules 标签介绍</span>
+                        <span class="visible-mobile">上一篇</span>
+                      </a>
+                    
+                  </article>
+                  <article class="post-next col-6">
+                    
+                    
+                      <a href="/2024/08/06/2024-08-06-openssf-scorecard/">
+                        <span class="hidden-mobile">软件供应链健康度评估之scorecard</span>
+                        <span class="visible-mobile">下一篇</span>
+                        <i class="iconfont icon-arrowright"></i>
+                      </a>
+                    
+                  </article>
+                </div>
+              
+            </div>
+
+            
+              <!-- Comments -->
+              <article class="comments" id="comments" lazyload>
+                
+                  
+                
+                
+  <script type="text/javascript">
+    Fluid.utils.loadComments('#comments', function() {
+      var light = 'github-light';
+      var dark = 'github-dark';
+      var schema = document.documentElement.getAttribute('data-user-color-scheme');
+      if (schema === 'dark') {
+        schema = dark;
+      } else {
+        schema = light;
+      }
+      window.UtterancesThemeLight = light;
+      window.UtterancesThemeDark = dark;
+      var s = document.createElement('script');
+      s.setAttribute('src', 'https://utteranc.es/client.js');
+      s.setAttribute('repo', 'hksanduo/commit-utterances');
+      s.setAttribute('issue-term', 'title');
+      
+      s.setAttribute('label', 'utterances');
+      
+      s.setAttribute('theme', schema);
+      s.setAttribute('crossorigin', 'anonymous');
+      document.getElementById('comments').appendChild(s);
+    })
+  </script>
+  <noscript>Please enable JavaScript to view the comments</noscript>
+
+
+              </article>
+            
+          </article>
+        </div>
+      </div>
+    </div>
+    
+      <div class="d-none d-lg-block col-lg-2 toc-container" id="toc-ctn">
+        <div id="toc">
+  <p class="toc-header"><i class="iconfont icon-list"></i>&nbsp;目录</p>
+  <div class="toc-body" id="toc-body"></div>
+</div>
+
+      </div>
+    
+  </div>
+</div>
+
+<!-- Custom -->
+
+
+    
+
+    
+      <a id="scroll-top-button" aria-label="TOP" href="#" role="button">
+        <i class="iconfont icon-arrowup" aria-hidden="true"></i>
+      </a>
+    
+
+    
+      <div class="modal fade" id="modalSearch" tabindex="-1" role="dialog" aria-labelledby="ModalLabel"
+     aria-hidden="true">
+  <div class="modal-dialog modal-dialog-scrollable modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header text-center">
+        <h4 class="modal-title w-100 font-weight-bold">搜索</h4>
+        <button type="button" id="local-search-close" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body mx-3">
+        <div class="md-form mb-5">
+          <input type="text" id="local-search-input" class="form-control validate">
+          <label data-error="x" data-success="v"
+                 for="local-search-input">关键词</label>
+        </div>
+        <div class="list-group" id="local-search-result"></div>
+      </div>
+    </div>
+  </div>
+</div>
+    
+
+    
+  </main>
+
+  <footer class="text-center mt-5 py-3">
+  <div class="footer-content">
+     <a href="https://hexo.io" target="_blank" rel="nofollow noopener"><span>Hexo</span></a> <i class="iconfont icon-love"></i> <a href="https://github.com/fluid-dev/hexo-theme-fluid" target="_blank" rel="nofollow noopener"><span>Fluid</span></a> 
+  </div>
+  
+  <div class="statistics">
+    
+    
+
+    
+      
+        <!-- 不蒜子统计PV -->
+        <span id="busuanzi_container_site_pv" style="display: none">
+            总访问量 
+            <span id="busuanzi_value_site_pv"></span>
+             次
+          </span>
+      
+      
+        <!-- 不蒜子统计UV -->
+        <span id="busuanzi_container_site_uv" style="display: none">
+            总访客数 
+            <span id="busuanzi_value_site_uv"></span>
+             人
+          </span>
+      
+    
+  </div>
+
+
+  
+
+  
+</footer>
+
+
+  <!-- SCRIPTS -->
+  
+  <script  src="https://cdn.jsdelivr.net/npm/nprogress@0/nprogress.min.js" ></script>
+  <link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/nprogress@0/nprogress.min.css" />
+
+  <script>
+    NProgress.configure({"showSpinner":false,"trickleSpeed":100})
+    NProgress.start()
+    window.addEventListener('load', function() {
+      NProgress.done();
+    })
+  </script>
+
+
+<script  src="https://cdn.jsdelivr.net/npm/jquery@3/dist/jquery.min.js" ></script>
+<script  src="https://cdn.jsdelivr.net/npm/bootstrap@4/dist/js/bootstrap.min.js" ></script>
+<script  src="/js/events.js" ></script>
+<script  src="/js/plugins.js" ></script>
+
+<!-- Plugins -->
+
+
+  <script  src="/js/local-search.js" ></script>
+
+
+
+  
+    <script  src="/js/img-lazyload.js" ></script>
+  
+
+
+
+  
+
+
+
+  
+    <script  src="https://cdn.jsdelivr.net/npm/tocbot@4/dist/tocbot.min.js" ></script>
+  
+  
+    <script  src="https://cdn.jsdelivr.net/npm/@fancyapps/fancybox@3/dist/jquery.fancybox.min.js" ></script>
+  
+  
+    <script  src="https://cdn.jsdelivr.net/npm/anchor-js@4/anchor.min.js" ></script>
+  
+  
+    <script defer src="https://cdn.jsdelivr.net/npm/clipboard@2/dist/clipboard.min.js" ></script>
+  
+
+
+
+  <script defer src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js" ></script>
+
+
+
+
+  <script  src="https://cdn.jsdelivr.net/npm/typed.js@2/lib/typed.min.js" ></script>
+  <script>
+    (function (window, document) {
+      var typing = Fluid.plugins.typing;
+      var title = document.getElementById('subtitle').title;
+      
+      typing(title)
+      
+    })(window, document);
+  </script>
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+    <!-- Google Analytics -->
+    <script defer>
+      window.ga = window.ga || function () { (ga.q = ga.q || []).push(arguments) };
+      ga.l = +new Date;
+      ga('create', 'UA-167858469-1', 'auto');
+      ga('send', 'pageview');
+    </script>
+    <script async src='https://www.google-analytics.com/analytics.js'></script>
+  
+
+  
+
+  
+
+  
+
+  
+
+
+
+
+
+<!-- 主题的启动项 保持在最底部 -->
+<script  src="/js/boot.js" ></script>
+
+
+</body>
+</html>

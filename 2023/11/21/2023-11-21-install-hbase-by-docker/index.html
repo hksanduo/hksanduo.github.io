@@ -1,0 +1,563 @@
+
+
+<!DOCTYPE html>
+<html lang="zh-CN" data-default-color-scheme=auto>
+
+
+
+<head>
+  <meta charset="UTF-8">
+  <link rel="apple-touch-icon" sizes="76x76" href="/img/favicon.png">
+  <link rel="icon" href="/img/favicon.png">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, shrink-to-fit=no">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  
+  <meta name="theme-color" content="#2f4154">
+  <meta name="description" content="">
+  <meta name="author" content="sanduo">
+  <meta name="keywords" content="">
+  <meta name="description" content="在docker中安装hbase-3(本地模式) 背景最近在处理数据，传统的模式已经无法支撑千万级的任务分析和存储，被迫得升级一下当前的技术栈，为了方便和易于部署(图省事)，构造hbase-3(本地模式)容器来继研究学习。 构造hbase容器参考harisekhon&#x2F;hbase的脚本以及配置文件，结合hbase最新版本特征，重新修改的配置文件和脚本目录树如下： 配置Dockerfile其中">
+<meta property="og:type" content="article">
+<meta property="og:title" content="在docker中安装hbase-3(本地模式)">
+<meta property="og:url" content="https://hksanduo.github.io/2023/11/21/2023-11-21-install-hbase-by-docker/index.html">
+<meta property="og:site_name" content="sanduo blog">
+<meta property="og:description" content="在docker中安装hbase-3(本地模式) 背景最近在处理数据，传统的模式已经无法支撑千万级的任务分析和存储，被迫得升级一下当前的技术栈，为了方便和易于部署(图省事)，构造hbase-3(本地模式)容器来继研究学习。 构造hbase容器参考harisekhon&#x2F;hbase的脚本以及配置文件，结合hbase最新版本特征，重新修改的配置文件和脚本目录树如下： 配置Dockerfile其中">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://hksanduo.github.io/img/20231121-01.png">
+<meta property="og:image" content="https://hksanduo.github.io/img/20231121-02.png">
+<meta property="og:image" content="https://hksanduo.github.io/img/20231121-03.png">
+<meta property="og:image" content="https://hksanduo.github.io/img/20231121-05.png">
+<meta property="og:image" content="https://hksanduo.github.io/img/20231121-04.png">
+<meta property="article:published_time" content="2023-11-21T09:00:00.000Z">
+<meta property="article:modified_time" content="2025-01-18T14:54:10.082Z">
+<meta property="article:author" content="sanduo">
+<meta property="article:tag" content="BigData">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:image" content="https://hksanduo.github.io/img/20231121-01.png">
+  
+  <title>在docker中安装hbase-3(本地模式) - sanduo blog</title>
+
+  <link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4/dist/css/bootstrap.min.css" />
+
+
+  <link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/github-markdown-css@4/github-markdown.min.css" />
+  <link  rel="stylesheet" href="/lib/hint/hint.min.css" />
+
+  
+    
+    
+      
+      <link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/highlight.js@10/styles/github-gist.min.css" />
+    
+  
+
+  
+    <link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fancyapps/fancybox@3/dist/jquery.fancybox.min.css" />
+  
+
+
+<!-- 主题依赖的图标库，不要自行修改 -->
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1749284_ba1fz6golrf.css">
+
+
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1736178_kmeydafke9r.css">
+
+
+<link  rel="stylesheet" href="/css/main.css" />
+
+<!-- 自定义样式保持在最底部 -->
+
+
+  <script id="fluid-configs">
+    var Fluid = window.Fluid || {};
+    var CONFIG = {"hostname":"hksanduo.github.io","root":"/","version":"1.8.12","typing":{"enable":true,"typeSpeed":70,"cursorChar":"_","loop":false},"anchorjs":{"enable":true,"element":"h1,h2,h3,h4,h5,h6","placement":"right","visible":"hover","icon":""},"progressbar":{"enable":true,"height_px":3,"color":"#29d","options":{"showSpinner":false,"trickleSpeed":100}},"copy_btn":true,"image_zoom":{"enable":true,"img_url_replace":["",""]},"toc":{"enable":true,"headingSelector":"h1,h2,h3,h4,h5,h6","collapseDepth":0},"lazyload":{"enable":true,"loading_img":"/img/loading.gif","onlypost":false,"offset_factor":2},"web_analytics":{"enable":true,"baidu":null,"google":"UA-167858469-1","gtag":null,"tencent":{"sid":null,"cid":null},"woyaola":null,"cnzz":null,"leancloud":{"app_id":null,"app_key":null,"server_url":null,"path":"window.location.pathname"}},"search_path":"/local-search.xml"};
+  </script>
+  <script  src="/js/utils.js" ></script>
+  <script  src="/js/color-schema.js" ></script>
+<meta name="generator" content="Hexo 5.4.2"></head>
+
+
+<body>
+  <header style="height: 70vh;">
+    <nav id="navbar" class="navbar fixed-top  navbar-expand-lg navbar-dark scrolling-navbar">
+  <div class="container">
+    <a class="navbar-brand" href="/">
+      <strong>Welcome To Sanduo&#39;s Blog</strong>
+    </a>
+
+    <button id="navbar-toggler-btn" class="navbar-toggler" type="button" data-toggle="collapse"
+            data-target="#navbarSupportedContent"
+            aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+      <div class="animated-icon"><span></span><span></span><span></span></div>
+    </button>
+
+    <!-- Collapsible content -->
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+      <ul class="navbar-nav ml-auto text-center">
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/">
+                <i class="iconfont icon-home-fill"></i>
+                首页
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/archives/">
+                <i class="iconfont icon-archive-fill"></i>
+                归档
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/categories/">
+                <i class="iconfont icon-category-fill"></i>
+                分类
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/tags/">
+                <i class="iconfont icon-tags-fill"></i>
+                标签
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/about/">
+                <i class="iconfont icon-user-fill"></i>
+                关于
+              </a>
+            </li>
+          
+        
+        
+          <li class="nav-item" id="search-btn">
+            <a class="nav-link" target="_self" href="javascript:;" data-toggle="modal" data-target="#modalSearch" aria-label="Search">
+              &nbsp;<i class="iconfont icon-search"></i>&nbsp;
+            </a>
+          </li>
+        
+        
+          <li class="nav-item" id="color-toggle-btn">
+            <a class="nav-link" target="_self" href="javascript:;" aria-label="Color Toggle">&nbsp;<i
+                class="iconfont icon-dark" id="color-toggle-icon"></i>&nbsp;</a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+</nav>
+
+    <div class="banner" id="banner" parallax=true
+         style="background: url('/img/default.png') no-repeat center center;
+           background-size: cover;">
+      <div class="full-bg-img">
+        <div class="mask flex-center" style="background-color: rgba(0, 0, 0, 0.3)">
+          <div class="page-header text-center fade-in-up">
+            <span class="h2" id="subtitle" title="在docker中安装hbase-3(本地模式)">
+              
+            </span>
+
+            
+              <div class="mt-3">
+  
+  
+    <span class="post-meta">
+      <i class="iconfont icon-date-fill" aria-hidden="true"></i>
+      <time datetime="2023-11-21 09:00" pubdate>
+        2023年11月21日 上午
+      </time>
+    </span>
+  
+</div>
+
+<div class="mt-1">
+  
+    <span class="post-meta mr-2">
+      <i class="iconfont icon-chart"></i>
+      8.8k 字
+    </span>
+  
+
+  
+    <span class="post-meta mr-2">
+      <i class="iconfont icon-clock-fill"></i>
+      
+      
+      28 分钟
+    </span>
+  
+
+  
+  
+</div>
+
+            
+          </div>
+
+          
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <main>
+    
+      
+
+<div class="container-fluid nopadding-x">
+  <div class="row nomargin-x">
+    <div class="d-none d-lg-block col-lg-2"></div>
+    <div class="col-lg-8 nopadding-x-md">
+      <div class="container nopadding-x-md" id="board-ctn">
+        <div class="py-5" id="board">
+          <article class="post-content mx-auto">
+            <!-- SEO header -->
+            <h1 style="display: none">在docker中安装hbase-3(本地模式)</h1>
+            
+            <div class="markdown-body">
+              <h1 id="在docker中安装hbase-3-本地模式"><a href="#在docker中安装hbase-3-本地模式" class="headerlink" title="在docker中安装hbase-3(本地模式)"></a>在docker中安装hbase-3(本地模式)</h1><hr>
+<h2 id="背景"><a href="#背景" class="headerlink" title="背景"></a>背景</h2><p>最近在处理数据，传统的模式已经无法支撑千万级的任务分析和存储，被迫得升级一下当前的技术栈，为了方便和易于部署(图省事)，构造hbase-3(本地模式)容器来继研究学习。</p>
+<h2 id="构造hbase容器"><a href="#构造hbase容器" class="headerlink" title="构造hbase容器"></a>构造hbase容器</h2><p>参考harisekhon&#x2F;hbase的脚本以及配置文件，结合hbase最新版本特征，重新修改的配置文件和脚本目录树如下：<br><img src="/img/20231121-01.png" srcset="/img/loading.gif" lazyload alt="hbase容器目录"></p>
+<h3 id="配置"><a href="#配置" class="headerlink" title="配置"></a>配置</h3><h4 id="Dockerfile"><a href="#Dockerfile" class="headerlink" title="Dockerfile"></a>Dockerfile</h4><p>其中，Dockerfile如下：</p>
+<figure class="highlight dockerfile"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br></pre></td><td class="code"><pre><code class="hljs dockerfile"><span class="hljs-keyword">FROM</span> harisekhon/alpine-java:jre8<br><br><span class="hljs-keyword">ARG</span> HBASE_VERSION=<span class="hljs-number">3.0</span>.<span class="hljs-number">0</span>-alpha-<span class="hljs-number">4</span><br><br><span class="hljs-keyword">ENV</span> PATH $PATH:/hbase/bin<br><br><span class="hljs-keyword">ENV</span> JAVA_HOME=/usr<br><br><span class="hljs-keyword">WORKDIR</span><span class="language-bash"> / </span><br><br><span class="hljs-comment"># bash - needed for entrypoint.sh</span><br><span class="hljs-keyword">RUN</span><span class="language-bash"> apk add --no-cache bash</span><br><br><span class="hljs-keyword">RUN</span><span class="language-bash"> <span class="hljs-built_in">set</span> -eux &amp;&amp; \</span><br><span class="language-bash">    apk add --no-cache wget tar &amp;&amp; \</span><br><span class="language-bash">    url=<span class="hljs-string">&quot;http://www.apache.org/dyn/closer.lua?filename=hbase/<span class="hljs-variable">$HBASE_VERSION</span>/hbase-<span class="hljs-variable">$HBASE_VERSION</span>-bin.tar.gz&amp;action=download&quot;</span>; \</span><br><span class="language-bash">    url_archive=<span class="hljs-string">&quot;http://archive.apache.org/dist/hbase/<span class="hljs-variable">$HBASE_VERSION</span>/hbase-<span class="hljs-variable">$HBASE_VERSION</span>-bin.tar.gz&quot;</span>; \</span><br><span class="language-bash">    wget -t 10 --max-redirect 1 --retry-connrefused -O <span class="hljs-string">&quot;hbase-<span class="hljs-variable">$HBASE_VERSION</span>-bin.tar.gz&quot;</span> <span class="hljs-string">&quot;<span class="hljs-variable">$url</span>&quot;</span> || \</span><br><span class="language-bash">    wget -t 10 --max-redirect 1 --retry-connrefused -O <span class="hljs-string">&quot;hbase-<span class="hljs-variable">$HBASE_VERSION</span>-bin.tar.gz&quot;</span> <span class="hljs-string">&quot;<span class="hljs-variable">$url_archive</span>&quot;</span> &amp;&amp; \</span><br><span class="language-bash">    <span class="hljs-built_in">mkdir</span> <span class="hljs-string">&quot;hbase-<span class="hljs-variable">$HBASE_VERSION</span>&quot;</span> &amp;&amp; \</span><br><span class="language-bash">    tar zxf <span class="hljs-string">&quot;hbase-<span class="hljs-variable">$HBASE_VERSION</span>-bin.tar.gz&quot;</span> -C <span class="hljs-string">&quot;hbase-<span class="hljs-variable">$HBASE_VERSION</span>&quot;</span> --strip 1 &amp;&amp; \</span><br><span class="language-bash">    <span class="hljs-built_in">test</span> -d <span class="hljs-string">&quot;hbase-<span class="hljs-variable">$HBASE_VERSION</span>&quot;</span> &amp;&amp; \</span><br><span class="language-bash">    <span class="hljs-built_in">ln</span> -sv <span class="hljs-string">&quot;hbase-<span class="hljs-variable">$HBASE_VERSION</span>&quot;</span> hbase &amp;&amp; \</span><br><span class="language-bash">    <span class="hljs-built_in">rm</span> -fv <span class="hljs-string">&quot;hbase-<span class="hljs-variable">$HBASE_VERSION</span>-bin.tar.gz&quot;</span> &amp;&amp; \</span><br><span class="language-bash">    <span class="hljs-built_in">rm</span> -rf hbase/docs hbase/src &amp;&amp; \</span><br><span class="language-bash">    <span class="hljs-built_in">mkdir</span> /hbase-data &amp;&amp; \</span><br><span class="language-bash">    apk del tar wget</span><br><br><span class="hljs-comment"># Needed for HBase 2.0+ hbase-shell</span><br><span class="hljs-comment"># asciidoctor solves &#x27;NotImplementedError: fstat unimplemented unsupported or native support failed to load&#x27;</span><br><span class="hljs-keyword">RUN</span><span class="language-bash"> bash -c <span class="hljs-string">&#x27; \</span></span><br><span class="hljs-string"><span class="language-bash">    set -euxo pipefail &amp;&amp; \</span></span><br><span class="hljs-string"><span class="language-bash">    apk add --no-cache jruby jruby-irb asciidoctor &amp;&amp; \</span></span><br><span class="hljs-string"><span class="language-bash">    echo exit | hbase shell \</span></span><br><span class="hljs-string"><span class="language-bash">    # jruby-maven jruby-minitest jruby-rdoc jruby-rake jruby-testunit &amp;&amp; \</span></span><br><span class="hljs-string"><span class="language-bash">    &#x27;</span></span><br><br><span class="hljs-keyword">VOLUME</span><span class="language-bash"> /hbase-data</span><br><br><span class="hljs-keyword">COPY</span><span class="language-bash"> entrypoint.sh /</span><br><span class="hljs-keyword">COPY</span><span class="language-bash"> conf/hbase-site.xml /hbase/conf/</span><br><br><span class="hljs-comment"># Stargate  8080  / 8085</span><br><span class="hljs-comment"># Thrift    9090  / 9095</span><br><span class="hljs-comment"># HMaster   16000 / 16010</span><br><span class="hljs-comment"># RS        16201 / 16301</span><br><span class="hljs-keyword">EXPOSE</span> <span class="hljs-number">2181</span> <span class="hljs-number">8080</span> <span class="hljs-number">8085</span> <span class="hljs-number">9090</span> <span class="hljs-number">9095</span> <span class="hljs-number">16000</span> <span class="hljs-number">16010</span> <span class="hljs-number">16030</span> <span class="hljs-number">16201</span> <span class="hljs-number">16301</span><br><br><span class="hljs-keyword">ENTRYPOINT</span><span class="language-bash"> [<span class="hljs-string">&quot;/entrypoint.sh&quot;</span>]</span><br></code></pre></td></tr></table></figure>
+<p>Dockerfile说明：<br>如果觉得harisekhon&#x2F;alpine-java:jre8比较陈旧，可以自行编译构建，参考：alpine-java</p>
+<h4 id="hbase-site-xml"><a href="#hbase-site-xml" class="headerlink" title="hbase-site.xml"></a>hbase-site.xml</h4><p>conf&#x2F;hbase-site.xml 配置如下:</p>
+<figure class="highlight dust"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br></pre></td><td class="code"><pre><code class="hljs dust"><span class="language-xml"><span class="hljs-meta">&lt;?xml version=<span class="hljs-string">&quot;1.0&quot;</span>?&gt;</span></span><br><span class="language-xml"><span class="hljs-meta">&lt;?xml-stylesheet type=<span class="hljs-string">&quot;text/xsl&quot;</span> href=<span class="hljs-string">&quot;configuration.xsl&quot;</span>?&gt;</span></span><br><span class="language-xml"><span class="hljs-tag">&lt;<span class="hljs-name">configuration</span>&gt;</span></span><br><span class="language-xml">  <span class="hljs-tag">&lt;<span class="hljs-name">property</span>&gt;</span></span><br><span class="language-xml">    <span class="hljs-tag">&lt;<span class="hljs-name">name</span>&gt;</span>hbase.cluster.distributed<span class="hljs-tag">&lt;/<span class="hljs-name">name</span>&gt;</span></span><br><span class="language-xml">    <span class="hljs-tag">&lt;<span class="hljs-name">value</span>&gt;</span>true<span class="hljs-tag">&lt;/<span class="hljs-name">value</span>&gt;</span></span><br><span class="language-xml">  <span class="hljs-tag">&lt;/<span class="hljs-name">property</span>&gt;</span></span><br><span class="language-xml">  <span class="hljs-tag">&lt;<span class="hljs-name">property</span>&gt;</span></span><br><span class="language-xml">    <span class="hljs-tag">&lt;<span class="hljs-name">name</span>&gt;</span>hbase.rootdir<span class="hljs-tag">&lt;/<span class="hljs-name">name</span>&gt;</span></span><br><span class="language-xml">    <span class="hljs-tag">&lt;<span class="hljs-name">value</span>&gt;</span>/hbase-data<span class="hljs-tag">&lt;/<span class="hljs-name">value</span>&gt;</span></span><br><span class="language-xml">  <span class="hljs-tag">&lt;/<span class="hljs-name">property</span>&gt;</span></span><br><span class="language-xml">  <span class="hljs-tag">&lt;<span class="hljs-name">property</span>&gt;</span></span><br><span class="language-xml">    <span class="hljs-tag">&lt;<span class="hljs-name">name</span>&gt;</span>hbase.zookeeper.quorum<span class="hljs-tag">&lt;/<span class="hljs-name">name</span>&gt;</span></span><br><span class="language-xml">    <span class="hljs-tag">&lt;<span class="hljs-name">value</span>&gt;</span>zookeeper:2181<span class="hljs-tag">&lt;/<span class="hljs-name">value</span>&gt;</span></span><br><span class="language-xml">  <span class="hljs-tag">&lt;/<span class="hljs-name">property</span>&gt;</span></span><br><span class="language-xml">  <span class="hljs-tag">&lt;<span class="hljs-name">property</span>&gt;</span></span><br><span class="language-xml">    <span class="hljs-tag">&lt;<span class="hljs-name">name</span>&gt;</span>hbase.tmp.dir<span class="hljs-tag">&lt;/<span class="hljs-name">name</span>&gt;</span></span><br><span class="language-xml">    <span class="hljs-tag">&lt;<span class="hljs-name">value</span>&gt;</span>$</span><span class="hljs-template-variable">&#123;env.HBASE_HOME:-.&#125;</span><span class="language-xml">/tmp<span class="hljs-tag">&lt;/<span class="hljs-name">value</span>&gt;</span></span><br><span class="language-xml">  <span class="hljs-tag">&lt;/<span class="hljs-name">property</span>&gt;</span></span><br><span class="language-xml">  <span class="hljs-tag">&lt;<span class="hljs-name">property</span>&gt;</span></span><br><span class="language-xml">    <span class="hljs-tag">&lt;<span class="hljs-name">name</span>&gt;</span>hbase.unsafe.stream.capability.enforce<span class="hljs-tag">&lt;/<span class="hljs-name">name</span>&gt;</span></span><br><span class="language-xml">    <span class="hljs-tag">&lt;<span class="hljs-name">value</span>&gt;</span>false<span class="hljs-tag">&lt;/<span class="hljs-name">value</span>&gt;</span></span><br><span class="language-xml">  <span class="hljs-tag">&lt;/<span class="hljs-name">property</span>&gt;</span></span><br><span class="language-xml"><span class="hljs-tag">&lt;/<span class="hljs-name">configuration</span>&gt;</span></span><br><span class="language-xml"></span><br></code></pre></td></tr></table></figure>
+<p>hbase-site.xml 配置说明：<br>这个配置文件主要是针对本地模式进行修改的，并不适配集群。</p>
+<h4 id="docker-compose-yaml"><a href="#docker-compose-yaml" class="headerlink" title="docker-compose.yaml"></a>docker-compose.yaml</h4><p>docker-compose.yaml 如下：</p>
+<figure class="highlight nestedtext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br></pre></td><td class="code"><pre><code class="hljs nestedtext"><span class="hljs-attribute">version</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&#x27;3&#x27;</span><br><br><span class="hljs-attribute">services</span><span class="hljs-punctuation">:</span><br>    <span class="hljs-attribute">hbase</span><span class="hljs-punctuation">:</span><br>        <span class="hljs-attribute">image</span><span class="hljs-punctuation">:</span> <span class="hljs-string">hksanduo/hbase:3.0.0-alpha-4</span><br>        <span class="hljs-attribute">container_name</span><span class="hljs-punctuation">:</span> <span class="hljs-string">hbase</span><br>        <span class="hljs-attribute">hostname</span><span class="hljs-punctuation">:</span> <span class="hljs-string">master</span><br>        <span class="hljs-attribute">restart</span><span class="hljs-punctuation">:</span> <span class="hljs-string">always</span><br>        <span class="hljs-attribute">logging</span><span class="hljs-punctuation">:</span><br>          <span class="hljs-attribute">driver</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;json-file&quot;</span><br>          <span class="hljs-attribute">options</span><span class="hljs-punctuation">:</span><br>            <span class="hljs-attribute">max-size</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;500m&quot;</span><br>        <span class="hljs-attribute">ports</span><span class="hljs-punctuation">:</span><br>          <span class="hljs-bullet">-</span> <span class="hljs-string">2181:2181</span><br>          <span class="hljs-bullet">-</span> <span class="hljs-string">8080:8080</span><br>          <span class="hljs-bullet">-</span> <span class="hljs-string">8085:8085</span><br>          <span class="hljs-bullet">-</span> <span class="hljs-string">9090:9090</span><br>          <span class="hljs-bullet">-</span> <span class="hljs-string">9095:9095</span><br>          <span class="hljs-bullet">-</span> <span class="hljs-string">16000:16000</span><br>          <span class="hljs-bullet">-</span> <span class="hljs-string">16010:16010</span><br>          <span class="hljs-bullet">-</span> <span class="hljs-string">16020:16020</span><br>          <span class="hljs-bullet">-</span> <span class="hljs-string">16030:16030</span><br>        <span class="hljs-attribute">volumes</span><span class="hljs-punctuation">:</span><br>          <span class="hljs-bullet">-</span> <span class="hljs-string">./hbase-data:/hbase-data</span><br>        <span class="hljs-attribute">environment</span><span class="hljs-punctuation">:</span><br>          <span class="hljs-bullet">-</span> <span class="hljs-string">TZ=Asia/Shanghai</span><br>        <span class="hljs-attribute">privileged</span><span class="hljs-punctuation">:</span> <span class="hljs-string">true</span><br><br></code></pre></td></tr></table></figure>
+<p>这里将当前目录的hbase-data目录进行映射，做到数据持久化。</p>
+<h4 id="entrypoint-sh"><a href="#entrypoint-sh" class="headerlink" title="entrypoint.sh"></a>entrypoint.sh</h4><p>entrypoint.sh 如下：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br><span class="line">100</span><br><span class="line">101</span><br><span class="line">102</span><br><span class="line">103</span><br><span class="line">104</span><br><span class="line">105</span><br><span class="line">106</span><br><span class="line">107</span><br><span class="line">108</span><br><span class="line">109</span><br><span class="line">110</span><br><span class="line">111</span><br><span class="line">112</span><br><span class="line">113</span><br><span class="line">114</span><br><span class="line">115</span><br><span class="line">116</span><br><span class="line">117</span><br><span class="line">118</span><br><span class="line">119</span><br><span class="line">120</span><br><span class="line">121</span><br><span class="line">122</span><br><span class="line">123</span><br><span class="line">124</span><br><span class="line">125</span><br><span class="line">126</span><br><span class="line">127</span><br><span class="line">128</span><br><span class="line">129</span><br><span class="line">130</span><br><span class="line">131</span><br><span class="line">132</span><br><span class="line">133</span><br><span class="line">134</span><br><span class="line">135</span><br><span class="line">136</span><br><span class="line">137</span><br><span class="line">138</span><br></pre></td><td class="code"><pre><code class="hljs bash"><span class="hljs-meta">#!/usr/bin/env bash</span><br><br><span class="hljs-built_in">set</span> -x<br><span class="hljs-built_in">set</span> -euo pipefail<br>[ -n <span class="hljs-string">&quot;<span class="hljs-variable">$&#123;DEBUG:-&#125;</span>&quot;</span> ] &amp;&amp; <span class="hljs-built_in">set</span> -x<br><br><br><span class="hljs-built_in">export</span> HBASE_HOME=<span class="hljs-string">&quot;/hbase&quot;</span><br><span class="hljs-built_in">export</span> JAVA_HOME=<span class="hljs-string">&quot;<span class="hljs-variable">$&#123;JAVA_HOME:-/usr&#125;</span>&quot;</span><br><br><span class="hljs-built_in">echo</span> <span class="hljs-string">&quot;================================================================================&quot;</span><br><span class="hljs-built_in">echo</span> <span class="hljs-string">&quot;                              HBase Docker Container&quot;</span><br><span class="hljs-built_in">echo</span> <span class="hljs-string">&quot;================================================================================&quot;</span><br><span class="hljs-built_in">echo</span><br><span class="hljs-comment"># shell breaks and doesn&#x27;t run zookeeper without this</span><br><span class="hljs-built_in">mkdir</span> -pv <span class="hljs-string">&quot;<span class="hljs-variable">$HBASE_HOME</span>/logs&quot;</span><br><br><span class="hljs-function"><span class="hljs-title">start_zookeeper</span></span>()&#123;<br>    <span class="hljs-comment"># tries to run zookeepers.sh distributed via SSH, run zookeeper manually instead now</span><br>    <span class="hljs-comment">#RUN sed -i &#x27;s/# export HBASE_MANAGES_ZK=true/export HBASE_MANAGES_ZK=true/&#x27; &quot;$HBASE_HOME/conf/hbase-env.sh&quot;</span><br>    <span class="hljs-built_in">echo</span><br>    <span class="hljs-built_in">echo</span> <span class="hljs-string">&quot;Starting Zookeeper...&quot;</span><br>    <span class="hljs-string">&quot;<span class="hljs-variable">$HBASE_HOME</span>/bin/hbase&quot;</span> zookeeper &amp;&gt;<span class="hljs-string">&quot;<span class="hljs-variable">$HBASE_HOME</span>/logs/zookeeper.log&quot;</span> &amp;<br>    <span class="hljs-built_in">echo</span><br>&#125;<br><br><span class="hljs-function"><span class="hljs-title">start_master</span></span>()&#123;<br>    <span class="hljs-built_in">echo</span> <span class="hljs-string">&quot;Starting HBase Master...&quot;</span><br>    <span class="hljs-string">&quot;<span class="hljs-variable">$HBASE_HOME</span>/bin/hbase-daemon.sh&quot;</span> start master<br>    <span class="hljs-built_in">echo</span><br>&#125;<br><br><span class="hljs-function"><span class="hljs-title">start_regionserver</span></span>()&#123;<br>    <span class="hljs-built_in">echo</span> <span class="hljs-string">&quot;Starting HBase RegionServer...&quot;</span><br>    <span class="hljs-comment"># HBase versions &lt; 1.0 fail to start RegionServer without SSH being installed</span><br>    <span class="hljs-keyword">if</span> [ <span class="hljs-string">&quot;<span class="hljs-subst">$(echo /hbase-* | sed &#x27;s,/hbase-,,&#x27; | cut -c 1)</span>&quot;</span> = 0 ]; <span class="hljs-keyword">then</span><br>        <span class="hljs-string">&quot;<span class="hljs-variable">$HBASE_HOME</span>/bin/local-regionservers.sh&quot;</span> start 1<br>    <span class="hljs-keyword">else</span><br>        <span class="hljs-string">&quot;<span class="hljs-variable">$HBASE_HOME</span>/bin/hbase-daemon.sh&quot;</span> start regionserver<br>    <span class="hljs-keyword">fi</span><br>    <span class="hljs-built_in">echo</span><br>&#125;<br><br><span class="hljs-function"><span class="hljs-title">start_stargate</span></span>()&#123;<br>    <span class="hljs-comment"># kill any pre-existing rest instances before starting new ones</span><br>    pgrep -f proc_rest &amp;&amp; pkill -9 -f proc_rest<br>    <span class="hljs-built_in">echo</span> <span class="hljs-string">&quot;Starting HBase Stargate Rest API server...&quot;</span><br>    <span class="hljs-string">&quot;<span class="hljs-variable">$HBASE_HOME</span>/bin/hbase-daemon.sh&quot;</span> start rest<br>    <span class="hljs-built_in">echo</span><br>&#125;<br><br><span class="hljs-function"><span class="hljs-title">start_thrift</span></span>()&#123;<br>    <span class="hljs-comment"># kill any pre-existing thrift instances before starting new ones</span><br>    pgrep -f proc_thrift &amp;&amp; pkill -9 -f proc_thrift<br>    <span class="hljs-built_in">echo</span> <span class="hljs-string">&quot;Starting HBase Thrift API server...&quot;</span><br>    <span class="hljs-comment">#&quot;$HBASE_HOME/bin/hbase-daemon.sh&quot; start thrift</span><br>    <span class="hljs-string">&quot;<span class="hljs-variable">$HBASE_HOME</span>/bin/hbase-daemon.sh&quot;</span> start thrift2<br>    <span class="hljs-built_in">echo</span><br>&#125;<br><br><span class="hljs-function"><span class="hljs-title">start_hbase_shell</span></span>()&#123;<br>    <span class="hljs-built_in">echo</span> <span class="hljs-string">&quot;</span><br><span class="hljs-string">Example Usage:</span><br><span class="hljs-string"></span><br><span class="hljs-string">create &#x27;table1&#x27;, &#x27;columnfamily1&#x27;</span><br><span class="hljs-string"></span><br><span class="hljs-string">put &#x27;table1&#x27;, &#x27;row1&#x27;, &#x27;columnfamily1:column1&#x27;, &#x27;value1&#x27;</span><br><span class="hljs-string"></span><br><span class="hljs-string">get &#x27;table1&#x27;, &#x27;row1&#x27;</span><br><span class="hljs-string"></span><br><span class="hljs-string"></span><br><span class="hljs-string">Now starting HBase Shell...</span><br><span class="hljs-string">&quot;</span><br>    <span class="hljs-string">&quot;<span class="hljs-variable">$HBASE_HOME</span>/bin/hbase&quot;</span> shell<br>&#125;<br><br><span class="hljs-function"><span class="hljs-title">trap_func</span></span>()&#123;<br>    <span class="hljs-built_in">echo</span> -e <span class="hljs-string">&#x27;\n\nShutting down HBase:&#x27;</span><br>    <span class="hljs-string">&quot;<span class="hljs-variable">$HBASE_HOME</span>/bin/hbase-daemon.sh&quot;</span> stop rest || :<br>    <span class="hljs-string">&quot;<span class="hljs-variable">$HBASE_HOME</span>/bin/hbase-daemon.sh&quot;</span> stop thrift || :<br>    <span class="hljs-string">&quot;<span class="hljs-variable">$HBASE_HOME</span>/bin/local-regionservers.sh&quot;</span> stop 1 || :<br>    <span class="hljs-comment"># let&#x27;s not confuse users with superficial errors in the Apache HBase scripts</span><br>    <span class="hljs-string">&quot;<span class="hljs-variable">$HBASE_HOME</span>/bin/stop-hbase.sh&quot;</span> |<br>        grep -v -e <span class="hljs-string">&quot;ssh: command not found&quot;</span> \<br>                -e <span class="hljs-string">&quot;kill: you need to specify whom to kill&quot;</span> \<br>                -e <span class="hljs-string">&quot;kill: can&#x27;t kill pid .*: No such process&quot;</span><br>    <span class="hljs-built_in">sleep</span> 2<br>    pgrep -fla org.apache.hadoop.hbase |<br>        grep -vi org.apache.hadoop.hbase.zookeeper |<br>            awk <span class="hljs-string">&#x27;&#123;print $1&#125;&#x27;</span> |<br>                xargs <span class="hljs-built_in">kill</span> 2&gt;/dev/null || :<br>    <span class="hljs-built_in">sleep</span> 3<br>    pkill -f org.apache.hadoop.hbase.zookeeper 2&gt;/dev/null || :<br>    <span class="hljs-built_in">sleep</span> 2<br>&#125;<br><span class="hljs-built_in">trap</span> trap_func INT QUIT TRAP ABRT TERM EXIT<br><br><span class="hljs-keyword">if</span> [ -n <span class="hljs-string">&quot;$*&quot;</span> ]; <span class="hljs-keyword">then</span><br>    <span class="hljs-keyword">if</span> [ <span class="hljs-string">&quot;<span class="hljs-variable">$1</span>&quot;</span> = master ] || [ <span class="hljs-string">&quot;<span class="hljs-variable">$1</span>&quot;</span> = m ]; <span class="hljs-keyword">then</span><br>        start_master<br>        <span class="hljs-built_in">tail</span> -f /dev/null <span class="hljs-string">&quot;<span class="hljs-variable">$HBASE_HOME</span>/logs/&quot;</span>* &amp;<br>    <span class="hljs-keyword">elif</span> [ <span class="hljs-string">&quot;<span class="hljs-variable">$1</span>&quot;</span> = regionserver ] || [ <span class="hljs-string">&quot;<span class="hljs-variable">$1</span>&quot;</span> = rs ]; <span class="hljs-keyword">then</span><br>        start_regionserver<br>        <span class="hljs-built_in">tail</span> -f /dev/null <span class="hljs-string">&quot;<span class="hljs-variable">$HBASE_HOME</span>/logs/&quot;</span>* &amp;<br>    <span class="hljs-keyword">elif</span> [ <span class="hljs-string">&quot;<span class="hljs-variable">$1</span>&quot;</span> = rest ] || [ <span class="hljs-string">&quot;<span class="hljs-variable">$1</span>&quot;</span> = stargate ]; <span class="hljs-keyword">then</span><br>        start_stargate<br>        <span class="hljs-built_in">tail</span> -f /dev/null <span class="hljs-string">&quot;<span class="hljs-variable">$HBASE_HOME</span>/logs/&quot;</span>* &amp;<br>    <span class="hljs-keyword">elif</span> [ <span class="hljs-string">&quot;<span class="hljs-variable">$1</span>&quot;</span> = thrift ]; <span class="hljs-keyword">then</span><br>        start_thrift<br>        <span class="hljs-built_in">tail</span> -f /dev/null <span class="hljs-string">&quot;<span class="hljs-variable">$HBASE_HOME</span>/logs/&quot;</span>* &amp;<br>    <span class="hljs-keyword">elif</span> [ <span class="hljs-string">&quot;<span class="hljs-variable">$1</span>&quot;</span> = shell ]; <span class="hljs-keyword">then</span><br>        <span class="hljs-string">&quot;<span class="hljs-variable">$HBASE_HOME</span>/bin/hbase&quot;</span> shell<br>    <span class="hljs-keyword">elif</span> [ <span class="hljs-string">&quot;<span class="hljs-variable">$1</span>&quot;</span> = bash ]; <span class="hljs-keyword">then</span><br>        bash<br>    <span class="hljs-keyword">else</span><br>        <span class="hljs-built_in">echo</span> <span class="hljs-string">&quot;usage:  must specify one of: master, regionserver, thrift, rest, shell, bash&quot;</span><br>    <span class="hljs-keyword">fi</span><br><span class="hljs-keyword">else</span><br>    sed -i <span class="hljs-string">&#x27;s/zookeeper:2181/localhost:2181/&#x27;</span> <span class="hljs-string">&quot;<span class="hljs-variable">$HBASE_HOME</span>/conf/hbase-site.xml&quot;</span><br>    start_zookeeper<br>    start_master<br>    start_regionserver<br>    start_stargate<br>    start_thrift<br>    <span class="hljs-keyword">if</span> [ -t 0 ]; <span class="hljs-keyword">then</span><br>        start_hbase_shell<br>    <span class="hljs-keyword">else</span><br>        <span class="hljs-built_in">echo</span> <span class="hljs-string">&quot;</span><br><span class="hljs-string">    Running non-interactively, will not open HBase shell</span><br><span class="hljs-string"></span><br><span class="hljs-string">    For HBase shell start this image with &#x27;docker run -t -i&#x27; switches</span><br><span class="hljs-string">    &quot;</span><br>        <span class="hljs-built_in">tail</span> -f /dev/null <span class="hljs-string">&quot;<span class="hljs-variable">$HBASE_HOME</span>/logs/&quot;</span>* &amp;<br>        <span class="hljs-comment"># this shuts down from Control-C but exits prematurely, even when +euo pipefail and doesn&#x27;t shut down HBase</span><br>        <span class="hljs-comment"># so I rely on the sig trap handler above</span><br>    <span class="hljs-keyword">fi</span><br><span class="hljs-keyword">fi</span><br><span class="hljs-built_in">wait</span> || :<br></code></pre></td></tr></table></figure>
+<p>说明：entrypoint.sh 中默认启用的是thrift2，如果需要thrift，请自行修改</p>
+<h3 id="构建运行镜像"><a href="#构建运行镜像" class="headerlink" title="构建运行镜像"></a>构建运行镜像</h3><p>将以上内容，按照上述目录结构进行保存，需要注意，提前赋予entrypoint.sh执行权限，然后进行构建，构建命令如下：</p>
+<p><code>docker build -t hksanduo/hbase:3.0.0-alpha-4 .</code></p>
+<p>构建成功如下：<br><img src="/img/20231121-02.png" srcset="/img/loading.gif" lazyload alt="构建成功"></p>
+<p>如果映射端口有所调整，请自行修改docker-compose.yaml，如果没有，直接执行<code>docker-compose up -d</code></p>
+<p>稍等片刻，访问：http:&#x2F;&#x2F;{your server ip}:10610&#x2F; 如果能够正常加载HBase Master web 界面证明运行成功。<br><img src="/img/20231121-03.png" srcset="/img/loading.gif" lazyload alt=" master status "></p>
+<h3 id="错误"><a href="#错误" class="headerlink" title="错误"></a>错误</h3><h4 id="NotImplementedError-fstat-unimplemented-unsupported-or-native-support-failed-to-load-see-https-github-com-jruby-jruby-wiki-Native-Libraries"><a href="#NotImplementedError-fstat-unimplemented-unsupported-or-native-support-failed-to-load-see-https-github-com-jruby-jruby-wiki-Native-Libraries" class="headerlink" title="NotImplementedError: fstat unimplemented unsupported or native support failed to load; see https://github.com/jruby/jruby/wiki/Native-Libraries"></a>NotImplementedError: fstat unimplemented unsupported or native support failed to load; see <a target="_blank" rel="noopener" href="https://github.com/jruby/jruby/wiki/Native-Libraries">https://github.com/jruby/jruby/wiki/Native-Libraries</a></h4><p><img src="/img/20231121-05.png" srcset="/img/loading.gif" lazyload alt="错误"><br>本次使用的基础镜像<code>harisekhon/alpine-java:jre8</code>已经好多年没更新了，安装低版本hbase(&lt;&#x3D;2.5.6)以下，并不会遇到这个问题，如果手动将alpine配置成3.13以上或者安装jruby(&gt;&#x3D;9.2.13)以上，就会遇到这个问题，这个问题网上的解决方案都是安装jruby和asciidoctor来解决，我们这里已经安装，同样这个问题可能是jruby过高而导致的兼容性问题，遇到这个问题，可以将hbase的安装下载回来，解压查看 hbase-{version}&#x2F;lib&#x2F;ruby 下jruby-complete版本，只要安装的jruby版本不高于jruby-complete即可，这个修复方案可能随着时间发展，兼容更强，各位谨慎参考。</p>
+<p><img src="/img/20231121-04.png" srcset="/img/loading.gif" lazyload alt=" jruby-complete "></p>
+<h2 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h2><ul>
+<li><a target="_blank" rel="noopener" href="https://github.com/harisekhon/Dockerfiles">https://github.com/harisekhon/Dockerfiles</a>【harisekhon hbase github】</li>
+<li><a target="_blank" rel="noopener" href="https://hub.docker.com/r/harisekhon/hbase">https://hub.docker.com/r/harisekhon/hbase</a>【harisekhon hbase】</li>
+<li><a target="_blank" rel="noopener" href="https://github.com/apache/hbase">https://github.com/apache/hbase</a>【hbase】</li>
+<li><a target="_blank" rel="noopener" href="https://github.com/harisekhon/Dockerfiles/tree/master/alpine-java">https://github.com/harisekhon/Dockerfiles/tree/master/alpine-java</a>【alpine java】</li>
+</ul>
+
+            </div>
+            <hr>
+            <div>
+              <div class="post-metas mb-3">
+                
+                  <div class="post-meta mr-3">
+                    <i class="iconfont icon-category"></i>
+                    
+                      <a class="hover-with-bg" href="/categories/Linux/">Linux</a>
+                    
+                  </div>
+                
+                
+                  <div class="post-meta">
+                    <i class="iconfont icon-tags"></i>
+                    
+                      <a class="hover-with-bg" href="/tags/BigData/">BigData</a>
+                    
+                  </div>
+                
+              </div>
+              
+                <p class="note note-warning">
+                  
+                    本博客所有文章除特别声明外，均采用 <a target="_blank" href="https://creativecommons.org/licenses/by-sa/4.0/deed.zh" rel="nofollow noopener noopener">CC BY-SA 4.0 协议</a> ，转载请注明出处！
+                  
+                </p>
+              
+              
+                <div class="post-prevnext">
+                  <article class="post-prev col-6">
+                    
+                    
+                      <a href="/2023/12/11/2023-12-11-Hijackable-Go-Module-Repositories/">
+                        <i class="iconfont icon-arrowleft"></i>
+                        <span class="hidden-mobile">Go 模块库劫持 (repojacking) 介绍 from VulnCheck</span>
+                        <span class="visible-mobile">上一篇</span>
+                      </a>
+                    
+                  </article>
+                  <article class="post-next col-6">
+                    
+                    
+                      <a href="/2023/11/10/2023-11-10-install-nexus-and-add-repos/">
+                        <span class="hidden-mobile">在nexus添加pipy代理源</span>
+                        <span class="visible-mobile">下一篇</span>
+                        <i class="iconfont icon-arrowright"></i>
+                      </a>
+                    
+                  </article>
+                </div>
+              
+            </div>
+
+            
+              <!-- Comments -->
+              <article class="comments" id="comments" lazyload>
+                
+                  
+                
+                
+  <script type="text/javascript">
+    Fluid.utils.loadComments('#comments', function() {
+      var light = 'github-light';
+      var dark = 'github-dark';
+      var schema = document.documentElement.getAttribute('data-user-color-scheme');
+      if (schema === 'dark') {
+        schema = dark;
+      } else {
+        schema = light;
+      }
+      window.UtterancesThemeLight = light;
+      window.UtterancesThemeDark = dark;
+      var s = document.createElement('script');
+      s.setAttribute('src', 'https://utteranc.es/client.js');
+      s.setAttribute('repo', 'hksanduo/commit-utterances');
+      s.setAttribute('issue-term', 'title');
+      
+      s.setAttribute('label', 'utterances');
+      
+      s.setAttribute('theme', schema);
+      s.setAttribute('crossorigin', 'anonymous');
+      document.getElementById('comments').appendChild(s);
+    })
+  </script>
+  <noscript>Please enable JavaScript to view the comments</noscript>
+
+
+              </article>
+            
+          </article>
+        </div>
+      </div>
+    </div>
+    
+      <div class="d-none d-lg-block col-lg-2 toc-container" id="toc-ctn">
+        <div id="toc">
+  <p class="toc-header"><i class="iconfont icon-list"></i>&nbsp;目录</p>
+  <div class="toc-body" id="toc-body"></div>
+</div>
+
+      </div>
+    
+  </div>
+</div>
+
+<!-- Custom -->
+
+
+    
+
+    
+      <a id="scroll-top-button" aria-label="TOP" href="#" role="button">
+        <i class="iconfont icon-arrowup" aria-hidden="true"></i>
+      </a>
+    
+
+    
+      <div class="modal fade" id="modalSearch" tabindex="-1" role="dialog" aria-labelledby="ModalLabel"
+     aria-hidden="true">
+  <div class="modal-dialog modal-dialog-scrollable modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header text-center">
+        <h4 class="modal-title w-100 font-weight-bold">搜索</h4>
+        <button type="button" id="local-search-close" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body mx-3">
+        <div class="md-form mb-5">
+          <input type="text" id="local-search-input" class="form-control validate">
+          <label data-error="x" data-success="v"
+                 for="local-search-input">关键词</label>
+        </div>
+        <div class="list-group" id="local-search-result"></div>
+      </div>
+    </div>
+  </div>
+</div>
+    
+
+    
+  </main>
+
+  <footer class="text-center mt-5 py-3">
+  <div class="footer-content">
+     <a href="https://hexo.io" target="_blank" rel="nofollow noopener"><span>Hexo</span></a> <i class="iconfont icon-love"></i> <a href="https://github.com/fluid-dev/hexo-theme-fluid" target="_blank" rel="nofollow noopener"><span>Fluid</span></a> 
+  </div>
+  
+  <div class="statistics">
+    
+    
+
+    
+      
+        <!-- 不蒜子统计PV -->
+        <span id="busuanzi_container_site_pv" style="display: none">
+            总访问量 
+            <span id="busuanzi_value_site_pv"></span>
+             次
+          </span>
+      
+      
+        <!-- 不蒜子统计UV -->
+        <span id="busuanzi_container_site_uv" style="display: none">
+            总访客数 
+            <span id="busuanzi_value_site_uv"></span>
+             人
+          </span>
+      
+    
+  </div>
+
+
+  
+
+  
+</footer>
+
+
+  <!-- SCRIPTS -->
+  
+  <script  src="https://cdn.jsdelivr.net/npm/nprogress@0/nprogress.min.js" ></script>
+  <link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/nprogress@0/nprogress.min.css" />
+
+  <script>
+    NProgress.configure({"showSpinner":false,"trickleSpeed":100})
+    NProgress.start()
+    window.addEventListener('load', function() {
+      NProgress.done();
+    })
+  </script>
+
+
+<script  src="https://cdn.jsdelivr.net/npm/jquery@3/dist/jquery.min.js" ></script>
+<script  src="https://cdn.jsdelivr.net/npm/bootstrap@4/dist/js/bootstrap.min.js" ></script>
+<script  src="/js/events.js" ></script>
+<script  src="/js/plugins.js" ></script>
+
+<!-- Plugins -->
+
+
+  <script  src="/js/local-search.js" ></script>
+
+
+
+  
+    <script  src="/js/img-lazyload.js" ></script>
+  
+
+
+
+  
+
+
+
+  
+    <script  src="https://cdn.jsdelivr.net/npm/tocbot@4/dist/tocbot.min.js" ></script>
+  
+  
+    <script  src="https://cdn.jsdelivr.net/npm/@fancyapps/fancybox@3/dist/jquery.fancybox.min.js" ></script>
+  
+  
+    <script  src="https://cdn.jsdelivr.net/npm/anchor-js@4/anchor.min.js" ></script>
+  
+  
+    <script defer src="https://cdn.jsdelivr.net/npm/clipboard@2/dist/clipboard.min.js" ></script>
+  
+
+
+
+  <script defer src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js" ></script>
+
+
+
+
+  <script  src="https://cdn.jsdelivr.net/npm/typed.js@2/lib/typed.min.js" ></script>
+  <script>
+    (function (window, document) {
+      var typing = Fluid.plugins.typing;
+      var title = document.getElementById('subtitle').title;
+      
+      typing(title)
+      
+    })(window, document);
+  </script>
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+    <!-- Google Analytics -->
+    <script defer>
+      window.ga = window.ga || function () { (ga.q = ga.q || []).push(arguments) };
+      ga.l = +new Date;
+      ga('create', 'UA-167858469-1', 'auto');
+      ga('send', 'pageview');
+    </script>
+    <script async src='https://www.google-analytics.com/analytics.js'></script>
+  
+
+  
+
+  
+
+  
+
+  
+
+
+
+
+
+<!-- 主题的启动项 保持在最底部 -->
+<script  src="/js/boot.js" ></script>
+
+
+</body>
+</html>

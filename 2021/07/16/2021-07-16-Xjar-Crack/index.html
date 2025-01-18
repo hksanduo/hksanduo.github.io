@@ -1,0 +1,577 @@
+
+
+<!DOCTYPE html>
+<html lang="zh-CN" data-default-color-scheme=auto>
+
+
+
+<head>
+  <meta charset="UTF-8">
+  <link rel="apple-touch-icon" sizes="76x76" href="/img/favicon.png">
+  <link rel="icon" href="/img/favicon.png">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, shrink-to-fit=no">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  
+  <meta name="theme-color" content="#2f4154">
+  <meta name="description" content="">
+  <meta name="author" content="sanduo">
+  <meta name="keywords" content="">
+  <meta name="description" content="Xjar加密破解  背景研发人员在客户侧部署系统时，为了防止更多源代码信息泄露，通常会将源码打包成二进制包，其中参杂一些混淆和加密的操作，防止逆向分析，安全人员在做测试，或者从一些泄露出来的二进制包进行漏洞挖掘时，总会遇到这些拦路虎，博主在逆向分析某系统jar包时就发现可以自动获取class文件，但是class内数据均被加密，打开全是乱码，但是spring boot启动相关代码是可以通过反编译获取">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Xjar加密破解">
+<meta property="og:url" content="https://hksanduo.github.io/2021/07/16/2021-07-16-Xjar-Crack/index.html">
+<meta property="og:site_name" content="sanduo blog">
+<meta property="og:description" content="Xjar加密破解  背景研发人员在客户侧部署系统时，为了防止更多源代码信息泄露，通常会将源码打包成二进制包，其中参杂一些混淆和加密的操作，防止逆向分析，安全人员在做测试，或者从一些泄露出来的二进制包进行漏洞挖掘时，总会遇到这些拦路虎，博主在逆向分析某系统jar包时就发现可以自动获取class文件，但是class内数据均被加密，打开全是乱码，但是spring boot启动相关代码是可以通过反编译获取">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://hksanduo.github.io/img/20210716-01.png">
+<meta property="og:image" content="https://hksanduo.github.io/img/20210716-02.png">
+<meta property="og:image" content="https://hksanduo.github.io/img/20210716-03.png">
+<meta property="og:image" content="https://hksanduo.github.io/img/20210716-04.png">
+<meta property="article:published_time" content="2021-07-16T02:13:00.000Z">
+<meta property="article:modified_time" content="2025-01-18T14:54:10.080Z">
+<meta property="article:author" content="sanduo">
+<meta property="article:tag" content="Code Audit">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:image" content="https://hksanduo.github.io/img/20210716-01.png">
+  
+  <title>Xjar加密破解 - sanduo blog</title>
+
+  <link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4/dist/css/bootstrap.min.css" />
+
+
+  <link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/github-markdown-css@4/github-markdown.min.css" />
+  <link  rel="stylesheet" href="/lib/hint/hint.min.css" />
+
+  
+    
+    
+      
+      <link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/highlight.js@10/styles/github-gist.min.css" />
+    
+  
+
+  
+    <link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fancyapps/fancybox@3/dist/jquery.fancybox.min.css" />
+  
+
+
+<!-- 主题依赖的图标库，不要自行修改 -->
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1749284_ba1fz6golrf.css">
+
+
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1736178_kmeydafke9r.css">
+
+
+<link  rel="stylesheet" href="/css/main.css" />
+
+<!-- 自定义样式保持在最底部 -->
+
+
+  <script id="fluid-configs">
+    var Fluid = window.Fluid || {};
+    var CONFIG = {"hostname":"hksanduo.github.io","root":"/","version":"1.8.12","typing":{"enable":true,"typeSpeed":70,"cursorChar":"_","loop":false},"anchorjs":{"enable":true,"element":"h1,h2,h3,h4,h5,h6","placement":"right","visible":"hover","icon":""},"progressbar":{"enable":true,"height_px":3,"color":"#29d","options":{"showSpinner":false,"trickleSpeed":100}},"copy_btn":true,"image_zoom":{"enable":true,"img_url_replace":["",""]},"toc":{"enable":true,"headingSelector":"h1,h2,h3,h4,h5,h6","collapseDepth":0},"lazyload":{"enable":true,"loading_img":"/img/loading.gif","onlypost":false,"offset_factor":2},"web_analytics":{"enable":true,"baidu":null,"google":"UA-167858469-1","gtag":null,"tencent":{"sid":null,"cid":null},"woyaola":null,"cnzz":null,"leancloud":{"app_id":null,"app_key":null,"server_url":null,"path":"window.location.pathname"}},"search_path":"/local-search.xml"};
+  </script>
+  <script  src="/js/utils.js" ></script>
+  <script  src="/js/color-schema.js" ></script>
+<meta name="generator" content="Hexo 5.4.2"></head>
+
+
+<body>
+  <header style="height: 70vh;">
+    <nav id="navbar" class="navbar fixed-top  navbar-expand-lg navbar-dark scrolling-navbar">
+  <div class="container">
+    <a class="navbar-brand" href="/">
+      <strong>Welcome To Sanduo&#39;s Blog</strong>
+    </a>
+
+    <button id="navbar-toggler-btn" class="navbar-toggler" type="button" data-toggle="collapse"
+            data-target="#navbarSupportedContent"
+            aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+      <div class="animated-icon"><span></span><span></span><span></span></div>
+    </button>
+
+    <!-- Collapsible content -->
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+      <ul class="navbar-nav ml-auto text-center">
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/">
+                <i class="iconfont icon-home-fill"></i>
+                首页
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/archives/">
+                <i class="iconfont icon-archive-fill"></i>
+                归档
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/categories/">
+                <i class="iconfont icon-category-fill"></i>
+                分类
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/tags/">
+                <i class="iconfont icon-tags-fill"></i>
+                标签
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/about/">
+                <i class="iconfont icon-user-fill"></i>
+                关于
+              </a>
+            </li>
+          
+        
+        
+          <li class="nav-item" id="search-btn">
+            <a class="nav-link" target="_self" href="javascript:;" data-toggle="modal" data-target="#modalSearch" aria-label="Search">
+              &nbsp;<i class="iconfont icon-search"></i>&nbsp;
+            </a>
+          </li>
+        
+        
+          <li class="nav-item" id="color-toggle-btn">
+            <a class="nav-link" target="_self" href="javascript:;" aria-label="Color Toggle">&nbsp;<i
+                class="iconfont icon-dark" id="color-toggle-icon"></i>&nbsp;</a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+</nav>
+
+    <div class="banner" id="banner" parallax=true
+         style="background: url('/img/default.png') no-repeat center center;
+           background-size: cover;">
+      <div class="full-bg-img">
+        <div class="mask flex-center" style="background-color: rgba(0, 0, 0, 0.3)">
+          <div class="page-header text-center fade-in-up">
+            <span class="h2" id="subtitle" title="Xjar加密破解">
+              
+            </span>
+
+            
+              <div class="mt-3">
+  
+  
+    <span class="post-meta">
+      <i class="iconfont icon-date-fill" aria-hidden="true"></i>
+      <time datetime="2021-07-16 02:13" pubdate>
+        2021年7月16日 凌晨
+      </time>
+    </span>
+  
+</div>
+
+<div class="mt-1">
+  
+    <span class="post-meta mr-2">
+      <i class="iconfont icon-chart"></i>
+      2.5k 字
+    </span>
+  
+
+  
+    <span class="post-meta mr-2">
+      <i class="iconfont icon-clock-fill"></i>
+      
+      
+      8 分钟
+    </span>
+  
+
+  
+  
+</div>
+
+            
+          </div>
+
+          
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <main>
+    
+      
+
+<div class="container-fluid nopadding-x">
+  <div class="row nomargin-x">
+    <div class="d-none d-lg-block col-lg-2"></div>
+    <div class="col-lg-8 nopadding-x-md">
+      <div class="container nopadding-x-md" id="board-ctn">
+        <div class="py-5" id="board">
+          <article class="post-content mx-auto">
+            <!-- SEO header -->
+            <h1 style="display: none">Xjar加密破解</h1>
+            
+            <div class="markdown-body">
+              <p>Xjar加密破解</p>
+<hr>
+<h2 id="背景"><a href="#背景" class="headerlink" title="背景"></a>背景</h2><p>研发人员在客户侧部署系统时，为了防止更多源代码信息泄露，通常会将源码打包成二进制包，其中参杂一些混淆和加密的操作，防止逆向分析，安全人员在做测试，或者从一些泄露出来的二进制包进行漏洞挖掘时，总会遇到这些拦路虎，博主在逆向分析某系统jar包时就发现可以自动获取class文件，但是class内数据均被加密，打开全是乱码，但是spring boot启动相关代码是可以通过反编译获取到，第一次遇到，挺奇怪的，通过分析包名发现了io.xjar，后经过检索，发现是知名jar包加密工具xjar的特征。既然查到了，就顺便分析一下。</p>
+<p><img src="/img/20210716-01.png" srcset="/img/loading.gif" lazyload alt="20210716-01.png"></p>
+<h2 id="xjar介绍"><a href="#xjar介绍" class="headerlink" title="xjar介绍"></a>xjar介绍</h2><p>xjar安全加密运行工具, 同时支持的原生JAR。基于对JAR包内资源的加密以及拓展ClassLoader来构建的一套程序加密启动、动态解密运行的方案, 避免源码泄露以及反编译.</p>
+<h3 id="功能特性"><a href="#功能特性" class="headerlink" title="功能特性"></a>功能特性</h3><ul>
+<li>无代码侵入, 只需要把编译好的JAR包通过工具加密即可.</li>
+<li>完全内存解密, 降低源码以及字节码泄露或反编译的风险.</li>
+<li>支持所有JDK内置加解密算法.</li>
+<li>可选择需要加解密的字节码或其他资源文件.</li>
+<li>支持Maven插件, 加密更加便捷.</li>
+<li>动态生成Go启动器, 保护密码不泄露.</li>
+</ul>
+<h2 id="破解"><a href="#破解" class="headerlink" title="破解"></a>破解</h2><h3 id="xjar加密分析"><a href="#xjar加密分析" class="headerlink" title="xjar加密分析"></a>xjar加密分析</h3><p>对于破解一些需要授权的系统，通常破解的思路是动态加载重写后的方法，或者直接替换 jar 或 class ，但是 xjar 使用一个用 go 写的加载器，并且原项目所有 class 均被加密了，并且还做了 md5 和 sha1 的校验，无法通过替换来绕过。<br>后续分析 xjar ,发现使用对称加密算法加密 class 字节码，每次使用 xjar 加密源码，都会自动生成相关 go 的源码，包括 jar 包 hash 和加密密码，用户需要自行编译启动器。每次系统启动前，运行启动器，将秘钥通过标准输入流传到 jvm 中，然后通过 jvm 的 classloader 动态解密字节码，所以是纯 jvm 内存的解密。</p>
+<h3 id="破解思路"><a href="#破解思路" class="headerlink" title="破解思路"></a>破解思路</h3><p>通过获取加解密秘钥，自行构建启动器(启动器在xjar项目源码中已存在，每次只会自动添加加密密钥，文件hash等数据，可以自行构建，移除hash检测，然后重新编译加载项目即可，这样就绕过了hash检测，我可以直接通过替换class，达到破解。但是当我做完这一步，发现我是真的笨，xjar提供了解密的方法，通过解密jar包，后续操作不就是水到渠成，何至于我还停留在修改启动器上。</p>
+<h3 id="破解步骤"><a href="#破解步骤" class="headerlink" title="破解步骤"></a>破解步骤</h3><p>通过分析启动器xjar.go，发现只检测参数中是否包含-jar参数，目的是获取jar的名称，然后通过获取到的参数，拼接命令行，启动java项目。</p>
+<p><img src="/img/20210716-02.png" srcset="/img/loading.gif" lazyload alt="20210716-02.png"></p>
+<p>可以写一个简单的程序将xjar启动器传给jvm的数据使用标准输出流打印出来。以下提供了php和go的两种写法，请自行参考或根据实际情况自行构建。<br>go版本:</p>
+<figure class="highlight stylus"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><code class="hljs stylus">package <span class="hljs-selector-tag">main</span><br><br>import (<br>	<span class="hljs-string">&quot;bufio&quot;</span><br>	<span class="hljs-string">&quot;fmt&quot;</span><br>	<span class="hljs-string">&quot;os&quot;</span><br>)<br><br>func <span class="hljs-selector-tag">main</span>() &#123;<br>	<span class="hljs-selector-tag">input</span> := bufio<span class="hljs-selector-class">.NewScanner</span>(os.Stdin) <span class="hljs-comment">//初始化一个扫表对象</span><br>	<span class="hljs-keyword">for</span> <span class="hljs-selector-tag">input</span><span class="hljs-selector-class">.Scan</span>() &#123;                  <span class="hljs-comment">//扫描输入内容</span><br>		<span class="hljs-selector-tag">line</span> := <span class="hljs-selector-tag">input</span><span class="hljs-selector-class">.Text</span>() <span class="hljs-comment">//把输入内容转换为字符串</span><br>		fmt<span class="hljs-selector-class">.Println</span>(line)    <span class="hljs-comment">//输出到标准输出</span><br>	&#125;<br>&#125;<br><br></code></pre></td></tr></table></figure>
+<p>输出输入流命令行如下,我这里构建完成的程序名为xjarCrack，是在linux上构建运行的：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs bash">./xjar ./xjarCrack java -jar xjarTest-1.0-SNAPSHOT.xjar<br></code></pre></td></tr></table></figure>
+
+<p><img src="/img/20210716-03.png" srcset="/img/loading.gif" lazyload alt="20210716-03.png"></p>
+<p>第一行是加密算法，第二行是密码长度，第三行是iv长度，最优一行是密码。</p>
+<p>我这里也提供一个php版本，原理相同，如果碰到，根据自己熟练的语言自行构建即可:</p>
+<figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs php"><span class="hljs-meta">&lt;?php</span> <span class="hljs-title function_ invoke__">var_dump</span>(<span class="hljs-title function_ invoke__">file_get_contents</span>(<span class="hljs-string">&#x27;php://stdin&#x27;</span>));<br></code></pre></td></tr></table></figure>
+<p>输出输入流命令行如下,我这里将php文件命名为file.php：</p>
+<figure class="highlight applescript"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs applescript">./xjar php <span class="hljs-built_in">file</span>.php java -jar xjarTest<span class="hljs-number">-1.0</span>-SNAPSHOT.xjar<br></code></pre></td></tr></table></figure>
+
+<p>通过获取到的密码，自行构建java项目，调用xjar解密方法，解密jar包即可。核心代码如下：</p>
+<p>spring-boot jar包解密</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><code class="hljs java"><span class="hljs-comment">// Spring-Boot Jar包解密</span><br><span class="hljs-type">String</span> <span class="hljs-variable">password</span> <span class="hljs-operator">=</span> <span class="hljs-string">&quot;io.xjar&quot;</span>;<br><span class="hljs-type">XKey</span> <span class="hljs-variable">xKey</span> <span class="hljs-operator">=</span> XKit.key(password);<br>XBoot.decrypt(<span class="hljs-string">&quot;/path/to/read/encrypted.jar&quot;</span>, <span class="hljs-string">&quot;/path/to/save/decrypted.jar&quot;</span>, xKey);<br></code></pre></td></tr></table></figure>
+
+<p>jar包解密</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><code class="hljs java"><span class="hljs-comment">// Jar包解密</span><br><span class="hljs-type">String</span> <span class="hljs-variable">password</span> <span class="hljs-operator">=</span> <span class="hljs-string">&quot;io.xjar&quot;</span>;<br><span class="hljs-type">XKey</span> <span class="hljs-variable">xKey</span> <span class="hljs-operator">=</span> XKit.key(password);<br>XJar.decrypt(<span class="hljs-string">&quot;/path/to/read/encrypted.jar&quot;</span>, <span class="hljs-string">&quot;/path/to/save/decrypted.jar&quot;</span>, xKey);<br></code></pre></td></tr></table></figure>
+<p>使用idea自动加载jar包，可以查看配置文件，伪代码相关信息。</p>
+<p><img src="/img/20210716-04.png" srcset="/img/loading.gif" lazyload alt="20210716-04.png"></p>
+<h2 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h2><p>本次破解能够成功，主要归根于作者将xjar的源码进行开源，否则博主也没这么方便就破解掉了，通过分析xjar源码，我也发现了xjar在加密jar包，对jar包无损加密上做的确实厉害，虽然 xjar 在安全性上没办法起到更大的保障，但在很多地方是值得学习，致敬每一位开源大佬。</p>
+<h2 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h2><ul>
+<li><a target="_blank" rel="noopener" href="https://github.com/core-lib/xjar">https://github.com/core-lib/xjar</a>【xjar github】</li>
+<li><a target="_blank" rel="noopener" href="https://learnku.com/articles/56253">https://learnku.com/articles/56253</a>【记录一次破解xjar加密的经历】</li>
+<li><a target="_blank" rel="noopener" href="https://www.jianshu.com/p/614e1d5358b2">https://www.jianshu.com/p/614e1d5358b2</a>【XJar: Spring-Boot JAR 包加&#x2F;解密工具，避免源码泄露以及反编译】</li>
+</ul>
+
+            </div>
+            <hr>
+            <div>
+              <div class="post-metas mb-3">
+                
+                  <div class="post-meta mr-3">
+                    <i class="iconfont icon-category"></i>
+                    
+                      <a class="hover-with-bg" href="/categories/Security/">Security</a>
+                    
+                  </div>
+                
+                
+                  <div class="post-meta">
+                    <i class="iconfont icon-tags"></i>
+                    
+                      <a class="hover-with-bg" href="/tags/Code-Audit/">Code Audit</a>
+                    
+                  </div>
+                
+              </div>
+              
+                <p class="note note-warning">
+                  
+                    本博客所有文章除特别声明外，均采用 <a target="_blank" href="https://creativecommons.org/licenses/by-sa/4.0/deed.zh" rel="nofollow noopener noopener">CC BY-SA 4.0 协议</a> ，转载请注明出处！
+                  
+                </p>
+              
+              
+                <div class="post-prevnext">
+                  <article class="post-prev col-6">
+                    
+                    
+                      <a href="/2021/08/28/2021-08-28-archlinux-sddm-plasma-display-bug/">
+                        <i class="iconfont icon-arrowleft"></i>
+                        <span class="hidden-mobile">plasma使用扩展屏幕无法加载任务栏bug</span>
+                        <span class="visible-mobile">上一篇</span>
+                      </a>
+                    
+                  </article>
+                  <article class="post-next col-6">
+                    
+                    
+                      <a href="/2021/07/05/2021-07-05-SDL-Best-Practice-Principles/">
+                        <span class="hidden-mobile">SDL最佳实践原则</span>
+                        <span class="visible-mobile">下一篇</span>
+                        <i class="iconfont icon-arrowright"></i>
+                      </a>
+                    
+                  </article>
+                </div>
+              
+            </div>
+
+            
+              <!-- Comments -->
+              <article class="comments" id="comments" lazyload>
+                
+                  
+                
+                
+  <script type="text/javascript">
+    Fluid.utils.loadComments('#comments', function() {
+      var light = 'github-light';
+      var dark = 'github-dark';
+      var schema = document.documentElement.getAttribute('data-user-color-scheme');
+      if (schema === 'dark') {
+        schema = dark;
+      } else {
+        schema = light;
+      }
+      window.UtterancesThemeLight = light;
+      window.UtterancesThemeDark = dark;
+      var s = document.createElement('script');
+      s.setAttribute('src', 'https://utteranc.es/client.js');
+      s.setAttribute('repo', 'hksanduo/commit-utterances');
+      s.setAttribute('issue-term', 'title');
+      
+      s.setAttribute('label', 'utterances');
+      
+      s.setAttribute('theme', schema);
+      s.setAttribute('crossorigin', 'anonymous');
+      document.getElementById('comments').appendChild(s);
+    })
+  </script>
+  <noscript>Please enable JavaScript to view the comments</noscript>
+
+
+              </article>
+            
+          </article>
+        </div>
+      </div>
+    </div>
+    
+      <div class="d-none d-lg-block col-lg-2 toc-container" id="toc-ctn">
+        <div id="toc">
+  <p class="toc-header"><i class="iconfont icon-list"></i>&nbsp;目录</p>
+  <div class="toc-body" id="toc-body"></div>
+</div>
+
+      </div>
+    
+  </div>
+</div>
+
+<!-- Custom -->
+
+
+    
+
+    
+      <a id="scroll-top-button" aria-label="TOP" href="#" role="button">
+        <i class="iconfont icon-arrowup" aria-hidden="true"></i>
+      </a>
+    
+
+    
+      <div class="modal fade" id="modalSearch" tabindex="-1" role="dialog" aria-labelledby="ModalLabel"
+     aria-hidden="true">
+  <div class="modal-dialog modal-dialog-scrollable modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header text-center">
+        <h4 class="modal-title w-100 font-weight-bold">搜索</h4>
+        <button type="button" id="local-search-close" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body mx-3">
+        <div class="md-form mb-5">
+          <input type="text" id="local-search-input" class="form-control validate">
+          <label data-error="x" data-success="v"
+                 for="local-search-input">关键词</label>
+        </div>
+        <div class="list-group" id="local-search-result"></div>
+      </div>
+    </div>
+  </div>
+</div>
+    
+
+    
+  </main>
+
+  <footer class="text-center mt-5 py-3">
+  <div class="footer-content">
+     <a href="https://hexo.io" target="_blank" rel="nofollow noopener"><span>Hexo</span></a> <i class="iconfont icon-love"></i> <a href="https://github.com/fluid-dev/hexo-theme-fluid" target="_blank" rel="nofollow noopener"><span>Fluid</span></a> 
+  </div>
+  
+  <div class="statistics">
+    
+    
+
+    
+      
+        <!-- 不蒜子统计PV -->
+        <span id="busuanzi_container_site_pv" style="display: none">
+            总访问量 
+            <span id="busuanzi_value_site_pv"></span>
+             次
+          </span>
+      
+      
+        <!-- 不蒜子统计UV -->
+        <span id="busuanzi_container_site_uv" style="display: none">
+            总访客数 
+            <span id="busuanzi_value_site_uv"></span>
+             人
+          </span>
+      
+    
+  </div>
+
+
+  
+
+  
+</footer>
+
+
+  <!-- SCRIPTS -->
+  
+  <script  src="https://cdn.jsdelivr.net/npm/nprogress@0/nprogress.min.js" ></script>
+  <link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/nprogress@0/nprogress.min.css" />
+
+  <script>
+    NProgress.configure({"showSpinner":false,"trickleSpeed":100})
+    NProgress.start()
+    window.addEventListener('load', function() {
+      NProgress.done();
+    })
+  </script>
+
+
+<script  src="https://cdn.jsdelivr.net/npm/jquery@3/dist/jquery.min.js" ></script>
+<script  src="https://cdn.jsdelivr.net/npm/bootstrap@4/dist/js/bootstrap.min.js" ></script>
+<script  src="/js/events.js" ></script>
+<script  src="/js/plugins.js" ></script>
+
+<!-- Plugins -->
+
+
+  <script  src="/js/local-search.js" ></script>
+
+
+
+  
+    <script  src="/js/img-lazyload.js" ></script>
+  
+
+
+
+  
+
+
+
+  
+    <script  src="https://cdn.jsdelivr.net/npm/tocbot@4/dist/tocbot.min.js" ></script>
+  
+  
+    <script  src="https://cdn.jsdelivr.net/npm/@fancyapps/fancybox@3/dist/jquery.fancybox.min.js" ></script>
+  
+  
+    <script  src="https://cdn.jsdelivr.net/npm/anchor-js@4/anchor.min.js" ></script>
+  
+  
+    <script defer src="https://cdn.jsdelivr.net/npm/clipboard@2/dist/clipboard.min.js" ></script>
+  
+
+
+
+  <script defer src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js" ></script>
+
+
+
+
+  <script  src="https://cdn.jsdelivr.net/npm/typed.js@2/lib/typed.min.js" ></script>
+  <script>
+    (function (window, document) {
+      var typing = Fluid.plugins.typing;
+      var title = document.getElementById('subtitle').title;
+      
+      typing(title)
+      
+    })(window, document);
+  </script>
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+    <!-- Google Analytics -->
+    <script defer>
+      window.ga = window.ga || function () { (ga.q = ga.q || []).push(arguments) };
+      ga.l = +new Date;
+      ga('create', 'UA-167858469-1', 'auto');
+      ga('send', 'pageview');
+    </script>
+    <script async src='https://www.google-analytics.com/analytics.js'></script>
+  
+
+  
+
+  
+
+  
+
+  
+
+
+
+
+
+<!-- 主题的启动项 保持在最底部 -->
+<script  src="/js/boot.js" ></script>
+
+
+</body>
+</html>

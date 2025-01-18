@@ -1,0 +1,629 @@
+
+
+<!DOCTYPE html>
+<html lang="zh-CN" data-default-color-scheme=auto>
+
+
+
+<head>
+  <meta charset="UTF-8">
+  <link rel="apple-touch-icon" sizes="76x76" href="/img/favicon.png">
+  <link rel="icon" href="/img/favicon.png">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, shrink-to-fit=no">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  
+  <meta name="theme-color" content="#2f4154">
+  <meta name="description" content="">
+  <meta name="author" content="sanduo">
+  <meta name="keywords" content="">
+  <meta name="description" content="敏捷代码审计之代码硬编码  介绍硬编码（英语：Hard Code或Hard Coding）是指在软件编码过程中，将输出或输入的相关参数（例如：路径、输出的形式或格式）直接以常量的方式撰写在源代码中，而非在执行期间由外界指定的设置、资源、资料或格式做出适当回应。一般被认定是种反模式或不完美的实现，因为软件受到输入资料或输出格式的改变就必须修改源代码，对客户而言，改变源代码之外的小设置也许还比较容易。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="敏捷代码审计之代码硬编码">
+<meta property="og:url" content="https://hksanduo.github.io/2022/09/09/2022-09-09-harder-coding-scan/index.html">
+<meta property="og:site_name" content="sanduo blog">
+<meta property="og:description" content="敏捷代码审计之代码硬编码  介绍硬编码（英语：Hard Code或Hard Coding）是指在软件编码过程中，将输出或输入的相关参数（例如：路径、输出的形式或格式）直接以常量的方式撰写在源代码中，而非在执行期间由外界指定的设置、资源、资料或格式做出适当回应。一般被认定是种反模式或不完美的实现，因为软件受到输入资料或输出格式的改变就必须修改源代码，对客户而言，改变源代码之外的小设置也许还比较容易。">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://hksanduo.github.io/img/20220909-01.png">
+<meta property="og:image" content="https://hksanduo.github.io/img/20220909-02.png">
+<meta property="og:image" content="https://hksanduo.github.io/img/20220909-03.png">
+<meta property="og:image" content="https://hksanduo.github.io/img/20220909-04.png">
+<meta property="article:published_time" content="2022-09-09T08:57:00.000Z">
+<meta property="article:modified_time" content="2025-01-18T14:54:10.081Z">
+<meta property="article:author" content="sanduo">
+<meta property="article:tag" content="Code Audit">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:image" content="https://hksanduo.github.io/img/20220909-01.png">
+  
+  <title>敏捷代码审计之代码硬编码 - sanduo blog</title>
+
+  <link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4/dist/css/bootstrap.min.css" />
+
+
+  <link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/github-markdown-css@4/github-markdown.min.css" />
+  <link  rel="stylesheet" href="/lib/hint/hint.min.css" />
+
+  
+    
+    
+      
+      <link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/highlight.js@10/styles/github-gist.min.css" />
+    
+  
+
+  
+    <link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fancyapps/fancybox@3/dist/jquery.fancybox.min.css" />
+  
+
+
+<!-- 主题依赖的图标库，不要自行修改 -->
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1749284_ba1fz6golrf.css">
+
+
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1736178_kmeydafke9r.css">
+
+
+<link  rel="stylesheet" href="/css/main.css" />
+
+<!-- 自定义样式保持在最底部 -->
+
+
+  <script id="fluid-configs">
+    var Fluid = window.Fluid || {};
+    var CONFIG = {"hostname":"hksanduo.github.io","root":"/","version":"1.8.12","typing":{"enable":true,"typeSpeed":70,"cursorChar":"_","loop":false},"anchorjs":{"enable":true,"element":"h1,h2,h3,h4,h5,h6","placement":"right","visible":"hover","icon":""},"progressbar":{"enable":true,"height_px":3,"color":"#29d","options":{"showSpinner":false,"trickleSpeed":100}},"copy_btn":true,"image_zoom":{"enable":true,"img_url_replace":["",""]},"toc":{"enable":true,"headingSelector":"h1,h2,h3,h4,h5,h6","collapseDepth":0},"lazyload":{"enable":true,"loading_img":"/img/loading.gif","onlypost":false,"offset_factor":2},"web_analytics":{"enable":true,"baidu":null,"google":"UA-167858469-1","gtag":null,"tencent":{"sid":null,"cid":null},"woyaola":null,"cnzz":null,"leancloud":{"app_id":null,"app_key":null,"server_url":null,"path":"window.location.pathname"}},"search_path":"/local-search.xml"};
+  </script>
+  <script  src="/js/utils.js" ></script>
+  <script  src="/js/color-schema.js" ></script>
+<meta name="generator" content="Hexo 5.4.2"></head>
+
+
+<body>
+  <header style="height: 70vh;">
+    <nav id="navbar" class="navbar fixed-top  navbar-expand-lg navbar-dark scrolling-navbar">
+  <div class="container">
+    <a class="navbar-brand" href="/">
+      <strong>Welcome To Sanduo&#39;s Blog</strong>
+    </a>
+
+    <button id="navbar-toggler-btn" class="navbar-toggler" type="button" data-toggle="collapse"
+            data-target="#navbarSupportedContent"
+            aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+      <div class="animated-icon"><span></span><span></span><span></span></div>
+    </button>
+
+    <!-- Collapsible content -->
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+      <ul class="navbar-nav ml-auto text-center">
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/">
+                <i class="iconfont icon-home-fill"></i>
+                首页
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/archives/">
+                <i class="iconfont icon-archive-fill"></i>
+                归档
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/categories/">
+                <i class="iconfont icon-category-fill"></i>
+                分类
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/tags/">
+                <i class="iconfont icon-tags-fill"></i>
+                标签
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/about/">
+                <i class="iconfont icon-user-fill"></i>
+                关于
+              </a>
+            </li>
+          
+        
+        
+          <li class="nav-item" id="search-btn">
+            <a class="nav-link" target="_self" href="javascript:;" data-toggle="modal" data-target="#modalSearch" aria-label="Search">
+              &nbsp;<i class="iconfont icon-search"></i>&nbsp;
+            </a>
+          </li>
+        
+        
+          <li class="nav-item" id="color-toggle-btn">
+            <a class="nav-link" target="_self" href="javascript:;" aria-label="Color Toggle">&nbsp;<i
+                class="iconfont icon-dark" id="color-toggle-icon"></i>&nbsp;</a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+</nav>
+
+    <div class="banner" id="banner" parallax=true
+         style="background: url('/img/default.png') no-repeat center center;
+           background-size: cover;">
+      <div class="full-bg-img">
+        <div class="mask flex-center" style="background-color: rgba(0, 0, 0, 0.3)">
+          <div class="page-header text-center fade-in-up">
+            <span class="h2" id="subtitle" title="敏捷代码审计之代码硬编码">
+              
+            </span>
+
+            
+              <div class="mt-3">
+  
+  
+    <span class="post-meta">
+      <i class="iconfont icon-date-fill" aria-hidden="true"></i>
+      <time datetime="2022-09-09 08:57" pubdate>
+        2022年9月9日 早上
+      </time>
+    </span>
+  
+</div>
+
+<div class="mt-1">
+  
+    <span class="post-meta mr-2">
+      <i class="iconfont icon-chart"></i>
+      5.5k 字
+    </span>
+  
+
+  
+    <span class="post-meta mr-2">
+      <i class="iconfont icon-clock-fill"></i>
+      
+      
+      17 分钟
+    </span>
+  
+
+  
+  
+</div>
+
+            
+          </div>
+
+          
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <main>
+    
+      
+
+<div class="container-fluid nopadding-x">
+  <div class="row nomargin-x">
+    <div class="d-none d-lg-block col-lg-2"></div>
+    <div class="col-lg-8 nopadding-x-md">
+      <div class="container nopadding-x-md" id="board-ctn">
+        <div class="py-5" id="board">
+          <article class="post-content mx-auto">
+            <!-- SEO header -->
+            <h1 style="display: none">敏捷代码审计之代码硬编码</h1>
+            
+            <div class="markdown-body">
+              <p>敏捷代码审计之代码硬编码</p>
+<hr>
+<h2 id="介绍"><a href="#介绍" class="headerlink" title="介绍"></a>介绍</h2><p>硬编码（英语：Hard Code或Hard Coding）是指在软件编码过程中，将输出或输入的相关参数（例如：路径、输出的形式或格式）直接以常量的方式撰写在源代码中，而非在执行期间由外界指定的设置、资源、资料或格式做出适当回应。一般被认定是种反模式或不完美的实现，因为软件受到输入资料或输出格式的改变就必须修改源代码，对客户而言，改变源代码之外的小设置也许还比较容易。但硬编码的状况也并非完全只有缺陷，因某些封装需要或软件本身的保护措施，有时是必要的手段。除此之外，有时候因应某些特殊的需求，制作出简单的应用程序，应用程序可能只会执行一次或者有限的几次，或者永远只应付某种单一需求。</p>
+<p>所谓硬编码，就是把一个本来应该（可以）写到配置信息中的信息直接在程序代码中写死了。密钥硬编码在代码中，而根据密钥的用途不同，这导致了不同的安全风险，有的导致加密数据被破解，数据不再保密，有的导致和服务器通信的加签被破解，引发各种血案。</p>
+<h2 id="硬编码检测方法"><a href="#硬编码检测方法" class="headerlink" title="硬编码检测方法"></a>硬编码检测方法</h2><p>方法论主要参考：密码密钥硬编码检查，参考链接详见文章末尾。</p>
+<h3 id="鉴别密码密钥方法"><a href="#鉴别密码密钥方法" class="headerlink" title="鉴别密码密钥方法"></a>鉴别密码密钥方法</h3><h4 id="香农熵-Shannon-entropy"><a href="#香农熵-Shannon-entropy" class="headerlink" title="香农熵(Shannon entropy)"></a>香农熵(Shannon entropy)</h4><p>密钥的长度决定了密钥空间(keyspace），通常以位为单位。密钥空间越大，密钥被攻破的难度就越大。<br>密钥是由密钥空间的随机值构成。对于任意一个随机变量 X，它的熵定义如下：</p>
+<p><img src="/img/20220909-01.png" srcset="/img/loading.gif" lazyload alt="熵定义"><br>变量的不确定性越大，熵也就越大，把它搞清楚所需要的信息量也就越大。</p>
+<ul>
+<li><p>P(x_i)P(xi) : 指的是单个样本变量所属的变量种类的个数占据所有变量个数的比例。同等长度的字符串，通常密钥的熵值更高</p>
+</li>
+<li><p>密钥为避免彩虹攻击，在取值上更加的离散，会尽量采用不重复的字符。就像我们为了增加密码的复杂性，要求长度不小于8，必须包含大小写、特殊字符、以及数字一样的道理。所以密钥的熵值会比一般的文本要高的多。我们就是利用这点来识别字符串是否是密钥。</p>
+</li>
+</ul>
+<h3 id="工具的检查逻辑"><a href="#工具的检查逻辑" class="headerlink" title="工具的检查逻辑"></a>工具的检查逻辑</h3><p>对于密码密钥的硬编码检查可以采用静态分析工具来完成。工具的检查过程通常包含四个过程：输入文件准备、检查、过滤和报告输出。<br><img src="/img/20220909-02.png" srcset="/img/loading.gif" lazyload alt="工具的检查过程">  </p>
+<h4 id="输入文件转换"><a href="#输入文件转换" class="headerlink" title="输入文件转换"></a>输入文件转换</h4><ul>
+<li><p>输入文件分类<br>  我们需要检查的文本文件进行分类，通常包括以下几种类型：</p>
+<ul>
+<li>程序语言：C、C++、Java、Python、Go、Js等；</li>
+<li>有统一格式的文件：属性文件、yaml、csv、json、xml等；</li>
+<li>文本文件：没有固定格式的文本文件。</li>
+</ul>
+</li>
+</ul>
+<p>分类的目的是为了更好的识别文件中的字符串常量，充分利用字符串常量的上下文关联，以便在分析中最大程度的减少误报。</p>
+<ul>
+<li>输入文件转换<ul>
+<li>程序语言：通过各语言的语法解析器，解析成抽象语法树，提取语法树中的等于字符串的常量，以及对    </li>
+<li>应的变量名；有统一格式的文件：照格式转换成变量名和字符串常量值；</li>
+<li>文本文件：采用token的方式分割成一个个的token，变成一个各的字符串常量。</li>
+</ul>
+</li>
+</ul>
+<h4 id="密码密钥检查"><a href="#密码密钥检查" class="headerlink" title="密码密钥检查"></a>密码密钥检查</h4><p>在我们得到大量的变量名和字符串常量后，主要通过正则表达式匹配的方式完成目标的筛选。我们收集的密钥格式包括国内国外主流平台、SDK等相关系统的密钥配置参数名称，可以根据客户的实际情况手动增加和优化规则，进而提高检测的速度和效率。<br>由于检查密码密钥的种类和类型不同，可以通过配置文件来提高检查能力的可扩展性。</p>
+<p>检查配置选项主要包括以下内容：</p>
+<table>
+<thead>
+<tr>
+<th>信息</th>
+<th>描述</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>检查类型</td>
+<td>可分为：变量名、字符串常量、或两个都检查</td>
+</tr>
+<tr>
+<td>密码密钥的类型</td>
+<td>用于区分不同类型的密码密钥；同时用于告警时区分具体检测到的密码密钥类型</td>
+</tr>
+<tr>
+<td>正则表达式</td>
+<td>主要设定匹配的长度，每个字符的可选类型</td>
+</tr>
+<tr>
+<td>熵值的阈值</td>
+<td>用于精确的识别密码密钥的类型，降低误报</td>
+</tr>
+</tbody></table>
+<p>例如：</p>
+<p>检查硬编码的口令：检查变量名中包含：password、passwd、pwd的变量，且变量等于字符串常量；正则表达式可以设置成为：”.*(password|passwd|pwd)$”。</p>
+<p>检查GitHub的个人凭证：检查字符串常量；这个凭证是以”ghp_”开头的，跟随长度为36的字符串，且每个字符可以为数字和字母；正则表达式可以设置成为：“ghp_[0-9a-zA-Z]{36}”。</p>
+<h4 id="密码密钥过滤"><a href="#密码密钥过滤" class="headerlink" title="密码密钥过滤"></a>密码密钥过滤</h4><p>静态分析能很大程度上减少了人工审核的工作量，但由于检查模式的不确定性，也会带来不少的误报。误报会给用户在审核过程中带来很大的负面情绪，从而不愿继续使用工具。为了进一步降低误报，我们可以通过下面的方式来降低误报：</p>
+<ul>
+<li><p>密码密钥熵值的计算</p>
+<p>  前面讨论过密码密钥的特点，可以通过检测密码密钥的信息熵的方式来降低误报。有些密码密钥设定了最低的阈值，但还是有很多密码密钥并未给出具体的阈值，这个就需要通过经验积累来设定，目前业界也有通过机器学习来完善这个阈值的设定。</p>
+</li>
+<li><p>污点分析</p>
+<p>  在代码中，对于口令的变量的取名上，很多并不会遵守可读性和可维护性来设定变量名，通过前面正则表达式的方式来查找硬编码密码的方式，会造成很多的漏报。这里还可以通过污点分析的方法，来推导出密码是否采用了硬编码。例如检查jdbc连接的密码参数，查看该参数是否为字符串常量。</p>
+</li>
+</ul>
+<h4 id="报告输出"><a href="#报告输出" class="headerlink" title="报告输出"></a>报告输出</h4><p>将经过过滤后的结果，输出告警，给出可能泄露的文件名和变量或可能为密码密钥的常量字符串位置，便于人工的排查。</p>
+<h2 id="硬编码检测实战"><a href="#硬编码检测实战" class="headerlink" title="硬编码检测实战"></a>硬编码检测实战</h2><p>对于审计人员或者安全管理人员并不需要关注密钥检查的算法，通常只需要选用合适的流程，匹配恰当的工具，迅速准确的定位硬编码即可。</p>
+<h3 id="检查的流程"><a href="#检查的流程" class="headerlink" title="检查的流程"></a>检查的流程</h3><p>信息收集：此阶段中，审计人员进行必要的信息收集，包括本次审计要求、稳定版本的源代码。<br>工具审计：确定工具审计的标准和各项配置参数，使用Fortify、gitleaks等工具检测目标源代码，对工具检测的结果进行人工核查，筛选，分析，汇总。<br>人工审计：对客户要求人工审计的重点代码采用人工分析的方法，对源代码中的硬编码进行审计。<br>综合汇总：将工具审计和人工审计的结果进行对比汇总<br>输出报告：此阶段中，审计人员根据测试的结果编写直观的硬编码审计服务报告。<br>源代码硬编码审计要求工作人员有丰富的经验及新颖的思路，同时也是一项比较耗费时间和资源的工作，从效率考虑，一般选择性的抽取部分重要环节的代码进行人工审计。</p>
+<h3 id="开源检查工具"><a href="#开源检查工具" class="headerlink" title="开源检查工具"></a>开源检查工具</h3><h4 id="SecretScanner"><a href="#SecretScanner" class="headerlink" title="SecretScanner"></a>SecretScanner</h4><p>项目地址：<a target="_blank" rel="noopener" href="https://github.com/deepfence/SecretScanner">https://github.com/deepfence/SecretScanner</a></p>
+<p>SecretScanner可以扫描主机上的容器镜像或本地目录，主要通过正则匹配，扫描效率较高，不仅支持代码而且支持容器扫描，并将结果输出到JSON文件，其中会包含SecretScanner找到的所有敏感数据的详细信息。<br>SecretScanner方便安全人员在主机上收集敏感数据，如果需要审计特定类型代码或者增加新的硬编码检测点，需要手动修改规则，默认配置文件位于项目中的config.yaml，可以根据实际情况自行修改。<br><img src="/img/20220909-03.png" srcset="/img/loading.gif" lazyload alt="SecretScanner">  </p>
+<p>不足：规则数量一般</p>
+<h4 id="gitleaks"><a href="#gitleaks" class="headerlink" title="gitleaks"></a>gitleaks</h4><p>Gitleaks为你提供了一种方法来扫描你的git存储库，以查找这些不需要的数据，这些数据应该是私有的，扫描可以自动化，以完全适合CI&#x2F;CD工作流程，以便在密码识别更深入到代码库之前进行识别。<br>gitleaks比较有趣的有以下几点：</p>
+<ul>
+<li>支持私有存储库扫描以及需要基于密钥的身份验证的存储库。</li>
+<li>支持Gitlab批量组织和存储库所有者（用户）存储库扫描，并提取请求扫描以在常见CI工作流中使用。</li>
+<li>支持Pre-Commit，方便研发人员在提交之前进行硬编码检测，防止敏感信息提交。</li>
+<li>支持使用git log命令验证由gitleaks找到的发现</li>
+</ul>
+<p><img src="/img/20220909-04.png" srcset="/img/loading.gif" lazyload alt="gitleaks">  </p>
+<p>不足：对普通用户友好程度一般，对于pre-commit需要手动配置，并且在大文件扫描效率较低，官方已移除多线程配置参数，使用默认线程数进行扫描，如果在使用过程中感觉缓慢，可自行设定编译。同样规则数量一般，可以根据实际情况添加。</p>
+<h4 id="SASTs"><a href="#SASTs" class="headerlink" title="SASTs"></a>SASTs</h4><p>各种SAST工具都可以检测硬编码，但是受限于使用场景，只能检测较少的硬编码场景，比如password，key等，对于特定的硬编码需要手动增加规则，规则友好性一般。</p>
+<h3 id="硬编码检测规则"><a href="#硬编码检测规则" class="headerlink" title="硬编码检测规则"></a>硬编码检测规则</h3><p>无论gitleaks还是secretScanner，均使用正则匹配相关硬编码，敏感信息，我这里整理出部分敏感信息参数，供大家参考，至于规则，按照要求，自行补充即可，比较简单，这里就不单独描述了</p>
+<figure class="highlight gherkin"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs gherkin">regex: &#x27;(?i)((access_key|<span class="hljs-string">access_token</span>|<span class="hljs-string">admin_pass</span>|<span class="hljs-string">admin_user</span>|<span class="hljs-string">algolia_admin_key</span>|<span class="hljs-string">algolia_api_key</span>|<span class="hljs-string">alias_pass</span>|<span class="hljs-string">alicloud_access_key</span>|<span class="hljs-string">amazon_secret_access_key</span>|<span class="hljs-string">amazonaws</span>|<span class="hljs-string">ansible_vault_password</span>|<span class="hljs-string">aos_key</span>|<span class="hljs-string">api_key</span>|<span class="hljs-string">api_key_secret</span>|<span class="hljs-string">api_key_sid</span>|<span class="hljs-string">api_secret</span>|<span class="hljs-string">api.googlemaps AIza</span>|<span class="hljs-string">apidocs</span>|<span class="hljs-string">apikey</span>|<span class="hljs-string">apiSecret</span>|<span class="hljs-string">app_debug</span>|<span class="hljs-string">app_id</span>|<span class="hljs-string">app_key</span>|<span class="hljs-string">app_log_level</span>|<span class="hljs-string">app_secret</span>|<span class="hljs-string">appkey</span>|<span class="hljs-string">appkeysecret</span>|<span class="hljs-string">application_key</span>|<span class="hljs-string">appsecret</span>|<span class="hljs-string">appspot</span>|<span class="hljs-string">auth_token</span>|<span class="hljs-string">authorizationToken</span>|<span class="hljs-string">authsecret</span>|<span class="hljs-string">aws_access</span>|<span class="hljs-string">aws_access_key_id</span>|<span class="hljs-string">aws_bucket</span>|<span class="hljs-string">aws_key</span>|<span class="hljs-string">aws_secret</span>|<span class="hljs-string">aws_secret_key</span>|<span class="hljs-string">aws_token</span>|<span class="hljs-string">AWSSecretKey</span>|<span class="hljs-string">b2_app_key</span>|<span class="hljs-string">bashrc password</span>|<span class="hljs-string">bintray_apikey</span>|<span class="hljs-string">bintray_gpg_password</span>|<span class="hljs-string">bintray_key</span>|<span class="hljs-string">bintraykey</span>|<span class="hljs-string">bluemix_api_key</span>|<span class="hljs-string">bluemix_pass</span>|<span class="hljs-string">browserstack_access_key</span>|<span class="hljs-string">bucket_password</span>|<span class="hljs-string">bucketeer_aws_access_key_id</span>|<span class="hljs-string">bucketeer_aws_secret_access_key</span>|<span class="hljs-string">built_branch_deploy_key</span>|<span class="hljs-string">bx_password</span>|<span class="hljs-string">cache_driver</span>|<span class="hljs-string">cache_s3_secret_key</span>|<span class="hljs-string">cattle_access_key</span>|<span class="hljs-string">cattle_secret_key</span>|<span class="hljs-string">certificate_password</span>|<span class="hljs-string">ci_deploy_password</span>|<span class="hljs-string">client_secret</span>|<span class="hljs-string">client_zpk_secret_key</span>|<span class="hljs-string">clojars_password</span>|<span class="hljs-string">cloud_api_key</span>|<span class="hljs-string">cloud_watch_aws_access_key</span>|<span class="hljs-string">cloudant_password</span>|<span class="hljs-string">cloudflare_api_key</span>|<span class="hljs-string">cloudflare_auth_key</span>|<span class="hljs-string">cloudinary_api_secret</span>|<span class="hljs-string">cloudinary_name</span>|<span class="hljs-string">codecov_token</span>|<span class="hljs-string">config</span>|<span class="hljs-string">conn.login</span>|<span class="hljs-string">connectionstring</span>|<span class="hljs-string">consumer_key</span>|<span class="hljs-string">consumer_secret</span>|<span class="hljs-string">credentials</span>|<span class="hljs-string">cypress_record_key</span>|<span class="hljs-string">database_password</span>|<span class="hljs-string">database_schema_test</span>|<span class="hljs-string">datadog_api_key</span>|<span class="hljs-string">datadog_app_key</span>|<span class="hljs-string">db_password</span>|<span class="hljs-string">db_server</span>|<span class="hljs-string">db_username</span>|<span class="hljs-string">dbpasswd</span>|<span class="hljs-string">dbpassword</span>|<span class="hljs-string">dbuser</span>|<span class="hljs-string">deploy_password</span>|<span class="hljs-string">digitalocean_ssh_key_body</span>|<span class="hljs-string">digitalocean_ssh_key_ids</span>|<span class="hljs-string">docker_hub_password</span>|<span class="hljs-string">docker_key</span>|<span class="hljs-string">docker_pass</span>|<span class="hljs-string">docker_passwd</span>|<span class="hljs-string">docker_password</span>|<span class="hljs-string">dockerhub_password</span>|<span class="hljs-string">dockerhubpassword</span>|<span class="hljs-string">dot-files</span>|<span class="hljs-string">dotfiles</span>|<span class="hljs-string">droplet_travis_password</span>|<span class="hljs-string">dynamoaccesskeyid</span>|<span class="hljs-string">dynamosecretaccesskey</span>|<span class="hljs-string">elastica_host</span>|<span class="hljs-string">elastica_port</span>|<span class="hljs-string">elasticsearch_password</span>|<span class="hljs-string">encryption_key</span>|<span class="hljs-string">encryption_password</span>|<span class="hljs-string">env.heroku_api_key</span>|<span class="hljs-string">env.sonatype_password</span>|<span class="hljs-string">eureka.awssecretkey)[a-z0-9_ .\-,]&#123;0,25&#125;)(=</span>|<span class="hljs-string">&gt;</span>|<span class="hljs-string">:=</span>|<span class="hljs-string">\</span>|<span class="hljs-string">\</span>|<span class="hljs-string">:</span>|<span class="hljs-string">&lt;=</span>|<span class="hljs-string">=&gt;</span>|<span class="hljs-string">:).&#123;0,5&#125;[\&quot;]([0-9a-zA-Z\-_=]&#123;8,64&#125;)[\&quot;]&#x27; </span><br></code></pre></td></tr></table></figure>
+
+<h2 id="参考："><a href="#参考：" class="headerlink" title="参考："></a>参考：</h2><ul>
+<li><a target="_blank" rel="noopener" href="https://developer.huawei.com/consumer/cn/forum/topic/0204931065040020698?fid=0101592429757310384">https://developer.huawei.com/consumer/cn/forum/topic/0204931065040020698?fid=0101592429757310384</a>【密码密钥硬编码检查】</li>
+<li><a target="_blank" rel="noopener" href="https://github.com/deepfence/SecretScanner">https://github.com/deepfence/SecretScanner</a>【SecretScanner】</li>
+<li><a target="_blank" rel="noopener" href="https://github.com/zricethezav/gitleaks">https://github.com/zricethezav/gitleaks</a>【gitleaks】</li>
+<li><a target="_blank" rel="noopener" href="https://wooyun.js.org/drops/Android%E5%AE%89%E5%85%A8%E5%BC%80%E5%8F%91%E4%B9%8B%E6%B5%85%E8%B0%88%E5%AF%86%E9%92%A5%E7%A1%AC%E7%BC%96%E7%A0%81.html">https://wooyun.js.org/drops/Android%E5%AE%89%E5%85%A8%E5%BC%80%E5%8F%91%E4%B9%8B%E6%B5%85%E8%B0%88%E5%AF%86%E9%92%A5%E7%A1%AC%E7%BC%96%E7%A0%81.html</a>【浅谈密钥硬编码】</li>
+</ul>
+
+            </div>
+            <hr>
+            <div>
+              <div class="post-metas mb-3">
+                
+                  <div class="post-meta mr-3">
+                    <i class="iconfont icon-category"></i>
+                    
+                      <a class="hover-with-bg" href="/categories/Security/">Security</a>
+                    
+                  </div>
+                
+                
+                  <div class="post-meta">
+                    <i class="iconfont icon-tags"></i>
+                    
+                      <a class="hover-with-bg" href="/tags/Code-Audit/">Code Audit</a>
+                    
+                  </div>
+                
+              </div>
+              
+                <p class="note note-warning">
+                  
+                    本博客所有文章除特别声明外，均采用 <a target="_blank" href="https://creativecommons.org/licenses/by-sa/4.0/deed.zh" rel="nofollow noopener noopener">CC BY-SA 4.0 协议</a> ，转载请注明出处！
+                  
+                </p>
+              
+              
+                <div class="post-prevnext">
+                  <article class="post-prev col-6">
+                    
+                    
+                      <a href="/2022/12/25/2022-12-25-china-mobile-family-gateway-crack/">
+                        <i class="iconfont icon-arrowleft"></i>
+                        <span class="hidden-mobile">中国移动光猫h5-9家庭网关重置管理员密码并桥接网络</span>
+                        <span class="visible-mobile">上一篇</span>
+                      </a>
+                    
+                  </article>
+                  <article class="post-next col-6">
+                    
+                    
+                      <a href="/2022/09/08/2022-09-08-salt-api-security-best-practices/">
+                        <span class="hidden-mobile">SALT API安全最佳实践</span>
+                        <span class="visible-mobile">下一篇</span>
+                        <i class="iconfont icon-arrowright"></i>
+                      </a>
+                    
+                  </article>
+                </div>
+              
+            </div>
+
+            
+              <!-- Comments -->
+              <article class="comments" id="comments" lazyload>
+                
+                  
+                
+                
+  <script type="text/javascript">
+    Fluid.utils.loadComments('#comments', function() {
+      var light = 'github-light';
+      var dark = 'github-dark';
+      var schema = document.documentElement.getAttribute('data-user-color-scheme');
+      if (schema === 'dark') {
+        schema = dark;
+      } else {
+        schema = light;
+      }
+      window.UtterancesThemeLight = light;
+      window.UtterancesThemeDark = dark;
+      var s = document.createElement('script');
+      s.setAttribute('src', 'https://utteranc.es/client.js');
+      s.setAttribute('repo', 'hksanduo/commit-utterances');
+      s.setAttribute('issue-term', 'title');
+      
+      s.setAttribute('label', 'utterances');
+      
+      s.setAttribute('theme', schema);
+      s.setAttribute('crossorigin', 'anonymous');
+      document.getElementById('comments').appendChild(s);
+    })
+  </script>
+  <noscript>Please enable JavaScript to view the comments</noscript>
+
+
+              </article>
+            
+          </article>
+        </div>
+      </div>
+    </div>
+    
+      <div class="d-none d-lg-block col-lg-2 toc-container" id="toc-ctn">
+        <div id="toc">
+  <p class="toc-header"><i class="iconfont icon-list"></i>&nbsp;目录</p>
+  <div class="toc-body" id="toc-body"></div>
+</div>
+
+      </div>
+    
+  </div>
+</div>
+
+<!-- Custom -->
+
+
+    
+
+    
+      <a id="scroll-top-button" aria-label="TOP" href="#" role="button">
+        <i class="iconfont icon-arrowup" aria-hidden="true"></i>
+      </a>
+    
+
+    
+      <div class="modal fade" id="modalSearch" tabindex="-1" role="dialog" aria-labelledby="ModalLabel"
+     aria-hidden="true">
+  <div class="modal-dialog modal-dialog-scrollable modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header text-center">
+        <h4 class="modal-title w-100 font-weight-bold">搜索</h4>
+        <button type="button" id="local-search-close" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body mx-3">
+        <div class="md-form mb-5">
+          <input type="text" id="local-search-input" class="form-control validate">
+          <label data-error="x" data-success="v"
+                 for="local-search-input">关键词</label>
+        </div>
+        <div class="list-group" id="local-search-result"></div>
+      </div>
+    </div>
+  </div>
+</div>
+    
+
+    
+  </main>
+
+  <footer class="text-center mt-5 py-3">
+  <div class="footer-content">
+     <a href="https://hexo.io" target="_blank" rel="nofollow noopener"><span>Hexo</span></a> <i class="iconfont icon-love"></i> <a href="https://github.com/fluid-dev/hexo-theme-fluid" target="_blank" rel="nofollow noopener"><span>Fluid</span></a> 
+  </div>
+  
+  <div class="statistics">
+    
+    
+
+    
+      
+        <!-- 不蒜子统计PV -->
+        <span id="busuanzi_container_site_pv" style="display: none">
+            总访问量 
+            <span id="busuanzi_value_site_pv"></span>
+             次
+          </span>
+      
+      
+        <!-- 不蒜子统计UV -->
+        <span id="busuanzi_container_site_uv" style="display: none">
+            总访客数 
+            <span id="busuanzi_value_site_uv"></span>
+             人
+          </span>
+      
+    
+  </div>
+
+
+  
+
+  
+</footer>
+
+
+  <!-- SCRIPTS -->
+  
+  <script  src="https://cdn.jsdelivr.net/npm/nprogress@0/nprogress.min.js" ></script>
+  <link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/nprogress@0/nprogress.min.css" />
+
+  <script>
+    NProgress.configure({"showSpinner":false,"trickleSpeed":100})
+    NProgress.start()
+    window.addEventListener('load', function() {
+      NProgress.done();
+    })
+  </script>
+
+
+<script  src="https://cdn.jsdelivr.net/npm/jquery@3/dist/jquery.min.js" ></script>
+<script  src="https://cdn.jsdelivr.net/npm/bootstrap@4/dist/js/bootstrap.min.js" ></script>
+<script  src="/js/events.js" ></script>
+<script  src="/js/plugins.js" ></script>
+
+<!-- Plugins -->
+
+
+  <script  src="/js/local-search.js" ></script>
+
+
+
+  
+    <script  src="/js/img-lazyload.js" ></script>
+  
+
+
+
+  
+
+
+
+  
+    <script  src="https://cdn.jsdelivr.net/npm/tocbot@4/dist/tocbot.min.js" ></script>
+  
+  
+    <script  src="https://cdn.jsdelivr.net/npm/@fancyapps/fancybox@3/dist/jquery.fancybox.min.js" ></script>
+  
+  
+    <script  src="https://cdn.jsdelivr.net/npm/anchor-js@4/anchor.min.js" ></script>
+  
+  
+    <script defer src="https://cdn.jsdelivr.net/npm/clipboard@2/dist/clipboard.min.js" ></script>
+  
+
+
+
+  <script defer src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js" ></script>
+
+
+
+
+  <script  src="https://cdn.jsdelivr.net/npm/typed.js@2/lib/typed.min.js" ></script>
+  <script>
+    (function (window, document) {
+      var typing = Fluid.plugins.typing;
+      var title = document.getElementById('subtitle').title;
+      
+      typing(title)
+      
+    })(window, document);
+  </script>
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+    <!-- Google Analytics -->
+    <script defer>
+      window.ga = window.ga || function () { (ga.q = ga.q || []).push(arguments) };
+      ga.l = +new Date;
+      ga('create', 'UA-167858469-1', 'auto');
+      ga('send', 'pageview');
+    </script>
+    <script async src='https://www.google-analytics.com/analytics.js'></script>
+  
+
+  
+
+  
+
+  
+
+  
+
+
+
+
+
+<!-- 主题的启动项 保持在最底部 -->
+<script  src="/js/boot.js" ></script>
+
+
+</body>
+</html>

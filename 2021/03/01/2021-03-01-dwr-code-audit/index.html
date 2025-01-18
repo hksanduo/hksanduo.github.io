@@ -1,0 +1,582 @@
+
+
+<!DOCTYPE html>
+<html lang="zh-CN" data-default-color-scheme=auto>
+
+
+
+<head>
+  <meta charset="UTF-8">
+  <link rel="apple-touch-icon" sizes="76x76" href="/img/favicon.png">
+  <link rel="icon" href="/img/favicon.png">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, shrink-to-fit=no">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  
+  <meta name="theme-color" content="#2f4154">
+  <meta name="description" content="">
+  <meta name="author" content="sanduo">
+  <meta name="keywords" content="">
+  <meta name="description" content="dwr框架代码审计  简述在做测试的过程中发现一个老系统提交的请求包比较奇怪，通过检索，发现是早期java web研发人员常用的DWR框架，dwr框架比较古老，可以帮助用户实现Ajax网站，可以让你在浏览器中的Javascript代码调用Web服务器上的Java，就像在Java代码就在浏览器中一样。 DWR 主要包括两部分： - 在服务器上运行的 Servlet 来处理请求并把结果返回浏览器。 -">
+<meta property="og:type" content="article">
+<meta property="og:title" content="dwr框架代码审计">
+<meta property="og:url" content="https://hksanduo.github.io/2021/03/01/2021-03-01-dwr-code-audit/index.html">
+<meta property="og:site_name" content="sanduo blog">
+<meta property="og:description" content="dwr框架代码审计  简述在做测试的过程中发现一个老系统提交的请求包比较奇怪，通过检索，发现是早期java web研发人员常用的DWR框架，dwr框架比较古老，可以帮助用户实现Ajax网站，可以让你在浏览器中的Javascript代码调用Web服务器上的Java，就像在Java代码就在浏览器中一样。 DWR 主要包括两部分： - 在服务器上运行的 Servlet 来处理请求并把结果返回浏览器。 -">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://hksanduo.github.io/img/20210301-01.png">
+<meta property="og:image" content="https://hksanduo.github.io/img/20210301-02.png">
+<meta property="og:image" content="https://hksanduo.github.io/img/20210301-03.png">
+<meta property="og:image" content="https://hksanduo.github.io/img/20210301-04.png">
+<meta property="og:image" content="https://hksanduo.github.io/img/20210301-05.png">
+<meta property="article:published_time" content="2021-03-01T13:30:00.000Z">
+<meta property="article:modified_time" content="2025-01-18T14:54:10.079Z">
+<meta property="article:author" content="sanduo">
+<meta property="article:tag" content="Code">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:image" content="https://hksanduo.github.io/img/20210301-01.png">
+  
+  <title>dwr框架代码审计 - sanduo blog</title>
+
+  <link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4/dist/css/bootstrap.min.css" />
+
+
+  <link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/github-markdown-css@4/github-markdown.min.css" />
+  <link  rel="stylesheet" href="/lib/hint/hint.min.css" />
+
+  
+    
+    
+      
+      <link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/highlight.js@10/styles/github-gist.min.css" />
+    
+  
+
+  
+    <link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fancyapps/fancybox@3/dist/jquery.fancybox.min.css" />
+  
+
+
+<!-- 主题依赖的图标库，不要自行修改 -->
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1749284_ba1fz6golrf.css">
+
+
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1736178_kmeydafke9r.css">
+
+
+<link  rel="stylesheet" href="/css/main.css" />
+
+<!-- 自定义样式保持在最底部 -->
+
+
+  <script id="fluid-configs">
+    var Fluid = window.Fluid || {};
+    var CONFIG = {"hostname":"hksanduo.github.io","root":"/","version":"1.8.12","typing":{"enable":true,"typeSpeed":70,"cursorChar":"_","loop":false},"anchorjs":{"enable":true,"element":"h1,h2,h3,h4,h5,h6","placement":"right","visible":"hover","icon":""},"progressbar":{"enable":true,"height_px":3,"color":"#29d","options":{"showSpinner":false,"trickleSpeed":100}},"copy_btn":true,"image_zoom":{"enable":true,"img_url_replace":["",""]},"toc":{"enable":true,"headingSelector":"h1,h2,h3,h4,h5,h6","collapseDepth":0},"lazyload":{"enable":true,"loading_img":"/img/loading.gif","onlypost":false,"offset_factor":2},"web_analytics":{"enable":true,"baidu":null,"google":"UA-167858469-1","gtag":null,"tencent":{"sid":null,"cid":null},"woyaola":null,"cnzz":null,"leancloud":{"app_id":null,"app_key":null,"server_url":null,"path":"window.location.pathname"}},"search_path":"/local-search.xml"};
+  </script>
+  <script  src="/js/utils.js" ></script>
+  <script  src="/js/color-schema.js" ></script>
+<meta name="generator" content="Hexo 5.4.2"></head>
+
+
+<body>
+  <header style="height: 70vh;">
+    <nav id="navbar" class="navbar fixed-top  navbar-expand-lg navbar-dark scrolling-navbar">
+  <div class="container">
+    <a class="navbar-brand" href="/">
+      <strong>Welcome To Sanduo&#39;s Blog</strong>
+    </a>
+
+    <button id="navbar-toggler-btn" class="navbar-toggler" type="button" data-toggle="collapse"
+            data-target="#navbarSupportedContent"
+            aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+      <div class="animated-icon"><span></span><span></span><span></span></div>
+    </button>
+
+    <!-- Collapsible content -->
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+      <ul class="navbar-nav ml-auto text-center">
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/">
+                <i class="iconfont icon-home-fill"></i>
+                首页
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/archives/">
+                <i class="iconfont icon-archive-fill"></i>
+                归档
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/categories/">
+                <i class="iconfont icon-category-fill"></i>
+                分类
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/tags/">
+                <i class="iconfont icon-tags-fill"></i>
+                标签
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/about/">
+                <i class="iconfont icon-user-fill"></i>
+                关于
+              </a>
+            </li>
+          
+        
+        
+          <li class="nav-item" id="search-btn">
+            <a class="nav-link" target="_self" href="javascript:;" data-toggle="modal" data-target="#modalSearch" aria-label="Search">
+              &nbsp;<i class="iconfont icon-search"></i>&nbsp;
+            </a>
+          </li>
+        
+        
+          <li class="nav-item" id="color-toggle-btn">
+            <a class="nav-link" target="_self" href="javascript:;" aria-label="Color Toggle">&nbsp;<i
+                class="iconfont icon-dark" id="color-toggle-icon"></i>&nbsp;</a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+</nav>
+
+    <div class="banner" id="banner" parallax=true
+         style="background: url('/img/default.png') no-repeat center center;
+           background-size: cover;">
+      <div class="full-bg-img">
+        <div class="mask flex-center" style="background-color: rgba(0, 0, 0, 0.3)">
+          <div class="page-header text-center fade-in-up">
+            <span class="h2" id="subtitle" title="dwr框架代码审计">
+              
+            </span>
+
+            
+              <div class="mt-3">
+  
+  
+    <span class="post-meta">
+      <i class="iconfont icon-date-fill" aria-hidden="true"></i>
+      <time datetime="2021-03-01 13:30" pubdate>
+        2021年3月1日 下午
+      </time>
+    </span>
+  
+</div>
+
+<div class="mt-1">
+  
+    <span class="post-meta mr-2">
+      <i class="iconfont icon-chart"></i>
+      4.4k 字
+    </span>
+  
+
+  
+    <span class="post-meta mr-2">
+      <i class="iconfont icon-clock-fill"></i>
+      
+      
+      14 分钟
+    </span>
+  
+
+  
+  
+</div>
+
+            
+          </div>
+
+          
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <main>
+    
+      
+
+<div class="container-fluid nopadding-x">
+  <div class="row nomargin-x">
+    <div class="d-none d-lg-block col-lg-2"></div>
+    <div class="col-lg-8 nopadding-x-md">
+      <div class="container nopadding-x-md" id="board-ctn">
+        <div class="py-5" id="board">
+          <article class="post-content mx-auto">
+            <!-- SEO header -->
+            <h1 style="display: none">dwr框架代码审计</h1>
+            
+            <div class="markdown-body">
+              <p>dwr框架代码审计</p>
+<hr>
+<h2 id="简述"><a href="#简述" class="headerlink" title="简述"></a>简述</h2><p>在做测试的过程中发现一个老系统提交的请求包比较奇怪，通过检索，发现是早期java web研发人员常用的DWR框架，dwr框架比较古老，可以帮助用户实现Ajax网站，可以让你在浏览器中的Javascript代码调用Web服务器上的Java，就像在Java代码就在浏览器中一样。</br><br><img src="/img/20210301-01.png" srcset="/img/loading.gif" lazyload alt="20210301-01"></p>
+<p>DWR 主要包括两部分：</p>
+<pre><code>- 在服务器上运行的 Servlet 来处理请求并把结果返回浏览器。
+- 运行在浏览器上的 Javascript，可以发送请求，并动态改变页面。
+</code></pre>
+<p>DWR 会根据你的 Java 类动态的生成Javascript代码。这些代码让你感觉整个Ajax调用都是在浏览器上发生的，但事实上是服务器执行了这些代码，DWR负责数据的传递和转换。DWR有些过时了，目前可以直接使用jquery来实现ajax请求。</p>
+<h2 id="DWR框架介绍"><a href="#DWR框架介绍" class="headerlink" title="DWR框架介绍"></a>DWR框架介绍</h2><p>使用maven或者直接从官网获取jar包，将jar包放入WEB-INF的lib文件夹下。同时，dwr依赖于commons-logging.jar<br>web.xml配置文件如下：</p>
+<figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><code class="hljs xml"><span class="hljs-tag">&lt;<span class="hljs-name">servlet</span>&gt;</span><br>  <span class="hljs-tag">&lt;<span class="hljs-name">servlet-name</span>&gt;</span>dwr-invoker<span class="hljs-tag">&lt;/<span class="hljs-name">servlet-name</span>&gt;</span><br>  <span class="hljs-tag">&lt;<span class="hljs-name">servlet-class</span>&gt;</span>uk.ltd.getahead.dwr.DWRServlet<span class="hljs-tag">&lt;/<span class="hljs-name">servlet-class</span>&gt;</span><br>  <span class="hljs-tag">&lt;<span class="hljs-name">init-param</span>&gt;</span><br>    <span class="hljs-tag">&lt;<span class="hljs-name">param-name</span>&gt;</span>debug<span class="hljs-tag">&lt;/<span class="hljs-name">param-name</span>&gt;</span><br>    <span class="hljs-tag">&lt;<span class="hljs-name">param-value</span>&gt;</span>true<span class="hljs-tag">&lt;/<span class="hljs-name">param-value</span>&gt;</span><br>  <span class="hljs-tag">&lt;/<span class="hljs-name">init-param</span>&gt;</span><br><span class="hljs-tag">&lt;/<span class="hljs-name">servlet</span>&gt;</span><br> <br><span class="hljs-tag">&lt;<span class="hljs-name">servlet-mapping</span>&gt;</span><br>  <span class="hljs-tag">&lt;<span class="hljs-name">servlet-name</span>&gt;</span>dwr-invoker<span class="hljs-tag">&lt;/<span class="hljs-name">servlet-name</span>&gt;</span><br>  <span class="hljs-tag">&lt;<span class="hljs-name">url-pattern</span>&gt;</span>/dwr/*<span class="hljs-tag">&lt;/<span class="hljs-name">url-pattern</span>&gt;</span><br><span class="hljs-tag">&lt;/<span class="hljs-name">servlet-mapping</span>&gt;</span><br></code></pre></td></tr></table></figure>
+<p>dwr配置如下：</p>
+<figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><code class="hljs xml"><span class="hljs-meta">&lt;!DOCTYPE <span class="hljs-keyword">dwr</span> <span class="hljs-keyword">PUBLIC</span></span><br><span class="hljs-meta">    <span class="hljs-string">&quot;-//GetAhead Limited//DTD Direct Web Remoting 3.0//EN&quot;</span></span><br><span class="hljs-meta">    <span class="hljs-string">&quot;http://getahead.org/dwr/dwr30.dtd&quot;</span>&gt;</span><br><br><span class="hljs-tag">&lt;<span class="hljs-name">dwr</span>&gt;</span><br>  <span class="hljs-tag">&lt;<span class="hljs-name">allow</span>&gt;</span><br>    <span class="hljs-tag">&lt;<span class="hljs-name">create</span> <span class="hljs-attr">creator</span>=<span class="hljs-string">&quot;new&quot;</span> <span class="hljs-attr">javascript</span>=<span class="hljs-string">&quot;JDate&quot;</span>&gt;</span><br>      <span class="hljs-tag">&lt;<span class="hljs-name">param</span> <span class="hljs-attr">name</span>=<span class="hljs-string">&quot;class&quot;</span> <span class="hljs-attr">value</span>=<span class="hljs-string">&quot;java.util.Date&quot;</span>/&gt;</span><br>    <span class="hljs-tag">&lt;/<span class="hljs-name">create</span>&gt;</span><br>    <span class="hljs-tag">&lt;<span class="hljs-name">create</span> <span class="hljs-attr">creator</span>=<span class="hljs-string">&quot;new&quot;</span> <span class="hljs-attr">javascript</span>=<span class="hljs-string">&quot;Demo&quot;</span>&gt;</span><br>      <span class="hljs-tag">&lt;<span class="hljs-name">param</span> <span class="hljs-attr">name</span>=<span class="hljs-string">&quot;class&quot;</span> <span class="hljs-attr">value</span>=<span class="hljs-string">&quot;your.java.Bean&quot;</span>/&gt;</span><br>    <span class="hljs-tag">&lt;/<span class="hljs-name">create</span>&gt;</span><br>  <span class="hljs-tag">&lt;/<span class="hljs-name">allow</span>&gt;</span><br><span class="hljs-tag">&lt;/<span class="hljs-name">dwr</span>&gt;</span><br></code></pre></td></tr></table></figure>
+<p>dwr.xml 是 dwr 的核心配置文件，主要的标签有：&lt;converter&gt;、&lt;convert&gt;、&lt;create&gt;这三个标签。&lt;create&gt; 标签是 dwr 中重要的标签，用来描述 java（服务器端） 与 javascript （客户端）的交互方式。其基本格式如下：</p>
+<figure class="highlight abnf"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><code class="hljs abnf">&lt;allow&gt;<br>  &lt;create creator<span class="hljs-operator">=</span><span class="hljs-string">&quot;...&quot;</span> javascript<span class="hljs-operator">=</span><span class="hljs-string">&quot;...&quot;</span> scope<span class="hljs-operator">=</span><span class="hljs-string">&quot;...&quot;</span>&gt;<br>    &lt;param name<span class="hljs-operator">=</span><span class="hljs-string">&quot;...&quot;</span> value<span class="hljs-operator">=</span><span class="hljs-string">&quot;...&quot;</span>/&gt;<br>    &lt;auth method<span class="hljs-operator">=</span><span class="hljs-string">&quot;...&quot;</span> role<span class="hljs-operator">=</span><span class="hljs-string">&quot;...&quot;</span>/&gt;<br>    &lt;exclude method<span class="hljs-operator">=</span><span class="hljs-string">&quot;...&quot;</span>/&gt;<br>    &lt;include method<span class="hljs-operator">=</span><span class="hljs-string">&quot;...&quot;</span>/&gt;<br>  &lt;/create&gt;<br>  ...<br>&lt;/allow&gt;<br></code></pre></td></tr></table></figure>
+<p>其中，creator 和 javascript 是必须属性，其他可以忽略。creator 包含有以下几个值：
+　　</p>
+<ul>
+<li>new：Java用“new”关键字创造对象</li>
+<li>none：它不创建对象  (v1.1+)</li>
+<li>scripted：通过BSF使用脚本语言创建对象，例如BeanShell或Groovy</li>
+<li>spring：通过Spring框架访问Bean</li>
+<li>struts：使用Struts的FormBean  (v1.1+)</li>
+<li>jsf：使用JSF的Bean  (v1.1+)</li>
+<li>pageflow：访问Weblogic或Beehive的PageFlow  (v1.1+)</li>
+<li>ejb3：使用EJB3 session bean  (v2.0+)</li>
+</ul>
+<p>这里初学，实用java new创建对象。<br>页面配置<br>页面需要引入3个JS</p>
+<figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><code class="hljs xml"><span class="hljs-tag">&lt;<span class="hljs-name">script</span> <span class="hljs-attr">src</span>=<span class="hljs-string">&quot;&lt;%=ctxPath%&gt;/dwr/interface/Chat.js&quot;</span> <span class="hljs-attr">type</span>=<span class="hljs-string">&quot;text/javascript&quot;</span>&gt;</span><span class="hljs-tag">&lt;/<span class="hljs-name">script</span>&gt;</span><br><span class="hljs-tag">&lt;<span class="hljs-name">script</span> <span class="hljs-attr">src</span>=<span class="hljs-string">&quot;&lt;%=ctxPath%&gt;/dwr/engine.js&quot;</span> <span class="hljs-attr">type</span>=<span class="hljs-string">&quot;text/javascript&quot;</span>&gt;</span><span class="hljs-tag">&lt;/<span class="hljs-name">script</span>&gt;</span><br><span class="hljs-tag">&lt;<span class="hljs-name">script</span> <span class="hljs-attr">src</span>=<span class="hljs-string">&quot;&lt;%=ctxPath%&gt;/dwr/util.js&quot;</span> <span class="hljs-attr">type</span>=<span class="hljs-string">&quot;text/javascript&quot;</span>&gt;</span><span class="hljs-tag">&lt;/<span class="hljs-name">script</span>&gt;</span> <br></code></pre></td></tr></table></figure>
+<p>其中 engine.js 必须要，如果需要用到dwr提供的一些方便的工具要引用util.js ，然后是dwr自动生成的js文件。名字和 dwr.xml 中 create 标签的 javascript 属性值一样，且必须是 dwr&#x2F;interface 开头的目录，详细请查阅官方文档，这里不过多说明。</p>
+<h2 id="审计"><a href="#审计" class="headerlink" title="审计"></a>审计</h2><p>DWR框架对于审计人员比较友好，通过分析web.xml和dwr配置文件，我们可以迅速定位到源代码的位置。<br>首先分析web.xml<br><img src="/img/20210301-02.png" srcset="/img/loading.gif" lazyload alt="20210301-02"><br>获取dwr配置文件目录<br><img src="/img/20210301-03.png" srcset="/img/loading.gif" lazyload alt="20210301-03"><br>这里查找scriptName为：CaUsermanAjax，方法名为：getTysfyhbList的具体实现的代码。<br>本次审计的dwr框架配置文件使用spring模式，使用spring框架访问bean,并且使用dwr-signatures的配置模式，signatures段使DWR能确定集合中存放的数据类型。<br>signatures段允许我们暗示DWR应该用什么类型去处理。格式对以了解JDK5的泛型的人来说很容易理解。</p>
+<figure class="highlight coffeescript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><code class="hljs coffeescript">&lt;signatures&gt;<br>  &lt;![CDATA[<br>    <span class="hljs-keyword">import</span> java.util.<span class="hljs-built_in">Map</span>;<br>    <span class="hljs-keyword">import</span> com.zfsoft.cacommon.username.ajax.UsermanAjax;<br>    CaUsermanAjax.getYrdgxxbList(<span class="hljs-built_in">Map</span>&lt;<span class="hljs-built_in">String</span>,<span class="hljs-built_in">String</span>&gt; condition);<br>    CaUsermanAjax.getTysfyhbList(<span class="hljs-built_in">Map</span>&lt;<span class="hljs-built_in">String</span>,<span class="hljs-built_in">String</span>&gt; condition);<br>    CaUsermanAjax.getOnlineUserList(<span class="hljs-built_in">Map</span>&lt;<span class="hljs-built_in">String</span>,<span class="hljs-built_in">String</span>&gt; condition);<br>    CaUsermanAjax.getZhmmxxbList(<span class="hljs-built_in">Map</span>&lt;<span class="hljs-built_in">String</span>,<span class="hljs-built_in">String</span>&gt; condition);<br>    ]]&gt;<br>&lt;/signatures&gt; <br></code></pre></td></tr></table></figure>
+<p><signatures>标签是用来声明java方法中List、Set或者Map参数所包含的确切类，以便java代码作出判断。<br>通过查找com.zfsoft.cacommon.username.ajax.UsermanAjax对象，我们找到getTysfyhbList方法。<br><img src="/img/20210301-04.png" srcset="/img/loading.gif" lazyload alt="20210301-04"><br>通过对比捕获的数据包我们可以了解到数据包的格式<br><img src="/img/20210301-05.png" srcset="/img/loading.gif" lazyload alt="20210301-05"></p>
+<p>请求地址为:</p>
+<figure class="highlight handlebars"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs handlebars"><span class="language-xml">http://ipaddress/dwr/call/plaincall/</span><span class="hljs-template-variable">&#123;&#123; <span class="hljs-name">scriptName</span> &#125;&#125;</span><span class="language-xml">.</span><span class="hljs-template-variable">&#123;&#123; <span class="hljs-name">methodName</span> &#125;&#125;</span><span class="language-xml">.dwr</span><br></code></pre></td></tr></table></figure>
+<p>http body:</p>
+<figure class="highlight handlebars"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><code class="hljs handlebars"><span class="language-xml">callCount=1</span><br><span class="language-xml">page=</span><span class="hljs-template-variable">&#123;&#123; <span class="hljs-name">任意JSP地址均可</span> &#125;&#125;</span><span class="language-xml"></span><br><span class="language-xml">httpSessionId= </span><span class="hljs-template-variable">&#123;&#123; <span class="hljs-name">可留空</span> &#125;&#125;</span><span class="language-xml"></span><br><span class="language-xml">scriptSessionId=</span><span class="hljs-template-variable">&#123;&#123;<span class="hljs-name">Cookie中的</span> DWRSESSION&#125;&#125;</span><span class="language-xml"></span><br><span class="language-xml">c0-scriptName=</span><span class="hljs-template-variable">&#123;&#123; <span class="hljs-name">scriptName</span> &#125;&#125;</span><span class="language-xml"></span><br><span class="language-xml">c0-methodName=</span><span class="hljs-template-variable">&#123;&#123; <span class="hljs-name">methodName</span> &#125;&#125;</span><span class="language-xml"></span><br><span class="language-xml">c0-id=0</span><br><span class="language-xml">c0-e1=number:0  设置参数</span><br><span class="language-xml">c0-e2=number:15</span><br><span class="language-xml">c0-e3=string:</span><br><span class="language-xml">c0-param0=string(类型): 值 </span><span class="hljs-template-variable">&#123;&#123; <span class="hljs-name">参数</span> <span class="hljs-number">1</span>&#125;&#125;</span><span class="language-xml"></span><br><span class="language-xml">也可以写成：c0-param0=Object_Object:&#123;start:reference:c0-e1,...&#125;start是参数名，后面是参数值的来源。</span><br><span class="language-xml">batchId=0</span><br></code></pre></td></tr></table></figure>
+
+<p>回过头，我们分析本次审计的源代码，其中TysfyhbDAO对象中的list方法会返回用户的数据信息，未经过处理，直接返回数据库中存储的用户敏感信息。在请求调用的整个过程中，未发现有相关的权限校验，存在未授权访问的风险。</p>
+<h2 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h2><ul>
+<li><a target="_blank" rel="noopener" href="http://directwebremoting.org/dwr/index.html">http://directwebremoting.org/dwr/index.html</a>【dwr wiki】</li>
+<li><a target="_blank" rel="noopener" href="https://xz.aliyun.com/t/8431">https://xz.aliyun.com/t/8431</a></li>
+<li><a target="_blank" rel="noopener" href="https://xz.aliyun.com/t/2147">https://xz.aliyun.com/t/2147</a></li>
+<li><a target="_blank" rel="noopener" href="https://blog.csdn.net/smileyan9/article/details/80545795">https://blog.csdn.net/smileyan9/article/details/80545795</a></li>
+<li><a target="_blank" rel="noopener" href="https://bbs.csdn.net/topics/390981028">https://bbs.csdn.net/topics/390981028</a></li>
+</ul>
+
+            </div>
+            <hr>
+            <div>
+              <div class="post-metas mb-3">
+                
+                  <div class="post-meta mr-3">
+                    <i class="iconfont icon-category"></i>
+                    
+                      <a class="hover-with-bg" href="/categories/Security/">Security</a>
+                    
+                      <a class="hover-with-bg" href="/categories/Security/Code-Audit/">Code Audit</a>
+                    
+                  </div>
+                
+                
+                  <div class="post-meta">
+                    <i class="iconfont icon-tags"></i>
+                    
+                      <a class="hover-with-bg" href="/tags/Code/">Code</a>
+                    
+                  </div>
+                
+              </div>
+              
+                <p class="note note-warning">
+                  
+                    本博客所有文章除特别声明外，均采用 <a target="_blank" href="https://creativecommons.org/licenses/by-sa/4.0/deed.zh" rel="nofollow noopener noopener">CC BY-SA 4.0 协议</a> ，转载请注明出处！
+                  
+                </p>
+              
+              
+                <div class="post-prevnext">
+                  <article class="post-prev col-6">
+                    
+                    
+                      <a href="/2021/03/18/2021-03-18-auditing-of-secondary-development-system-based-on-django-fiamework/">
+                        <i class="iconfont icon-arrowleft"></i>
+                        <span class="hidden-mobile">记一次基于django二次开发系统业务源代码审计</span>
+                        <span class="visible-mobile">上一篇</span>
+                      </a>
+                    
+                  </article>
+                  <article class="post-next col-6">
+                    
+                    
+                      <a href="/2021/01/20/2021-01-20-code-diff/">
+                        <span class="hidden-mobile">代码审计复测代码对比技巧</span>
+                        <span class="visible-mobile">下一篇</span>
+                        <i class="iconfont icon-arrowright"></i>
+                      </a>
+                    
+                  </article>
+                </div>
+              
+            </div>
+
+            
+              <!-- Comments -->
+              <article class="comments" id="comments" lazyload>
+                
+                  
+                
+                
+  <script type="text/javascript">
+    Fluid.utils.loadComments('#comments', function() {
+      var light = 'github-light';
+      var dark = 'github-dark';
+      var schema = document.documentElement.getAttribute('data-user-color-scheme');
+      if (schema === 'dark') {
+        schema = dark;
+      } else {
+        schema = light;
+      }
+      window.UtterancesThemeLight = light;
+      window.UtterancesThemeDark = dark;
+      var s = document.createElement('script');
+      s.setAttribute('src', 'https://utteranc.es/client.js');
+      s.setAttribute('repo', 'hksanduo/commit-utterances');
+      s.setAttribute('issue-term', 'title');
+      
+      s.setAttribute('label', 'utterances');
+      
+      s.setAttribute('theme', schema);
+      s.setAttribute('crossorigin', 'anonymous');
+      document.getElementById('comments').appendChild(s);
+    })
+  </script>
+  <noscript>Please enable JavaScript to view the comments</noscript>
+
+
+              </article>
+            
+          </article>
+        </div>
+      </div>
+    </div>
+    
+      <div class="d-none d-lg-block col-lg-2 toc-container" id="toc-ctn">
+        <div id="toc">
+  <p class="toc-header"><i class="iconfont icon-list"></i>&nbsp;目录</p>
+  <div class="toc-body" id="toc-body"></div>
+</div>
+
+      </div>
+    
+  </div>
+</div>
+
+<!-- Custom -->
+
+
+    
+
+    
+      <a id="scroll-top-button" aria-label="TOP" href="#" role="button">
+        <i class="iconfont icon-arrowup" aria-hidden="true"></i>
+      </a>
+    
+
+    
+      <div class="modal fade" id="modalSearch" tabindex="-1" role="dialog" aria-labelledby="ModalLabel"
+     aria-hidden="true">
+  <div class="modal-dialog modal-dialog-scrollable modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header text-center">
+        <h4 class="modal-title w-100 font-weight-bold">搜索</h4>
+        <button type="button" id="local-search-close" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body mx-3">
+        <div class="md-form mb-5">
+          <input type="text" id="local-search-input" class="form-control validate">
+          <label data-error="x" data-success="v"
+                 for="local-search-input">关键词</label>
+        </div>
+        <div class="list-group" id="local-search-result"></div>
+      </div>
+    </div>
+  </div>
+</div>
+    
+
+    
+  </main>
+
+  <footer class="text-center mt-5 py-3">
+  <div class="footer-content">
+     <a href="https://hexo.io" target="_blank" rel="nofollow noopener"><span>Hexo</span></a> <i class="iconfont icon-love"></i> <a href="https://github.com/fluid-dev/hexo-theme-fluid" target="_blank" rel="nofollow noopener"><span>Fluid</span></a> 
+  </div>
+  
+  <div class="statistics">
+    
+    
+
+    
+      
+        <!-- 不蒜子统计PV -->
+        <span id="busuanzi_container_site_pv" style="display: none">
+            总访问量 
+            <span id="busuanzi_value_site_pv"></span>
+             次
+          </span>
+      
+      
+        <!-- 不蒜子统计UV -->
+        <span id="busuanzi_container_site_uv" style="display: none">
+            总访客数 
+            <span id="busuanzi_value_site_uv"></span>
+             人
+          </span>
+      
+    
+  </div>
+
+
+  
+
+  
+</footer>
+
+
+  <!-- SCRIPTS -->
+  
+  <script  src="https://cdn.jsdelivr.net/npm/nprogress@0/nprogress.min.js" ></script>
+  <link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/nprogress@0/nprogress.min.css" />
+
+  <script>
+    NProgress.configure({"showSpinner":false,"trickleSpeed":100})
+    NProgress.start()
+    window.addEventListener('load', function() {
+      NProgress.done();
+    })
+  </script>
+
+
+<script  src="https://cdn.jsdelivr.net/npm/jquery@3/dist/jquery.min.js" ></script>
+<script  src="https://cdn.jsdelivr.net/npm/bootstrap@4/dist/js/bootstrap.min.js" ></script>
+<script  src="/js/events.js" ></script>
+<script  src="/js/plugins.js" ></script>
+
+<!-- Plugins -->
+
+
+  <script  src="/js/local-search.js" ></script>
+
+
+
+  
+    <script  src="/js/img-lazyload.js" ></script>
+  
+
+
+
+  
+
+
+
+  
+    <script  src="https://cdn.jsdelivr.net/npm/tocbot@4/dist/tocbot.min.js" ></script>
+  
+  
+    <script  src="https://cdn.jsdelivr.net/npm/@fancyapps/fancybox@3/dist/jquery.fancybox.min.js" ></script>
+  
+  
+    <script  src="https://cdn.jsdelivr.net/npm/anchor-js@4/anchor.min.js" ></script>
+  
+  
+    <script defer src="https://cdn.jsdelivr.net/npm/clipboard@2/dist/clipboard.min.js" ></script>
+  
+
+
+
+  <script defer src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js" ></script>
+
+
+
+
+  <script  src="https://cdn.jsdelivr.net/npm/typed.js@2/lib/typed.min.js" ></script>
+  <script>
+    (function (window, document) {
+      var typing = Fluid.plugins.typing;
+      var title = document.getElementById('subtitle').title;
+      
+      typing(title)
+      
+    })(window, document);
+  </script>
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+    <!-- Google Analytics -->
+    <script defer>
+      window.ga = window.ga || function () { (ga.q = ga.q || []).push(arguments) };
+      ga.l = +new Date;
+      ga('create', 'UA-167858469-1', 'auto');
+      ga('send', 'pageview');
+    </script>
+    <script async src='https://www.google-analytics.com/analytics.js'></script>
+  
+
+  
+
+  
+
+  
+
+  
+
+
+
+
+
+<!-- 主题的启动项 保持在最底部 -->
+<script  src="/js/boot.js" ></script>
+
+
+</body>
+</html>

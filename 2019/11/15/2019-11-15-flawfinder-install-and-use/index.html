@@ -1,0 +1,561 @@
+
+
+<!DOCTYPE html>
+<html lang="zh-CN" data-default-color-scheme=auto>
+
+
+
+<head>
+  <meta charset="UTF-8">
+  <link rel="apple-touch-icon" sizes="76x76" href="/img/favicon.png">
+  <link rel="icon" href="/img/favicon.png">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, shrink-to-fit=no">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  
+  <meta name="theme-color" content="#2f4154">
+  <meta name="description" content="">
+  <meta name="author" content="sanduo">
+  <meta name="keywords" content="">
+  <meta name="description" content="Flawfinder开源C&#x2F;C++静态扫描分析工具安装与使用flawfinder的介绍Flawfinder是一款开源的关于C&#x2F;C++静态扫描分析工具，其根据内部字典数据库进行静态搜索，匹配简单的缺陷与漏洞，flawfinder工具不需要编译C&#x2F;C++代码，可以直接进行扫描分析。简单快速，最大的有点就是免费，不需要编译。flawfinder工具可以在官网进行下载。htt">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Flawfinder开源C&#x2F;C++静态扫描分析工具安装与使用">
+<meta property="og:url" content="https://hksanduo.github.io/2019/11/15/2019-11-15-flawfinder-install-and-use/index.html">
+<meta property="og:site_name" content="sanduo blog">
+<meta property="og:description" content="Flawfinder开源C&#x2F;C++静态扫描分析工具安装与使用flawfinder的介绍Flawfinder是一款开源的关于C&#x2F;C++静态扫描分析工具，其根据内部字典数据库进行静态搜索，匹配简单的缺陷与漏洞，flawfinder工具不需要编译C&#x2F;C++代码，可以直接进行扫描分析。简单快速，最大的有点就是免费，不需要编译。flawfinder工具可以在官网进行下载。htt">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://hksanduo.github.io/img/flawfinder-csv.png">
+<meta property="og:image" content="https://hksanduo.github.io/img/flawfinder-error.png">
+<meta property="og:image" content="https://hksanduo.github.io/img/flawfinder-office-advice.png">
+<meta property="og:image" content="https://hksanduo.github.io/img/flawfinder-persional-advice1.png">
+<meta property="og:image" content="https://hksanduo.github.io/img/flawfinder-persional-advice2.png">
+<meta property="article:published_time" content="2019-11-15T04:00:00.000Z">
+<meta property="article:modified_time" content="2025-01-18T14:54:10.078Z">
+<meta property="article:author" content="sanduo">
+<meta property="article:tag" content="Flawfinder">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:image" content="https://hksanduo.github.io/img/flawfinder-csv.png">
+  
+  <title>Flawfinder开源C/C++静态扫描分析工具安装与使用 - sanduo blog</title>
+
+  <link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4/dist/css/bootstrap.min.css" />
+
+
+  <link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/github-markdown-css@4/github-markdown.min.css" />
+  <link  rel="stylesheet" href="/lib/hint/hint.min.css" />
+
+  
+    
+    
+      
+      <link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/highlight.js@10/styles/github-gist.min.css" />
+    
+  
+
+  
+    <link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fancyapps/fancybox@3/dist/jquery.fancybox.min.css" />
+  
+
+
+<!-- 主题依赖的图标库，不要自行修改 -->
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1749284_ba1fz6golrf.css">
+
+
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1736178_kmeydafke9r.css">
+
+
+<link  rel="stylesheet" href="/css/main.css" />
+
+<!-- 自定义样式保持在最底部 -->
+
+
+  <script id="fluid-configs">
+    var Fluid = window.Fluid || {};
+    var CONFIG = {"hostname":"hksanduo.github.io","root":"/","version":"1.8.12","typing":{"enable":true,"typeSpeed":70,"cursorChar":"_","loop":false},"anchorjs":{"enable":true,"element":"h1,h2,h3,h4,h5,h6","placement":"right","visible":"hover","icon":""},"progressbar":{"enable":true,"height_px":3,"color":"#29d","options":{"showSpinner":false,"trickleSpeed":100}},"copy_btn":true,"image_zoom":{"enable":true,"img_url_replace":["",""]},"toc":{"enable":true,"headingSelector":"h1,h2,h3,h4,h5,h6","collapseDepth":0},"lazyload":{"enable":true,"loading_img":"/img/loading.gif","onlypost":false,"offset_factor":2},"web_analytics":{"enable":true,"baidu":null,"google":"UA-167858469-1","gtag":null,"tencent":{"sid":null,"cid":null},"woyaola":null,"cnzz":null,"leancloud":{"app_id":null,"app_key":null,"server_url":null,"path":"window.location.pathname"}},"search_path":"/local-search.xml"};
+  </script>
+  <script  src="/js/utils.js" ></script>
+  <script  src="/js/color-schema.js" ></script>
+<meta name="generator" content="Hexo 5.4.2"></head>
+
+
+<body>
+  <header style="height: 70vh;">
+    <nav id="navbar" class="navbar fixed-top  navbar-expand-lg navbar-dark scrolling-navbar">
+  <div class="container">
+    <a class="navbar-brand" href="/">
+      <strong>Welcome To Sanduo&#39;s Blog</strong>
+    </a>
+
+    <button id="navbar-toggler-btn" class="navbar-toggler" type="button" data-toggle="collapse"
+            data-target="#navbarSupportedContent"
+            aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+      <div class="animated-icon"><span></span><span></span><span></span></div>
+    </button>
+
+    <!-- Collapsible content -->
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+      <ul class="navbar-nav ml-auto text-center">
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/">
+                <i class="iconfont icon-home-fill"></i>
+                首页
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/archives/">
+                <i class="iconfont icon-archive-fill"></i>
+                归档
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/categories/">
+                <i class="iconfont icon-category-fill"></i>
+                分类
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/tags/">
+                <i class="iconfont icon-tags-fill"></i>
+                标签
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/about/">
+                <i class="iconfont icon-user-fill"></i>
+                关于
+              </a>
+            </li>
+          
+        
+        
+          <li class="nav-item" id="search-btn">
+            <a class="nav-link" target="_self" href="javascript:;" data-toggle="modal" data-target="#modalSearch" aria-label="Search">
+              &nbsp;<i class="iconfont icon-search"></i>&nbsp;
+            </a>
+          </li>
+        
+        
+          <li class="nav-item" id="color-toggle-btn">
+            <a class="nav-link" target="_self" href="javascript:;" aria-label="Color Toggle">&nbsp;<i
+                class="iconfont icon-dark" id="color-toggle-icon"></i>&nbsp;</a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+</nav>
+
+    <div class="banner" id="banner" parallax=true
+         style="background: url('/img/default.png') no-repeat center center;
+           background-size: cover;">
+      <div class="full-bg-img">
+        <div class="mask flex-center" style="background-color: rgba(0, 0, 0, 0.3)">
+          <div class="page-header text-center fade-in-up">
+            <span class="h2" id="subtitle" title="Flawfinder开源C/C++静态扫描分析工具安装与使用">
+              
+            </span>
+
+            
+              <div class="mt-3">
+  
+  
+    <span class="post-meta">
+      <i class="iconfont icon-date-fill" aria-hidden="true"></i>
+      <time datetime="2019-11-15 04:00" pubdate>
+        2019年11月15日 凌晨
+      </time>
+    </span>
+  
+</div>
+
+<div class="mt-1">
+  
+    <span class="post-meta mr-2">
+      <i class="iconfont icon-chart"></i>
+      2.9k 字
+    </span>
+  
+
+  
+    <span class="post-meta mr-2">
+      <i class="iconfont icon-clock-fill"></i>
+      
+      
+      9 分钟
+    </span>
+  
+
+  
+  
+</div>
+
+            
+          </div>
+
+          
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <main>
+    
+      
+
+<div class="container-fluid nopadding-x">
+  <div class="row nomargin-x">
+    <div class="d-none d-lg-block col-lg-2"></div>
+    <div class="col-lg-8 nopadding-x-md">
+      <div class="container nopadding-x-md" id="board-ctn">
+        <div class="py-5" id="board">
+          <article class="post-content mx-auto">
+            <!-- SEO header -->
+            <h1 style="display: none">Flawfinder开源C/C++静态扫描分析工具安装与使用</h1>
+            
+            <div class="markdown-body">
+              <h2 id="Flawfinder开源C-x2F-C-静态扫描分析工具安装与使用"><a href="#Flawfinder开源C-x2F-C-静态扫描分析工具安装与使用" class="headerlink" title="Flawfinder开源C&#x2F;C++静态扫描分析工具安装与使用"></a>Flawfinder开源C&#x2F;C++静态扫描分析工具安装与使用</h2><h2 id="flawfinder的介绍"><a href="#flawfinder的介绍" class="headerlink" title="flawfinder的介绍"></a>flawfinder的介绍</h2><p>Flawfinder是一款开源的关于C&#x2F;C++静态扫描分析工具，其根据内部字典数据库进行静态搜索，匹配简单的缺陷与漏洞，flawfinder工具不需要编译C&#x2F;C++代码，可以直接进行扫描分析。简单快速，最大的有点就是免费，不需要编译。flawfinder工具可以在官网进行下载。<br><a target="_blank" rel="noopener" href="https://dwheeler.com/flawfinder/#downloading">https://dwheeler.com/flawfinder/#downloading</a></p>
+<h2 id="flawfinder的安装"><a href="#flawfinder的安装" class="headerlink" title="flawfinder的安装"></a>flawfinder的安装</h2><h3 id="在线安装"><a href="#在线安装" class="headerlink" title="在线安装"></a>在线安装</h3><p>flawfinder安装比较简单，由于其是基于Python实现的一款工具，所以需要首先安装Python环境，并配置环境变量。flawfinder下载之后解压既可使用。flawfinder目前之前python2和python3，简单的方法是使用pip工具，执行以下指令进行安装。</p>
+<figure class="highlight cmake"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs cmake">pip <span class="hljs-keyword">install</span> flawfinder<br></code></pre></td></tr></table></figure>
+<h3 id="离线安装"><a href="#离线安装" class="headerlink" title="离线安装"></a>离线安装</h3><p>直接从flawfinder下载程序压缩包，解压完成以后，使用python直接加载flawfiner程序即可，或者直接下载flawfinder-*.whl，使用pip工具离线安装，这种通常是在一些甲方审计项目中出现，甲方客户无法协调审计设备上的管理员权限，又无法连接外网，只能使用一些免安装的工具。对于这种情况，python直接使用免安装版本，使用离线的方式使用pip安装或者使用python直接运行flawfinder,给各位审计人员一个建议，原理这些不靠谱的甲方企业。</p>
+<h2 id="flawfinder的使用"><a href="#flawfinder的使用" class="headerlink" title="flawfinder的使用"></a>flawfinder的使用</h2><p>方式一：<code>flawfinder  --csv  &gt; test-result.csv   test.c</code><br>这种方式根据缺陷库生成一个 .csv文件  ，你只需要根据这个.csv文件就可以转换为正常Excel文件使用，转换方法自行百度。<br>方式二：<code>flawfinder  --html &gt; test-result.html test.c</code></p>
+<h2 id="案例讲解"><a href="#案例讲解" class="headerlink" title="案例讲解"></a>案例讲解</h2><p>由于在日常审计过程中，项目中有其他格式的文件，通常使用linux<code>find</code>工具批量筛选.c或者.cpp文件，然后使用flawfinder进行扫描</p>
+<figure class="highlight jboss-cli"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs jboss-cli">cp <span class="hljs-params">--parents</span> `find 程序目录<span class="hljs-string">/-name</span> *<span class="hljs-string">.c</span>`  指定扫描目录<br></code></pre></td></tr></table></figure>
+<ul>
+<li>增加–parents目录主要作用是在拷贝的时候，会在目标路径中创建源文件参数中的所有父目录层级(不止是一层父目录)，然后将源文件拷贝进去。这样做的目的主要是清晰展示目录结构，方便写报告。</li>
+</ul>
+<figure class="highlight q"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs q">flawfinder --<span class="hljs-built_in">csv</span> &gt; result.<span class="hljs-built_in">csv</span> 指定扫描目录<br></code></pre></td></tr></table></figure>
+<p>导出csv文件内容展示如下<br><img src="/img/flawfinder-csv.png" srcset="/img/loading.gif" lazyload alt="flawfinder-csv.png"></p>
+<h2 id="flawfinder分析"><a href="#flawfinder分析" class="headerlink" title="flawfinder分析"></a>flawfinder分析</h2><p>Flawfinder 不是类似于fortify那样复杂的工具,它是一个简单并有意义工具。Flawfinder通过使用内置的C&#x2F;C++函数数据库来工作，该数据库具有众所周知的安全风险，例如缓冲区溢出风险（例如strcpy()，strcat()，gets()，sprintf()和scanf()），格式字符串问题（printf()，snprintf()和syslog()），竞争条件（例如access()，chown()，chgrp()，chmod()，tmpfile()，tmpnam()，tempnam()和mktemp()），潜在的远程命令执行风险（大多数exec()系列，system()，popen()）和较差的随机数获取方法（例如random()）。<br>Flawfinder的好处是不必创建相关数据库，自身就拥有相关数据库。Flawfinder获取源代码，并将源代码文本与这些名称匹配，同时忽略注释和字符串中的文本。Flawfinder还支持gettext（国际化程序的公共库），并且会将通过gettext传递的常量字符串当作常量字符串对待。这减少了国际化程序中的错误命中次数。<br>Flawfinder生成按风险分类的（潜在安全漏洞）列表；默认情况下，最危险的匹配项将首先显示。风险级别不仅取决于功能，还取决于功能的参数值。例如：在许多情况下，常量字符串通常比完全可变字符串的风险要小。在某些情况下，代码审计人员可能能够确定该结构体完全没有风险，从而减少了误报。与仅在源代码上运行“ grep”相比，Flawfinder提供了更好的信息和更好的优先级。flawfinder可以忽略注释和字符串内部，并且还将检查参数以估计风险水平。但是，从根本上来说，flawfinder仅仅是一个简单的python程序。它甚至不知道函数参数的数据类型，并且当然也不进行控制流或数据流分析。由于Flawfinder很简单，因此不会被宏定义和更复杂的工具遇到的其他奇怪问题所混淆。Flawfinder可以分析无法构建的软件；在某些情况下，它可以分析甚至无法在本地编译的文件。但是需要主要一点儿，并非发现的每个问题都是一个安全漏洞，也不一定能找到所有安全漏洞。如上所述，flawfinder不能真正理解代码的语义，它主要完成简单的文本模式匹配（忽略注释和字符串），不执行数据流或控制流分析，尽管如此，flawfinder在实际代码审计项目中也可以协助安全人员发现和消除安全漏洞。</p>
+<h2 id="错误修复"><a href="#错误修复" class="headerlink" title="错误修复"></a>错误修复</h2><h3 id="UnicodeDecodeError-‘utf-8’-codec-can’t-decode-byte-0xff-in-position-0-invalid-start-byte"><a href="#UnicodeDecodeError-‘utf-8’-codec-can’t-decode-byte-0xff-in-position-0-invalid-start-byte" class="headerlink" title="UnicodeDecodeError: ‘utf-8’ codec can’t decode byte 0xff in position 0: invalid start byte"></a>UnicodeDecodeError: ‘utf-8’ codec can’t decode byte 0xff in position 0: invalid start byte</h3><p>在运行过程中，会出现解码出错，官方给出的建议是通过强制转换扫描文档的格式为utf-8，我们可以直接忽略<br><code>UnicodeDecodeError: &#39;utf-8&#39; codec can&#39;t decode byte 0xff in position 0: invalid start byte</code><br><img src="/img/flawfinder-error.png" srcset="/img/loading.gif" lazyload alt="flawfinder-error.png"></p>
+<h4 id="官方修复建议"><a href="#官方修复建议" class="headerlink" title="官方修复建议"></a>官方修复建议</h4><p><img src="/img/flawfinder-office-advice.png" srcset="/img/loading.gif" lazyload alt="flawfinder-office-advice.png"><br>将操作系统的编码格式设置成<code>utf-8</code>，将程序编码格式强制转换为utf-8，官方推荐的工具为<code> cvt2utf</code>，可以根据实际情况自行修改。</p>
+<h4 id="个人修复建议"><a href="#个人修复建议" class="headerlink" title="个人修复建议"></a>个人修复建议</h4><p><img src="/img/flawfinder-persional-advice1.png" srcset="/img/loading.gif" lazyload alt="flawfinder-persional-advice1.png"><br>个人这个就有点儿暴力，直接在打开文件的那一步设定，如果出现错误直接忽略。flawfinder如果使用pip安装，安装的位置位于<code>/usr/local/bin/flawfinder</code>，其他安装方式，请根据实际情况进行查找。<br><img src="/img/flawfinder-persional-advice2.png" srcset="/img/loading.gif" lazyload alt="flawfinder-persional-advice2.png"></p>
+<h3 id="UnicodeDecodeError-‘ascii’-codec-can’t-decode-byte-0xe6-in-position-29-ordinal-not-in-range-128"><a href="#UnicodeDecodeError-‘ascii’-codec-can’t-decode-byte-0xe6-in-position-29-ordinal-not-in-range-128" class="headerlink" title="UnicodeDecodeError: ‘ascii’ codec can’t decode byte 0xe6 in position 29: ordinal not in range(128)"></a>UnicodeDecodeError: ‘ascii’ codec can’t decode byte 0xe6 in position 29: ordinal not in range(128)</h3><h4 id="错误原因"><a href="#错误原因" class="headerlink" title="错误原因"></a>错误原因</h4><p>提示中的“ordinal not in range(128)”，意思是，字符不在128范围内，即说明不是普通的ASCII字符，超出处理能力了。</p>
+<h4 id="解决方法"><a href="#解决方法" class="headerlink" title="解决方法"></a>解决方法</h4><p>找到flawfinder程序文件，用文本编辑器打开，在文件抬头加入以下代码。</p>
+<figure class="highlight stylus"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><code class="hljs stylus">import sys<br><span class="hljs-function"><span class="hljs-title">reload</span><span class="hljs-params">(sys)</span></span><br>sys<span class="hljs-selector-class">.setdefaultencoding</span>(<span class="hljs-string">&quot;utf-8&quot;</span>)<br></code></pre></td></tr></table></figure>
+
+<h2 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h2><ul>
+<li><a target="_blank" rel="noopener" href="https://dwheeler.com/flawfinder/">https://dwheeler.com/flawfinder/</a>【flawfinder官网】</li>
+<li><a target="_blank" rel="noopener" href="https://github.com/david-a-wheeler/flawfinder">https://github.com/david-a-wheeler/flawfinder</a>【github】</li>
+</ul>
+
+            </div>
+            <hr>
+            <div>
+              <div class="post-metas mb-3">
+                
+                  <div class="post-meta mr-3">
+                    <i class="iconfont icon-category"></i>
+                    
+                      <a class="hover-with-bg" href="/categories/Security/">Security</a>
+                    
+                      <a class="hover-with-bg" href="/categories/Security/Code-Audit/">Code Audit</a>
+                    
+                  </div>
+                
+                
+                  <div class="post-meta">
+                    <i class="iconfont icon-tags"></i>
+                    
+                      <a class="hover-with-bg" href="/tags/Flawfinder/">Flawfinder</a>
+                    
+                  </div>
+                
+              </div>
+              
+                <p class="note note-warning">
+                  
+                    本博客所有文章除特别声明外，均采用 <a target="_blank" href="https://creativecommons.org/licenses/by-sa/4.0/deed.zh" rel="nofollow noopener noopener">CC BY-SA 4.0 协议</a> ，转载请注明出处！
+                  
+                </p>
+              
+              
+                <div class="post-prevnext">
+                  <article class="post-prev col-6">
+                    
+                    
+                      <a href="/2019/12/19/2019-12-19-clean-up-a-mining-trojan-named-aliyun/">
+                        <i class="iconfont icon-arrowleft"></i>
+                        <span class="hidden-mobile">一个名叫aliyun的挖矿木马处理过程</span>
+                        <span class="visible-mobile">上一篇</span>
+                      </a>
+                    
+                  </article>
+                  <article class="post-next col-6">
+                    
+                    
+                      <a href="/2019/11/12/2019-11-12-grub-vs-grub2-bootloader/">
+                        <span class="hidden-mobile">grub vs grub2 bootloader</span>
+                        <span class="visible-mobile">下一篇</span>
+                        <i class="iconfont icon-arrowright"></i>
+                      </a>
+                    
+                  </article>
+                </div>
+              
+            </div>
+
+            
+              <!-- Comments -->
+              <article class="comments" id="comments" lazyload>
+                
+                  
+                
+                
+  <script type="text/javascript">
+    Fluid.utils.loadComments('#comments', function() {
+      var light = 'github-light';
+      var dark = 'github-dark';
+      var schema = document.documentElement.getAttribute('data-user-color-scheme');
+      if (schema === 'dark') {
+        schema = dark;
+      } else {
+        schema = light;
+      }
+      window.UtterancesThemeLight = light;
+      window.UtterancesThemeDark = dark;
+      var s = document.createElement('script');
+      s.setAttribute('src', 'https://utteranc.es/client.js');
+      s.setAttribute('repo', 'hksanduo/commit-utterances');
+      s.setAttribute('issue-term', 'title');
+      
+      s.setAttribute('label', 'utterances');
+      
+      s.setAttribute('theme', schema);
+      s.setAttribute('crossorigin', 'anonymous');
+      document.getElementById('comments').appendChild(s);
+    })
+  </script>
+  <noscript>Please enable JavaScript to view the comments</noscript>
+
+
+              </article>
+            
+          </article>
+        </div>
+      </div>
+    </div>
+    
+      <div class="d-none d-lg-block col-lg-2 toc-container" id="toc-ctn">
+        <div id="toc">
+  <p class="toc-header"><i class="iconfont icon-list"></i>&nbsp;目录</p>
+  <div class="toc-body" id="toc-body"></div>
+</div>
+
+      </div>
+    
+  </div>
+</div>
+
+<!-- Custom -->
+
+
+    
+
+    
+      <a id="scroll-top-button" aria-label="TOP" href="#" role="button">
+        <i class="iconfont icon-arrowup" aria-hidden="true"></i>
+      </a>
+    
+
+    
+      <div class="modal fade" id="modalSearch" tabindex="-1" role="dialog" aria-labelledby="ModalLabel"
+     aria-hidden="true">
+  <div class="modal-dialog modal-dialog-scrollable modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header text-center">
+        <h4 class="modal-title w-100 font-weight-bold">搜索</h4>
+        <button type="button" id="local-search-close" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body mx-3">
+        <div class="md-form mb-5">
+          <input type="text" id="local-search-input" class="form-control validate">
+          <label data-error="x" data-success="v"
+                 for="local-search-input">关键词</label>
+        </div>
+        <div class="list-group" id="local-search-result"></div>
+      </div>
+    </div>
+  </div>
+</div>
+    
+
+    
+  </main>
+
+  <footer class="text-center mt-5 py-3">
+  <div class="footer-content">
+     <a href="https://hexo.io" target="_blank" rel="nofollow noopener"><span>Hexo</span></a> <i class="iconfont icon-love"></i> <a href="https://github.com/fluid-dev/hexo-theme-fluid" target="_blank" rel="nofollow noopener"><span>Fluid</span></a> 
+  </div>
+  
+  <div class="statistics">
+    
+    
+
+    
+      
+        <!-- 不蒜子统计PV -->
+        <span id="busuanzi_container_site_pv" style="display: none">
+            总访问量 
+            <span id="busuanzi_value_site_pv"></span>
+             次
+          </span>
+      
+      
+        <!-- 不蒜子统计UV -->
+        <span id="busuanzi_container_site_uv" style="display: none">
+            总访客数 
+            <span id="busuanzi_value_site_uv"></span>
+             人
+          </span>
+      
+    
+  </div>
+
+
+  
+
+  
+</footer>
+
+
+  <!-- SCRIPTS -->
+  
+  <script  src="https://cdn.jsdelivr.net/npm/nprogress@0/nprogress.min.js" ></script>
+  <link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/nprogress@0/nprogress.min.css" />
+
+  <script>
+    NProgress.configure({"showSpinner":false,"trickleSpeed":100})
+    NProgress.start()
+    window.addEventListener('load', function() {
+      NProgress.done();
+    })
+  </script>
+
+
+<script  src="https://cdn.jsdelivr.net/npm/jquery@3/dist/jquery.min.js" ></script>
+<script  src="https://cdn.jsdelivr.net/npm/bootstrap@4/dist/js/bootstrap.min.js" ></script>
+<script  src="/js/events.js" ></script>
+<script  src="/js/plugins.js" ></script>
+
+<!-- Plugins -->
+
+
+  <script  src="/js/local-search.js" ></script>
+
+
+
+  
+    <script  src="/js/img-lazyload.js" ></script>
+  
+
+
+
+  
+
+
+
+  
+    <script  src="https://cdn.jsdelivr.net/npm/tocbot@4/dist/tocbot.min.js" ></script>
+  
+  
+    <script  src="https://cdn.jsdelivr.net/npm/@fancyapps/fancybox@3/dist/jquery.fancybox.min.js" ></script>
+  
+  
+    <script  src="https://cdn.jsdelivr.net/npm/anchor-js@4/anchor.min.js" ></script>
+  
+  
+    <script defer src="https://cdn.jsdelivr.net/npm/clipboard@2/dist/clipboard.min.js" ></script>
+  
+
+
+
+  <script defer src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js" ></script>
+
+
+
+
+  <script  src="https://cdn.jsdelivr.net/npm/typed.js@2/lib/typed.min.js" ></script>
+  <script>
+    (function (window, document) {
+      var typing = Fluid.plugins.typing;
+      var title = document.getElementById('subtitle').title;
+      
+      typing(title)
+      
+    })(window, document);
+  </script>
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+    <!-- Google Analytics -->
+    <script defer>
+      window.ga = window.ga || function () { (ga.q = ga.q || []).push(arguments) };
+      ga.l = +new Date;
+      ga('create', 'UA-167858469-1', 'auto');
+      ga('send', 'pageview');
+    </script>
+    <script async src='https://www.google-analytics.com/analytics.js'></script>
+  
+
+  
+
+  
+
+  
+
+  
+
+
+
+
+
+<!-- 主题的启动项 保持在最底部 -->
+<script  src="/js/boot.js" ></script>
+
+
+</body>
+</html>

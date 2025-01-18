@@ -1,0 +1,583 @@
+
+
+<!DOCTYPE html>
+<html lang="zh-CN" data-default-color-scheme=auto>
+
+
+
+<head>
+  <meta charset="UTF-8">
+  <link rel="apple-touch-icon" sizes="76x76" href="/img/favicon.png">
+  <link rel="icon" href="/img/favicon.png">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, shrink-to-fit=no">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  
+  <meta name="theme-color" content="#2f4154">
+  <meta name="description" content="">
+  <meta name="author" content="sanduo">
+  <meta name="keywords" content="">
+  <meta name="description" content="安装并使用checkmarx进行代码审计  背景在客户侧审计C++代码，本来前期交流已明确说明不做客户端代码审计，主要是没有太大的必要，浪费人力物力，并且对审计人员不太友好，进入现场实施发现客户极其不配合，而且盲目自信，对于这种客户我没有去说服他的勇气，只能按照他的意愿进行审计，审计正常开展，发现大量c++代码，这部分代码属于安卓客户端项目中底层的一些依赖组件，主要是安卓的native层，Nati">
+<meta property="og:type" content="article">
+<meta property="og:title" content="安装并使用checkmarx进行代码审计">
+<meta property="og:url" content="https://hksanduo.github.io/2020/10/30/2020-10-30-install-checkmarx-and-crack/index.html">
+<meta property="og:site_name" content="sanduo blog">
+<meta property="og:description" content="安装并使用checkmarx进行代码审计  背景在客户侧审计C++代码，本来前期交流已明确说明不做客户端代码审计，主要是没有太大的必要，浪费人力物力，并且对审计人员不太友好，进入现场实施发现客户极其不配合，而且盲目自信，对于这种客户我没有去说服他的勇气，只能按照他的意愿进行审计，审计正常开展，发现大量c++代码，这部分代码属于安卓客户端项目中底层的一些依赖组件，主要是安卓的native层，Nati">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://hksanduo.github.io/img/20201030-01.png">
+<meta property="og:image" content="https://hksanduo.github.io/img/20201030-02.png">
+<meta property="og:image" content="https://hksanduo.github.io/img/20201030-03.png">
+<meta property="og:image" content="https://hksanduo.github.io/img/20201030-04.png">
+<meta property="og:image" content="https://hksanduo.github.io/img/20201030-05.png">
+<meta property="og:image" content="https://hksanduo.github.io/img/20201030-06.png">
+<meta property="og:image" content="https://hksanduo.github.io/img/20201030-07.png">
+<meta property="og:image" content="https://hksanduo.github.io/img/20201030-08.png">
+<meta property="og:image" content="https://hksanduo.github.io/img/20201030-09.png">
+<meta property="og:image" content="https://hksanduo.github.io/img/20201030-10.png">
+<meta property="og:image" content="https://hksanduo.github.io/img/20201030-12.png">
+<meta property="og:image" content="https://hksanduo.github.io/img/20201030-11.png">
+<meta property="og:image" content="https://hksanduo.github.io/img/20201030-13.png">
+<meta property="og:image" content="https://hksanduo.github.io/img/20201030-14.png">
+<meta property="og:image" content="https://hksanduo.github.io/img/20201030-15.png">
+<meta property="og:image" content="https://hksanduo.github.io/img/20201030-16.png">
+<meta property="og:image" content="https://hksanduo.github.io/img/20201030-17.png">
+<meta property="og:image" content="https://hksanduo.github.io/img/20201030-18.png">
+<meta property="og:image" content="https://hksanduo.github.io/img/20201030-20.png">
+<meta property="og:image" content="https://hksanduo.github.io/img/20201030-21.png">
+<meta property="og:image" content="https://hksanduo.github.io/img/20201030-22.png">
+<meta property="og:image" content="https://hksanduo.github.io/img/20201030-23.png">
+<meta property="og:image" content="https://hksanduo.github.io/img/20201030-24.png">
+<meta property="og:image" content="https://hksanduo.github.io/img/20201030-19.png">
+<meta property="article:published_time" content="2020-10-30T08:08:00.000Z">
+<meta property="article:modified_time" content="2025-01-18T14:54:10.079Z">
+<meta property="article:author" content="sanduo">
+<meta property="article:tag" content="guide">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:image" content="https://hksanduo.github.io/img/20201030-01.png">
+  
+  <title>安装并使用checkmarx进行代码审计 - sanduo blog</title>
+
+  <link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4/dist/css/bootstrap.min.css" />
+
+
+  <link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/github-markdown-css@4/github-markdown.min.css" />
+  <link  rel="stylesheet" href="/lib/hint/hint.min.css" />
+
+  
+    
+    
+      
+      <link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/highlight.js@10/styles/github-gist.min.css" />
+    
+  
+
+  
+    <link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fancyapps/fancybox@3/dist/jquery.fancybox.min.css" />
+  
+
+
+<!-- 主题依赖的图标库，不要自行修改 -->
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1749284_ba1fz6golrf.css">
+
+
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1736178_kmeydafke9r.css">
+
+
+<link  rel="stylesheet" href="/css/main.css" />
+
+<!-- 自定义样式保持在最底部 -->
+
+
+  <script id="fluid-configs">
+    var Fluid = window.Fluid || {};
+    var CONFIG = {"hostname":"hksanduo.github.io","root":"/","version":"1.8.12","typing":{"enable":true,"typeSpeed":70,"cursorChar":"_","loop":false},"anchorjs":{"enable":true,"element":"h1,h2,h3,h4,h5,h6","placement":"right","visible":"hover","icon":""},"progressbar":{"enable":true,"height_px":3,"color":"#29d","options":{"showSpinner":false,"trickleSpeed":100}},"copy_btn":true,"image_zoom":{"enable":true,"img_url_replace":["",""]},"toc":{"enable":true,"headingSelector":"h1,h2,h3,h4,h5,h6","collapseDepth":0},"lazyload":{"enable":true,"loading_img":"/img/loading.gif","onlypost":false,"offset_factor":2},"web_analytics":{"enable":true,"baidu":null,"google":"UA-167858469-1","gtag":null,"tencent":{"sid":null,"cid":null},"woyaola":null,"cnzz":null,"leancloud":{"app_id":null,"app_key":null,"server_url":null,"path":"window.location.pathname"}},"search_path":"/local-search.xml"};
+  </script>
+  <script  src="/js/utils.js" ></script>
+  <script  src="/js/color-schema.js" ></script>
+<meta name="generator" content="Hexo 5.4.2"></head>
+
+
+<body>
+  <header style="height: 70vh;">
+    <nav id="navbar" class="navbar fixed-top  navbar-expand-lg navbar-dark scrolling-navbar">
+  <div class="container">
+    <a class="navbar-brand" href="/">
+      <strong>Welcome To Sanduo&#39;s Blog</strong>
+    </a>
+
+    <button id="navbar-toggler-btn" class="navbar-toggler" type="button" data-toggle="collapse"
+            data-target="#navbarSupportedContent"
+            aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+      <div class="animated-icon"><span></span><span></span><span></span></div>
+    </button>
+
+    <!-- Collapsible content -->
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+      <ul class="navbar-nav ml-auto text-center">
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/">
+                <i class="iconfont icon-home-fill"></i>
+                首页
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/archives/">
+                <i class="iconfont icon-archive-fill"></i>
+                归档
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/categories/">
+                <i class="iconfont icon-category-fill"></i>
+                分类
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/tags/">
+                <i class="iconfont icon-tags-fill"></i>
+                标签
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/about/">
+                <i class="iconfont icon-user-fill"></i>
+                关于
+              </a>
+            </li>
+          
+        
+        
+          <li class="nav-item" id="search-btn">
+            <a class="nav-link" target="_self" href="javascript:;" data-toggle="modal" data-target="#modalSearch" aria-label="Search">
+              &nbsp;<i class="iconfont icon-search"></i>&nbsp;
+            </a>
+          </li>
+        
+        
+          <li class="nav-item" id="color-toggle-btn">
+            <a class="nav-link" target="_self" href="javascript:;" aria-label="Color Toggle">&nbsp;<i
+                class="iconfont icon-dark" id="color-toggle-icon"></i>&nbsp;</a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+</nav>
+
+    <div class="banner" id="banner" parallax=true
+         style="background: url('/img/default.png') no-repeat center center;
+           background-size: cover;">
+      <div class="full-bg-img">
+        <div class="mask flex-center" style="background-color: rgba(0, 0, 0, 0.3)">
+          <div class="page-header text-center fade-in-up">
+            <span class="h2" id="subtitle" title="安装并使用checkmarx进行代码审计">
+              
+            </span>
+
+            
+              <div class="mt-3">
+  
+  
+    <span class="post-meta">
+      <i class="iconfont icon-date-fill" aria-hidden="true"></i>
+      <time datetime="2020-10-30 08:08" pubdate>
+        2020年10月30日 早上
+      </time>
+    </span>
+  
+</div>
+
+<div class="mt-1">
+  
+    <span class="post-meta mr-2">
+      <i class="iconfont icon-chart"></i>
+      2.5k 字
+    </span>
+  
+
+  
+    <span class="post-meta mr-2">
+      <i class="iconfont icon-clock-fill"></i>
+      
+      
+      8 分钟
+    </span>
+  
+
+  
+  
+</div>
+
+            
+          </div>
+
+          
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <main>
+    
+      
+
+<div class="container-fluid nopadding-x">
+  <div class="row nomargin-x">
+    <div class="d-none d-lg-block col-lg-2"></div>
+    <div class="col-lg-8 nopadding-x-md">
+      <div class="container nopadding-x-md" id="board-ctn">
+        <div class="py-5" id="board">
+          <article class="post-content mx-auto">
+            <!-- SEO header -->
+            <h1 style="display: none">安装并使用checkmarx进行代码审计</h1>
+            
+            <div class="markdown-body">
+              <p>安装并使用checkmarx进行代码审计</p>
+<hr>
+<h2 id="背景"><a href="#背景" class="headerlink" title="背景"></a>背景</h2><p>在客户侧审计C++代码，本来前期交流已明确说明不做客户端代码审计，主要是没有太大的必要，浪费人力物力，并且对审计人员不太友好，进入现场实施发现客户极其不配合，而且盲目自信，对于这种客户我没有去说服他的勇气，只能按照他的意愿进行审计，审计正常开展，发现大量c++代码，这部分代码属于安卓客户端项目中底层的一些依赖组件，主要是安卓的native层，Native层这部分常见一些本地服务和一些链接库等。这一层的一个特点就是通过C和C++语言实现。比如我们现在要执行一个复杂运算，如果通过java代码去实现，那么效率会非常低，此时可以选择通过C或C++代码去实现，然后和我们上层的Java代码通信（这部分在android中称为jni机制）。又比如我们的设备需要运行，那么必然要和底层的硬件驱动交互，也要通过Native层。<br>对于native层代码的话，利用难度很高，而且没法通过一个native层的接口就能确定有安全风险，只能找一下是否存在危险函数，是否有一些逻辑问题，前期准备使用fortify sca辅助分析，但是fortify sca 分析C++代码需要将分析指令加到编译指令当中，修改安卓SDK的mmma命令，将fortify sca 扫描指令加到mmma函数中，通过运行，会出现各种问题，尝试各种办法后放弃了。目前只能用flawfinder,cppcheck检查一下了，整体效果很差经，这时候想到了checkmarx,尝试了一下还行，中规中矩。<br>本篇就是一片水文，看官酌情处理。</p>
+<h2 id="准备"><a href="#准备" class="headerlink" title="准备"></a>准备</h2><p>从互联网上找到了checkmarx 8.7的按照包和激活工具，但是没有激活教程，网上也没找到，只能自己摸索着来，希望激活工具管用，百度云链接详见参考。</p>
+<p><img src="/img/20201030-01.png" srcset="/img/loading.gif" lazyload alt="20201030-01"><br>由于checkmarx耗费资源不少，使用内部的一台虚拟的windows server 2012来安装，由于某些杀软会删除checkmarx部分dll文件，需要先关闭杀软，我的这台内网服务器也没安装杀软，具体情况我也不清楚，官方安装文档中说明的，可详见Checkmarx安装说明文档8.7.pdf(该文档位于百度云压缩包中)</p>
+<h2 id="安装"><a href="#安装" class="headerlink" title="安装"></a>安装</h2><p>首先解压CxSAST.870.Release.Setup_8.7.0.57.zip，获取CxSetup.exe,使用管理员权限运行该安装文件。<br><img src="/img/20201030-02.png" srcset="/img/loading.gif" lazyload alt="20201030-02"><br>初次安装选择多合一安装就行，如果需要自定义安装，根据手册进行安装<br><img src="/img/20201030-03.png" srcset="/img/loading.gif" lazyload alt="20201030-03"></p>
+<p>基本上都是直接一路点击下一步，注意，如果有许可证书可以输入证书，如果没有证书，选择请求新许可证</p>
+<p><img src="/img/20201030-04.png" srcset="/img/loading.gif" lazyload alt="20201030-04"></p>
+<p>点击安装，静静的等待吧，除了安装checkmarx还会安装Microsoft SQL Server 2012,如果电脑上已安装过 Sql server 2012要注意，使用高级安装进行自定义安装。<br><img src="/img/20201030-05.png" srcset="/img/loading.gif" lazyload alt="20201030-05"><br><img src="/img/20201030-06.png" srcset="/img/loading.gif" lazyload alt="20201030-06"><br>安装成功<br><img src="/img/20201030-07.png" srcset="/img/loading.gif" lazyload alt="20201030-07"><br>桌面上会生成两个快捷方式<br><img src="/img/20201030-08.png" srcset="/img/loading.gif" lazyload alt="20201030-08"></p>
+<h2 id="激活"><a href="#激活" class="headerlink" title="激活"></a>激活</h2><p>这里只是个人使用，自己就是一个穷鬼，如果单位使用，强烈建议采用官方正版授权。<br>进入checkmarx的安装目录，我这里是 *** C:\Program Files\Checkmarx\ ***<br>将CheckMarx_Keygen.zip压缩包中的文件解压到 *** License Importer *** 目录下，双击运行KeyGen_Check.exe ，这里需要注意，默认授权有效期是当前时间，建议修改有效期为未来的时间，看个人喜好，授权单位随便写就行，点击生成许可，生成证书。<br><img src="/img/20201030-09.png" srcset="/img/loading.gif" lazyload alt="20201030-09"><br>然后点击修补程序<br><img src="/img/20201030-10.png" srcset="/img/loading.gif" lazyload alt="20201030-10"><br>如果提示写入文件出错，大概率是IIS，checkmarx进程在后台运行，使用任务管理器，强制关闭即可<br><img src="/img/20201030-12.png" srcset="/img/loading.gif" lazyload alt="20201030-12"><br><img src="/img/20201030-11.png" srcset="/img/loading.gif" lazyload alt="20201030-11"><br><img src="/img/20201030-13.png" srcset="/img/loading.gif" lazyload alt="20201030-13"><br>替换成功后，退出即可<br><img src="/img/20201030-14.png" srcset="/img/loading.gif" lazyload alt="20201030-14"></p>
+<p>点击License Importer目录下的CxLicenseImporter.exe，导入刚才生成的证书。<br><img src="/img/20201030-15.png" srcset="/img/loading.gif" lazyload alt="20201030-15"><br>导入成功后，启动相关服务<br><img src="/img/20201030-16.png" srcset="/img/loading.gif" lazyload alt="20201030-16"><br>确保以下这几个服务已启动，如果未启动，手动启动，如果启动出现问题，可能是证书问题，请重新生成证书。</p>
+<ul>
+<li>CxJobsManager</li>
+<li>CxScansManager</li>
+<li>CxSystemManager</li>
+<li>CxScanEngine</li>
+<li>IIS Admin Service</li>
+<li>World Wide Web Publishing Service</li>
+</ul>
+<h2 id="使用"><a href="#使用" class="headerlink" title="使用"></a>使用</h2><p>桌面上的Checkmarx Portal是checkmarx url的快捷方式，Checkmarx Audit是本地客户端，点击 Checkmarx Portal 配置checkmarx,需要等待片刻。首先进行配置管理员账号和密码，（首次登陆设置超级管理员的账号和密码，复杂度要求是要有大写小写字母数字以及标点符号，最少为9位），这个要求挺变态的。<br><img src="/img/20201030-17.png" srcset="/img/loading.gif" lazyload alt="20201030-17"><br>设置完成以后，可以登录checkmarx<br><img src="/img/20201030-18.png" srcset="/img/loading.gif" lazyload alt="20201030-18"></p>
+<p>checkmarx 使用很友好，通过创建项目，上传扫描源代码压缩包，然后等待就可以了。<br><img src="/img/20201030-20.png" srcset="/img/loading.gif" lazyload alt="20201030-20"><br><img src="/img/20201030-21.png" srcset="/img/loading.gif" lazyload alt="20201030-21"><br>点击Finish按钮后，进入查询界面，自动开始扫描源代码，checkmarx Audit 的使用和此类似。<br><img src="/img/20201030-22.png" srcset="/img/loading.gif" lazyload alt="20201030-22"><br>扫描结果可以通过扫描列表查看，点击预览，可以查看详细的扫描信息，操作比较友好，不懂的可以随便点点就行了，步步高点火机，那里不会点那里。<br><img src="/img/20201030-23.png" srcset="/img/loading.gif" lazyload alt="20201030-23"><br><img src="/img/20201030-24.png" srcset="/img/loading.gif" lazyload alt="20201030-24"></p>
+<h2 id="配置"><a href="#配置" class="headerlink" title="配置"></a>配置</h2><p>主要是配置以下默认语言，其他按需配置，依次点击Management-&gt;Application Settings -&gt; General，点击最下面的edit按钮进行编辑。<br><img src="/img/20201030-19.png" srcset="/img/loading.gif" lazyload alt="20201030-19"></p>
+<h2 id="遇到的错误"><a href="#遇到的错误" class="headerlink" title="遇到的错误"></a>遇到的错误</h2><p>我遇到的错误就是使用激活软件未修改授权有效期，只生成了当天的证书，当我第二天准备再试用一下，发现checkmarx多个进程无法启动，强制启动就会报错，相当尴尬，找了半天才发现是证书授权问题，好多时间被浪费了。</p>
+<h3 id="20220331-更新"><a href="#20220331-更新" class="headerlink" title="20220331 更新"></a>20220331 更新</h3><p>有同学加我好友询问安装包解压密码，密码在《Checkmarx安装说明文档8.7.pdf》文档当中，checkmarx在互联网企业中使用的较多，博主从20年到现在，使用checkmarx比较少，并且尚未获取到最新的checkmarx安装版本，据某大厂的朋友说，由于checkmarx的规则一般，但是检测引擎集相关配套设施比较不错，他们自行在优化规则。</p>
+<h2 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h2><ul>
+<li><a target="_blank" rel="noopener" href="https://pan.baidu.com/s/1mQjsUTWuhRuQyXvHL5smzQ">链接：https://pan.baidu.com/s/1mQjsUTWuhRuQyXvHL5smzQ 提取码：vlfk </a>【checkmarx 百度云】</li>
+</ul>
+
+            </div>
+            <hr>
+            <div>
+              <div class="post-metas mb-3">
+                
+                  <div class="post-meta mr-3">
+                    <i class="iconfont icon-category"></i>
+                    
+                      <a class="hover-with-bg" href="/categories/Code-Audit/">Code Audit</a>
+                    
+                      <a class="hover-with-bg" href="/categories/Code-Audit/Security/">Security</a>
+                    
+                  </div>
+                
+                
+                  <div class="post-meta">
+                    <i class="iconfont icon-tags"></i>
+                    
+                      <a class="hover-with-bg" href="/tags/guide/">guide</a>
+                    
+                  </div>
+                
+              </div>
+              
+                <p class="note note-warning">
+                  
+                    本博客所有文章除特别声明外，均采用 <a target="_blank" href="https://creativecommons.org/licenses/by-sa/4.0/deed.zh" rel="nofollow noopener noopener">CC BY-SA 4.0 协议</a> ，转载请注明出处！
+                  
+                </p>
+              
+              
+                <div class="post-prevnext">
+                  <article class="post-prev col-6">
+                    
+                    
+                      <a href="/2020/12/15/2020-12-15-personal-life/">
+                        <i class="iconfont icon-arrowleft"></i>
+                        <span class="hidden-mobile">这大概就是生活</span>
+                        <span class="visible-mobile">上一篇</span>
+                      </a>
+                    
+                  </article>
+                  <article class="post-next col-6">
+                    
+                    
+                      <a href="/2020/09/20/2020-09-20-backup-and-recure-os-with-mondo/">
+                        <span class="hidden-mobile">使用mondo备份恢复Linux操作系统</span>
+                        <span class="visible-mobile">下一篇</span>
+                        <i class="iconfont icon-arrowright"></i>
+                      </a>
+                    
+                  </article>
+                </div>
+              
+            </div>
+
+            
+              <!-- Comments -->
+              <article class="comments" id="comments" lazyload>
+                
+                  
+                
+                
+  <script type="text/javascript">
+    Fluid.utils.loadComments('#comments', function() {
+      var light = 'github-light';
+      var dark = 'github-dark';
+      var schema = document.documentElement.getAttribute('data-user-color-scheme');
+      if (schema === 'dark') {
+        schema = dark;
+      } else {
+        schema = light;
+      }
+      window.UtterancesThemeLight = light;
+      window.UtterancesThemeDark = dark;
+      var s = document.createElement('script');
+      s.setAttribute('src', 'https://utteranc.es/client.js');
+      s.setAttribute('repo', 'hksanduo/commit-utterances');
+      s.setAttribute('issue-term', 'title');
+      
+      s.setAttribute('label', 'utterances');
+      
+      s.setAttribute('theme', schema);
+      s.setAttribute('crossorigin', 'anonymous');
+      document.getElementById('comments').appendChild(s);
+    })
+  </script>
+  <noscript>Please enable JavaScript to view the comments</noscript>
+
+
+              </article>
+            
+          </article>
+        </div>
+      </div>
+    </div>
+    
+      <div class="d-none d-lg-block col-lg-2 toc-container" id="toc-ctn">
+        <div id="toc">
+  <p class="toc-header"><i class="iconfont icon-list"></i>&nbsp;目录</p>
+  <div class="toc-body" id="toc-body"></div>
+</div>
+
+      </div>
+    
+  </div>
+</div>
+
+<!-- Custom -->
+
+
+    
+
+    
+      <a id="scroll-top-button" aria-label="TOP" href="#" role="button">
+        <i class="iconfont icon-arrowup" aria-hidden="true"></i>
+      </a>
+    
+
+    
+      <div class="modal fade" id="modalSearch" tabindex="-1" role="dialog" aria-labelledby="ModalLabel"
+     aria-hidden="true">
+  <div class="modal-dialog modal-dialog-scrollable modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header text-center">
+        <h4 class="modal-title w-100 font-weight-bold">搜索</h4>
+        <button type="button" id="local-search-close" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body mx-3">
+        <div class="md-form mb-5">
+          <input type="text" id="local-search-input" class="form-control validate">
+          <label data-error="x" data-success="v"
+                 for="local-search-input">关键词</label>
+        </div>
+        <div class="list-group" id="local-search-result"></div>
+      </div>
+    </div>
+  </div>
+</div>
+    
+
+    
+  </main>
+
+  <footer class="text-center mt-5 py-3">
+  <div class="footer-content">
+     <a href="https://hexo.io" target="_blank" rel="nofollow noopener"><span>Hexo</span></a> <i class="iconfont icon-love"></i> <a href="https://github.com/fluid-dev/hexo-theme-fluid" target="_blank" rel="nofollow noopener"><span>Fluid</span></a> 
+  </div>
+  
+  <div class="statistics">
+    
+    
+
+    
+      
+        <!-- 不蒜子统计PV -->
+        <span id="busuanzi_container_site_pv" style="display: none">
+            总访问量 
+            <span id="busuanzi_value_site_pv"></span>
+             次
+          </span>
+      
+      
+        <!-- 不蒜子统计UV -->
+        <span id="busuanzi_container_site_uv" style="display: none">
+            总访客数 
+            <span id="busuanzi_value_site_uv"></span>
+             人
+          </span>
+      
+    
+  </div>
+
+
+  
+
+  
+</footer>
+
+
+  <!-- SCRIPTS -->
+  
+  <script  src="https://cdn.jsdelivr.net/npm/nprogress@0/nprogress.min.js" ></script>
+  <link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/nprogress@0/nprogress.min.css" />
+
+  <script>
+    NProgress.configure({"showSpinner":false,"trickleSpeed":100})
+    NProgress.start()
+    window.addEventListener('load', function() {
+      NProgress.done();
+    })
+  </script>
+
+
+<script  src="https://cdn.jsdelivr.net/npm/jquery@3/dist/jquery.min.js" ></script>
+<script  src="https://cdn.jsdelivr.net/npm/bootstrap@4/dist/js/bootstrap.min.js" ></script>
+<script  src="/js/events.js" ></script>
+<script  src="/js/plugins.js" ></script>
+
+<!-- Plugins -->
+
+
+  <script  src="/js/local-search.js" ></script>
+
+
+
+  
+    <script  src="/js/img-lazyload.js" ></script>
+  
+
+
+
+  
+
+
+
+  
+    <script  src="https://cdn.jsdelivr.net/npm/tocbot@4/dist/tocbot.min.js" ></script>
+  
+  
+    <script  src="https://cdn.jsdelivr.net/npm/@fancyapps/fancybox@3/dist/jquery.fancybox.min.js" ></script>
+  
+  
+    <script  src="https://cdn.jsdelivr.net/npm/anchor-js@4/anchor.min.js" ></script>
+  
+  
+    <script defer src="https://cdn.jsdelivr.net/npm/clipboard@2/dist/clipboard.min.js" ></script>
+  
+
+
+
+  <script defer src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js" ></script>
+
+
+
+
+  <script  src="https://cdn.jsdelivr.net/npm/typed.js@2/lib/typed.min.js" ></script>
+  <script>
+    (function (window, document) {
+      var typing = Fluid.plugins.typing;
+      var title = document.getElementById('subtitle').title;
+      
+      typing(title)
+      
+    })(window, document);
+  </script>
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+    <!-- Google Analytics -->
+    <script defer>
+      window.ga = window.ga || function () { (ga.q = ga.q || []).push(arguments) };
+      ga.l = +new Date;
+      ga('create', 'UA-167858469-1', 'auto');
+      ga('send', 'pageview');
+    </script>
+    <script async src='https://www.google-analytics.com/analytics.js'></script>
+  
+
+  
+
+  
+
+  
+
+  
+
+
+
+
+
+<!-- 主题的启动项 保持在最底部 -->
+<script  src="/js/boot.js" ></script>
+
+
+</body>
+</html>
